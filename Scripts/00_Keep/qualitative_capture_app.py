@@ -62,10 +62,26 @@ POSSIBLE_SHORTLIST_FILES = [
 
 # Find the first existing shortlist file
 PLAYER_DB_FILE = None
-for file_path in POSSIBLE_SHORTLIST_FILES:
-    if file_path.exists():
-        PLAYER_DB_FILE = file_path
-        break
+
+# First, check for uploaded files in DATA_DIR (persistent storage)
+if DATA_DIR.exists():
+    for uploaded_file in DATA_DIR.glob('*.xlsx'):
+        if uploaded_file.exists():
+            PLAYER_DB_FILE = uploaded_file
+            break
+    # Also check for .xls files
+    if PLAYER_DB_FILE is None:
+        for uploaded_file in DATA_DIR.glob('*.xls'):
+            if uploaded_file.exists():
+                PLAYER_DB_FILE = uploaded_file
+                break
+
+# If no uploaded file, check local files
+if PLAYER_DB_FILE is None:
+    for file_path in POSSIBLE_SHORTLIST_FILES:
+        if file_path.exists():
+            PLAYER_DB_FILE = file_path
+            break
 
 # If no shortlist file found, try loading from conference reports
 if PLAYER_DB_FILE is None:
@@ -140,7 +156,26 @@ def load_player_info():
                                     team = row.get('Team', '')
                                     conference = row.get('Conference', '')
                                     
-                                    # If conference not in columns, try to extract from team name
+                                    # Normalize conference names (handle variations like BIG10, IVY, etc.)
+                                    if conference and pd.notna(conference):
+                                        conference_str = str(conference).upper().strip()
+                                        # Map common variations to standard names
+                                        conference_map = {
+                                            'BIG10': 'Big Ten',
+                                            'BIG 10': 'Big Ten',
+                                            'B1G': 'Big Ten',
+                                            'BIG12': 'Big 12',
+                                            'BIG 12': 'Big 12',
+                                            'IVY': 'Ivy League',
+                                            'IVY LEAGUE': 'Ivy League',
+                                            'ACC': 'ACC',
+                                            'SEC': 'SEC',
+                                            'BIG TEN': 'Big Ten',
+                                            'BIG TWELVE': 'Big 12',
+                                        }
+                                        conference = conference_map.get(conference_str, conference_str)
+                                    
+                                    # If conference not in columns or still empty, try to extract from team name
                                     if not conference or pd.isna(conference) or conference == '':
                                         team_str = str(team).upper()
                                         
@@ -149,7 +184,7 @@ def load_player_info():
                                         # SEC teams
                                         sec_teams = ['ALABAMA', 'GEORGIA', 'FLORIDA', 'LSU', 'TENNESSEE', 'ARKANSAS', 'SOUTH CAROLINA', 'MISSISSIPPI', 'MISSISSIPPI STATE', 'AUBURN', 'KENTUCKY', 'VANDERBILT', 'MISSOURI', 'TEXAS A&M']
                                         # Big Ten teams
-                                        big10_teams = ['MICHIGAN', 'OHIO STATE', 'PENN STATE', 'MICHIGAN STATE', 'WISCONSIN', 'IOWA', 'NEBRASKA', 'MINNESOTA', 'INDIANA', 'PURDUE', 'ILLINOIS', 'NORTHWESTERN', 'MARYLAND', 'RUTGERS']
+                                        big10_teams = ['MICHIGAN', 'OHIO STATE', 'PENN STATE', 'MICHIGAN STATE', 'WISCONSIN', 'IOWA', 'NEBRASKA', 'MINNESOTA', 'INDIANA', 'PURDUE', 'ILLINOIS', 'NORTHWESTERN', 'MARYLAND', 'RUTGERS', 'USC', 'UCLA']
                                         # Big 12 teams
                                         big12_teams = ['TEXAS', 'OKLAHOMA', 'KANSAS', 'BAYLOR', 'TCU', 'OKLAHOMA STATE', 'TEXAS TECH', 'IOWA STATE', 'WEST VIRGINIA', 'KANSAS STATE', 'HOUSTON', 'CINCINNATI', 'UCF', 'BYU']
                                         # Ivy League teams
@@ -642,30 +677,29 @@ def get_players_by_team(team):
             players.append(player_name)
     return sorted(players)
 
-# File uploader for player database (if file not found)
+# File uploader for player database (always show, but highlight if file exists)
+st.sidebar.markdown("### 📁 Upload Player Database")
+uploaded_file = st.sidebar.file_uploader(
+    "Upload player database (Excel file)",
+    type=['xlsx', 'xls'],
+    help="Upload a shortlist or conference report Excel file. Files are saved permanently."
+)
+
+if uploaded_file is not None:
+    # Save uploaded file to DATA_DIR (persistent storage)
+    uploaded_path = DATA_DIR / uploaded_file.name
+    with open(uploaded_path, 'wb') as f:
+        f.write(uploaded_file.getbuffer())
+    # Clear cache to reload with new file
+    load_player_database.clear()
+    load_player_info.clear()
+    st.sidebar.success(f"✅ Uploaded and saved: {uploaded_file.name}")
+    st.rerun()
+
+# Check if uploaded file exists
 UPLOADED_PLAYER_FILE = None
-if not (PLAYER_DB_FILE and PLAYER_DB_FILE.exists()):
-    st.sidebar.markdown("### 📁 Upload Player Database")
-    uploaded_file = st.sidebar.file_uploader(
-        "Upload player database (Excel file)",
-        type=['xlsx', 'xls'],
-        help="Upload a shortlist or conference report Excel file"
-    )
-    
-    if uploaded_file is not None:
-        # Save uploaded file to DATA_DIR
-        uploaded_path = DATA_DIR / uploaded_file.name
-        with open(uploaded_path, 'wb') as f:
-            f.write(uploaded_file.getbuffer())
-        UPLOADED_PLAYER_FILE = uploaded_path
-        PLAYER_DB_FILE = uploaded_path
-        # Clear cache to reload with new file
-        load_player_database.clear()
-        load_player_info.clear()
-        st.sidebar.success(f"✅ Uploaded: {uploaded_file.name}")
-        st.rerun()
-    else:
-        st.sidebar.error("⚠️ No player database file found!\n\nPlease upload a player database file above, or ensure one of these files exists:\n- Portland Thorns 2025 Long Shortlist.xlsx\n- Portland Thorns 2025 Short Shortlist.xlsx\n- AI Shortlist.xlsx\n- Conference Reports")
+if PLAYER_DB_FILE and PLAYER_DB_FILE.exists() and DATA_DIR in PLAYER_DB_FILE.parents:
+    UPLOADED_PLAYER_FILE = PLAYER_DB_FILE
 
 # Display loading status in sidebar
 if PLAYER_DB_FILE and PLAYER_DB_FILE.exists():
