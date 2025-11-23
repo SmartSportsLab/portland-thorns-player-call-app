@@ -32,10 +32,22 @@ st.set_page_config(
     layout="wide"
 )
 
-# Data storage
-BASE_DIR = Path('/Users/daniel/Documents/Smart Sports Lab/Football/Sports Data Campus/Portland Thorns/Data/Advanced Search')
+# Data storage - use relative paths for Streamlit Cloud compatibility
+# On Streamlit Cloud, the app runs from the repo root
+# For local development, detect the base directory from script location
+_script_dir = Path(__file__).parent
+# Check if we're in the expected local directory structure
+_local_base = _script_dir.parent.parent.parent.parent
+if _local_base.exists() and (_local_base / 'Portland Thorns 2025 Long Shortlist.xlsx').exists():
+    # Local development - use detected path
+    BASE_DIR = _local_base
+else:
+    # Streamlit Cloud or other environment - use current directory
+    BASE_DIR = Path('.')
+
 DATA_DIR = BASE_DIR / 'Qualitative_Data'
-DATA_DIR.mkdir(exist_ok=True)
+# Create directory and parents if they don't exist
+DATA_DIR.mkdir(parents=True, exist_ok=True)
 CALL_LOG_FILE = DATA_DIR / 'call_log.csv'
 AGENT_DB_FILE = DATA_DIR / 'agents.csv'
 DRAFT_FILE = DATA_DIR / 'call_log_draft.json'
