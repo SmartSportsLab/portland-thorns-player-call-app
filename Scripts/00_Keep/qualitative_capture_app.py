@@ -68,6 +68,88 @@ TRANSLATIONS = {
         'step3_desc': 'PDF and CSV files available after saving. View call history anytime.',
         'step4': 'View Player Overviews',
         'step4_desc': 'Upload PDF overviews or view existing ones. Compare players across metrics.',
+        # Form labels
+        'log_new_call': 'Log New Call',
+        'player_not_in_database': 'Player not in database',
+        'player_name': 'Player Name',
+        'enter_player_name': 'Enter player name',
+        'conference': 'Conference',
+        'team': 'Team',
+        'position': 'Position',
+        'search_player': 'Search Player',
+        'call_date': 'Call Date',
+        'call_type': 'Call Type',
+        'duration_minutes': 'Duration (minutes)',
+        'participants': 'Participants',
+        'list_participants': 'List all participants in the call',
+        'call_notes': 'Call Notes',
+        'general_notes': 'General notes about the call',
+        'agent_assessment': 'Agent Assessment',
+        'agent_name': 'Agent Name',
+        'or_enter_new_agent': 'Or enter new agent name',
+        'leave_empty_if_using_dropdown': 'Leave empty if using dropdown above',
+        'relationship': 'Relationship',
+        'relationship_other': 'Relationship (Other)',
+        'specify_if_other': "Specify if 'Other' selected",
+        'agent_professionalism': 'Agent Professionalism (1-10)',
+        'agent_responsiveness': 'Agent Responsiveness (1-10)',
+        'reasonable_expectations': 'Reasonable Expectations (1-10)',
+        'transparency_honesty': 'Transparency/Honesty (1-10)',
+        'negotiation_style': 'Negotiation Style (1-10)',
+        'negotiation_help': '1 = Aggressive, 10 = Collaborative',
+        'agent_notes': 'Agent Notes',
+        'player_notes_section': 'Player Notes',
+        'player_notes_field': 'Player Notes',
+        'general_notes_player': 'General notes about the player',
+        'personality_self_awareness': 'Personality & Self Awareness',
+        'how_they_carry': 'How They Carry Themselves',
+        'how_they_carry_placeholder': 'Describe how the player presents themselves',
+        'preparation_level': 'How prepared are they? (1-10)',
+        'preparation_help': 'Knowledge of Portland Thorns and readiness to ask questions',
+        'preparation_notes': 'Preparation Notes',
+        'preparation_notes_placeholder': 'What questions did they ask? What did they know?',
+        'how_they_view': 'How They View Themselves',
+        'how_they_view_placeholder': 'How does the player describe themselves?',
+        'what_important': 'What Is Important To Them',
+        'what_important_placeholder': 'What matters most to this player?',
+        'mindset_growth': 'Mindset Towards Growth',
+        'mindset_growth_placeholder': 'How do they approach learning and improvement?',
+        'has_big_injuries': 'Has Big Injuries',
+        'injury_periods': 'Injury Periods',
+        'injury_periods_placeholder': 'Describe injury history and recovery periods',
+        'personality_traits': 'Personality Traits',
+        'other_traits': 'Other traits (comma-separated)',
+        'key_talking_points_section': 'Key Talking Points',
+        'interest_level': 'Interest Level in Portland',
+        'timeline': 'Timeline',
+        'timeline_custom': 'Timeline (Custom)',
+        'enter_custom_timeline': 'Enter custom timeline',
+        'salary_expectations': 'Salary Expectations',
+        'if_discussed': 'If discussed',
+        'other_opportunities': 'Other Opportunities',
+        'other_opportunities_placeholder': 'Other teams/opportunities mentioned',
+        'key_talking_points': 'Key Talking Points',
+        'main_discussion_points': 'Main discussion points',
+        'red_flags_concerns': 'Red Flags & Concerns',
+        'severity': 'Severity',
+        'red_flags': 'Red Flags / Concerns',
+        'any_concerns': 'Any concerns or red flags',
+        'overall_assessment': 'Overall Assessment',
+        'assessment_summary': 'Assessment Summary',
+        'total_assessment_score': 'Total Assessment Score',
+        'assessment_percentage': 'Assessment Percentage',
+        'grade': 'Grade',
+        'recommendation': 'Recommendation',
+        'summary_notes': 'Summary Notes',
+        'overall_impression': 'Overall impression and summary',
+        'next_steps': 'Next Steps',
+        'follow_up_needed': 'Follow-up Needed',
+        'follow_up_date': 'Follow-up Date',
+        'action_items': 'Action Items',
+        'what_needs_happen': 'What needs to happen next?',
+        'save_call_log': 'Save Call Log',
+        'save_draft': 'Save Draft',
+        'save_progress': 'Save Progress',
     },
     'Spanish': {
         'title': 'Portland Thorns - Sistema de Registro de Llamadas',
@@ -103,6 +185,88 @@ TRANSLATIONS = {
         'step3_desc': 'Archivos PDF y CSV disponibles después de guardar. Ver historial de llamadas en cualquier momento.',
         'step4': 'Ver Resúmenes de Jugadores',
         'step4_desc': 'Sube resúmenes PDF o visualiza los existentes. Compara jugadores en todas las métricas.',
+        # Form labels
+        'log_new_call': 'Registrar Nueva Llamada',
+        'player_not_in_database': 'Jugador no está en la base de datos',
+        'player_name': 'Nombre del Jugador',
+        'enter_player_name': 'Ingresa el nombre del jugador',
+        'conference': 'Conferencia',
+        'team': 'Equipo',
+        'position': 'Posición',
+        'search_player': 'Buscar Jugador',
+        'call_date': 'Fecha de la Llamada',
+        'call_type': 'Tipo de Llamada',
+        'duration_minutes': 'Duración (minutos)',
+        'participants': 'Participantes',
+        'list_participants': 'Lista todos los participantes en la llamada',
+        'call_notes': 'Notas de la Llamada',
+        'general_notes': 'Notas generales sobre la llamada',
+        'agent_assessment': 'Evaluación del Agente',
+        'agent_name': 'Nombre del Agente',
+        'or_enter_new_agent': 'O ingresa un nuevo nombre de agente',
+        'leave_empty_if_using_dropdown': 'Deja vacío si usas el menú desplegable arriba',
+        'relationship': 'Relación',
+        'relationship_other': 'Relación (Otro)',
+        'specify_if_other': "Especifica si se seleccionó 'Otro'",
+        'agent_professionalism': 'Profesionalismo del Agente (1-10)',
+        'agent_responsiveness': 'Capacidad de Respuesta del Agente (1-10)',
+        'reasonable_expectations': 'Expectativas Razonables (1-10)',
+        'transparency_honesty': 'Transparencia/Honestidad (1-10)',
+        'negotiation_style': 'Estilo de Negociación (1-10)',
+        'negotiation_help': '1 = Agresivo, 10 = Colaborativo',
+        'agent_notes': 'Notas del Agente',
+        'player_notes_section': 'Notas del Jugador',
+        'player_notes_field': 'Notas del Jugador',
+        'general_notes_player': 'Notas generales sobre el jugador',
+        'personality_self_awareness': 'Personalidad y Autoconciencia',
+        'how_they_carry': 'Cómo Se Presentan',
+        'how_they_carry_placeholder': 'Describe cómo se presenta el jugador',
+        'preparation_level': '¿Qué tan preparados están? (1-10)',
+        'preparation_help': 'Conocimiento de Portland Thorns y disposición para hacer preguntas',
+        'preparation_notes': 'Notas de Preparación',
+        'preparation_notes_placeholder': '¿Qué preguntas hicieron? ¿Qué sabían?',
+        'how_they_view': 'Cómo Se Ven a Sí Mismos',
+        'how_they_view_placeholder': '¿Cómo se describe el jugador?',
+        'what_important': 'Qué Es Importante Para Ellos',
+        'what_important_placeholder': '¿Qué es lo más importante para este jugador?',
+        'mindset_growth': 'Mentalidad Hacia el Crecimiento',
+        'mindset_growth_placeholder': '¿Cómo abordan el aprendizaje y la mejora?',
+        'has_big_injuries': 'Tiene Lesiones Importantes',
+        'injury_periods': 'Períodos de Lesión',
+        'injury_periods_placeholder': 'Describe el historial de lesiones y períodos de recuperación',
+        'personality_traits': 'Rasgos de Personalidad',
+        'other_traits': 'Otros rasgos (separados por comas)',
+        'key_talking_points_section': 'Puntos Clave de Conversación',
+        'interest_level': 'Nivel de Interés en Portland',
+        'timeline': 'Cronograma',
+        'timeline_custom': 'Cronograma (Personalizado)',
+        'enter_custom_timeline': 'Ingresa cronograma personalizado',
+        'salary_expectations': 'Expectativas Salariales',
+        'if_discussed': 'Si se discutió',
+        'other_opportunities': 'Otras Oportunidades',
+        'other_opportunities_placeholder': 'Otros equipos/oportunidades mencionadas',
+        'key_talking_points': 'Puntos Clave de Conversación',
+        'main_discussion_points': 'Puntos principales de discusión',
+        'red_flags_concerns': 'Banderas Rojas y Preocupaciones',
+        'severity': 'Severidad',
+        'red_flags': 'Banderas Rojas / Preocupaciones',
+        'any_concerns': 'Cualquier preocupación o bandera roja',
+        'overall_assessment': 'Evaluación General',
+        'assessment_summary': 'Resumen de Evaluación',
+        'total_assessment_score': 'Puntuación Total de Evaluación',
+        'assessment_percentage': 'Porcentaje de Evaluación',
+        'grade': 'Calificación',
+        'recommendation': 'Recomendación',
+        'summary_notes': 'Notas Resumen',
+        'overall_impression': 'Impresión general y resumen',
+        'next_steps': 'Próximos Pasos',
+        'follow_up_needed': 'Seguimiento Necesario',
+        'follow_up_date': 'Fecha de Seguimiento',
+        'action_items': 'Elementos de Acción',
+        'what_needs_happen': '¿Qué necesita suceder a continuación?',
+        'save_call_log': 'Guardar Registro de Llamada',
+        'save_draft': 'Guardar Borrador',
+        'save_progress': 'Guardar Progreso',
     },
     'French': {
         'title': 'Portland Thorns - Système de Journal d\'Appels',
@@ -138,6 +302,88 @@ TRANSLATIONS = {
         'step3_desc': 'Fichiers PDF et CSV disponibles après l\'enregistrement. Consultez l\'historique des appels à tout moment.',
         'step4': 'Voir les Aperçus des Joueurs',
         'step4_desc': 'Téléchargez les aperçus PDF ou consultez les existants. Comparez les joueurs sur toutes les métriques.',
+        # Form labels
+        'log_new_call': 'Enregistrer un Nouvel Appel',
+        'player_not_in_database': 'Joueur non dans la base de données',
+        'player_name': 'Nom du Joueur',
+        'enter_player_name': 'Entrez le nom du joueur',
+        'conference': 'Conférence',
+        'team': 'Équipe',
+        'position': 'Position',
+        'search_player': 'Rechercher un Joueur',
+        'call_date': 'Date de l\'Appel',
+        'call_type': 'Type d\'Appel',
+        'duration_minutes': 'Durée (minutes)',
+        'participants': 'Participants',
+        'list_participants': 'Liste tous les participants à l\'appel',
+        'call_notes': 'Notes de l\'Appel',
+        'general_notes': 'Notes générales sur l\'appel',
+        'agent_assessment': 'Évaluation de l\'Agent',
+        'agent_name': 'Nom de l\'Agent',
+        'or_enter_new_agent': 'Ou entrez un nouveau nom d\'agent',
+        'leave_empty_if_using_dropdown': 'Laissez vide si vous utilisez le menu déroulant ci-dessus',
+        'relationship': 'Relation',
+        'relationship_other': 'Relation (Autre)',
+        'specify_if_other': "Spécifiez si 'Autre' est sélectionné",
+        'agent_professionalism': 'Professionnalisme de l\'Agent (1-10)',
+        'agent_responsiveness': 'Réactivité de l\'Agent (1-10)',
+        'reasonable_expectations': 'Attentes Raisonnables (1-10)',
+        'transparency_honesty': 'Transparence/Honnêteté (1-10)',
+        'negotiation_style': 'Style de Négociation (1-10)',
+        'negotiation_help': '1 = Agressif, 10 = Collaboratif',
+        'agent_notes': 'Notes de l\'Agent',
+        'player_notes_section': 'Notes du Joueur',
+        'player_notes_field': 'Notes du Joueur',
+        'general_notes_player': 'Notes générales sur le joueur',
+        'personality_self_awareness': 'Personnalité et Conscience de Soi',
+        'how_they_carry': 'Comment Ils Se Présentent',
+        'how_they_carry_placeholder': 'Décrivez comment le joueur se présente',
+        'preparation_level': 'À quel point sont-ils préparés? (1-10)',
+        'preparation_help': 'Connaissance de Portland Thorns et volonté de poser des questions',
+        'preparation_notes': 'Notes de Préparation',
+        'preparation_notes_placeholder': 'Quelles questions ont-ils posées? Que savaient-ils?',
+        'how_they_view': 'Comment Ils Se Voient',
+        'how_they_view_placeholder': 'Comment le joueur se décrit-il?',
+        'what_important': 'Ce Qui Est Important Pour Eux',
+        'what_important_placeholder': 'Qu\'est-ce qui compte le plus pour ce joueur?',
+        'mindset_growth': 'Mentalité envers la Croissance',
+        'mindset_growth_placeholder': 'Comment abordent-ils l\'apprentissage et l\'amélioration?',
+        'has_big_injuries': 'A des Blessures Importantes',
+        'injury_periods': 'Périodes de Blessure',
+        'injury_periods_placeholder': 'Décrivez l\'historique des blessures et les périodes de récupération',
+        'personality_traits': 'Traits de Personnalité',
+        'other_traits': 'Autres traits (séparés par des virgules)',
+        'key_talking_points_section': 'Points Clés de Discussion',
+        'interest_level': 'Niveau d\'Intérêt pour Portland',
+        'timeline': 'Calendrier',
+        'timeline_custom': 'Calendrier (Personnalisé)',
+        'enter_custom_timeline': 'Entrez un calendrier personnalisé',
+        'salary_expectations': 'Attentes Salariales',
+        'if_discussed': 'Si discuté',
+        'other_opportunities': 'Autres Opportunités',
+        'other_opportunities_placeholder': 'Autres équipes/opportunités mentionnées',
+        'key_talking_points': 'Points Clés de Discussion',
+        'main_discussion_points': 'Points principaux de discussion',
+        'red_flags_concerns': 'Drapeaux Rouges et Préoccupations',
+        'severity': 'Gravité',
+        'red_flags': 'Drapeaux Rouges / Préoccupations',
+        'any_concerns': 'Toute préoccupation ou drapeau rouge',
+        'overall_assessment': 'Évaluation Globale',
+        'assessment_summary': 'Résumé de l\'Évaluation',
+        'total_assessment_score': 'Score Total d\'Évaluation',
+        'assessment_percentage': 'Pourcentage d\'Évaluation',
+        'grade': 'Note',
+        'recommendation': 'Recommandation',
+        'summary_notes': 'Notes de Résumé',
+        'overall_impression': 'Impression générale et résumé',
+        'next_steps': 'Prochaines Étapes',
+        'follow_up_needed': 'Suivi Nécessaire',
+        'follow_up_date': 'Date de Suivi',
+        'action_items': 'Éléments d\'Action',
+        'what_needs_happen': 'Que faut-il faire ensuite?',
+        'save_call_log': 'Enregistrer le Journal d\'Appel',
+        'save_draft': 'Enregistrer le Brouillon',
+        'save_progress': 'Enregistrer le Progrès',
     },
     'Portuguese': {
         'title': 'Portland Thorns - Sistema de Registro de Chamadas',
@@ -173,6 +419,88 @@ TRANSLATIONS = {
         'step3_desc': 'Arquivos PDF e CSV disponíveis após salvar. Veja o histórico de chamadas a qualquer momento.',
         'step4': 'Ver Visões Gerais dos Jogadores',
         'step4_desc': 'Carregue visões gerais PDF ou visualize as existentes. Compare jogadores em todas as métricas.',
+        # Form labels
+        'log_new_call': 'Registrar Nova Chamada',
+        'player_not_in_database': 'Jogador não está no banco de dados',
+        'player_name': 'Nome do Jogador',
+        'enter_player_name': 'Digite o nome do jogador',
+        'conference': 'Conferência',
+        'team': 'Time',
+        'position': 'Posição',
+        'search_player': 'Buscar Jogador',
+        'call_date': 'Data da Chamada',
+        'call_type': 'Tipo de Chamada',
+        'duration_minutes': 'Duração (minutos)',
+        'participants': 'Participantes',
+        'list_participants': 'Liste todos os participantes na chamada',
+        'call_notes': 'Notas da Chamada',
+        'general_notes': 'Notas gerais sobre a chamada',
+        'agent_assessment': 'Avaliação do Agente',
+        'agent_name': 'Nome do Agente',
+        'or_enter_new_agent': 'Ou digite um novo nome de agente',
+        'leave_empty_if_using_dropdown': 'Deixe vazio se estiver usando o menu suspenso acima',
+        'relationship': 'Relacionamento',
+        'relationship_other': 'Relacionamento (Outro)',
+        'specify_if_other': "Especifique se 'Outro' foi selecionado",
+        'agent_professionalism': 'Profissionalismo do Agente (1-10)',
+        'agent_responsiveness': 'Capacidade de Resposta do Agente (1-10)',
+        'reasonable_expectations': 'Expectativas Razoáveis (1-10)',
+        'transparency_honesty': 'Transparência/Honestidade (1-10)',
+        'negotiation_style': 'Estilo de Negociação (1-10)',
+        'negotiation_help': '1 = Agressivo, 10 = Colaborativo',
+        'agent_notes': 'Notas do Agente',
+        'player_notes_section': 'Notas do Jogador',
+        'player_notes_field': 'Notas do Jogador',
+        'general_notes_player': 'Notas gerais sobre o jogador',
+        'personality_self_awareness': 'Personalidade e Autoconsciência',
+        'how_they_carry': 'Como Eles Se Apresentam',
+        'how_they_carry_placeholder': 'Descreva como o jogador se apresenta',
+        'preparation_level': 'Quão preparados estão? (1-10)',
+        'preparation_help': 'Conhecimento do Portland Thorns e prontidão para fazer perguntas',
+        'preparation_notes': 'Notas de Preparação',
+        'preparation_notes_placeholder': 'Quais perguntas fizeram? O que sabiam?',
+        'how_they_view': 'Como Eles Se Veem',
+        'how_they_view_placeholder': 'Como o jogador se descreve?',
+        'what_important': 'O Que É Importante Para Eles',
+        'what_important_placeholder': 'O que é mais importante para este jogador?',
+        'mindset_growth': 'Mentalidade em Relação ao Crescimento',
+        'mindset_growth_placeholder': 'Como eles abordam o aprendizado e a melhoria?',
+        'has_big_injuries': 'Tem Lesões Importantes',
+        'injury_periods': 'Períodos de Lesão',
+        'injury_periods_placeholder': 'Descreva o histórico de lesões e períodos de recuperação',
+        'personality_traits': 'Traços de Personalidade',
+        'other_traits': 'Outros traços (separados por vírgulas)',
+        'key_talking_points_section': 'Pontos Principais da Conversa',
+        'interest_level': 'Nível de Interesse em Portland',
+        'timeline': 'Cronograma',
+        'timeline_custom': 'Cronograma (Personalizado)',
+        'enter_custom_timeline': 'Digite cronograma personalizado',
+        'salary_expectations': 'Expectativas Salariais',
+        'if_discussed': 'Se discutido',
+        'other_opportunities': 'Outras Oportunidades',
+        'other_opportunities_placeholder': 'Outros times/oportunidades mencionadas',
+        'key_talking_points': 'Pontos Principais da Conversa',
+        'main_discussion_points': 'Pontos principais de discussão',
+        'red_flags_concerns': 'Bandeiras Vermelhas e Preocupações',
+        'severity': 'Severidade',
+        'red_flags': 'Bandeiras Vermelhas / Preocupações',
+        'any_concerns': 'Qualquer preocupação ou bandeira vermelha',
+        'overall_assessment': 'Avaliação Geral',
+        'assessment_summary': 'Resumo da Avaliação',
+        'total_assessment_score': 'Pontuação Total da Avaliação',
+        'assessment_percentage': 'Porcentagem da Avaliação',
+        'grade': 'Nota',
+        'recommendation': 'Recomendação',
+        'summary_notes': 'Notas Resumo',
+        'overall_impression': 'Impressão geral e resumo',
+        'next_steps': 'Próximos Passos',
+        'follow_up_needed': 'Acompanhamento Necessário',
+        'follow_up_date': 'Data de Acompanhamento',
+        'action_items': 'Itens de Ação',
+        'what_needs_happen': 'O que precisa acontecer a seguir?',
+        'save_call_log': 'Salvar Registro de Chamada',
+        'save_draft': 'Salvar Rascunho',
+        'save_progress': 'Salvar Progresso',
     },
     'German': {
         'title': 'Portland Thorns - Anrufprotokoll-System',
@@ -208,6 +536,88 @@ TRANSLATIONS = {
         'step3_desc': 'PDF- und CSV-Dateien stehen nach dem Speichern zur Verfügung. Sehen Sie den Anrufverlauf jederzeit ein.',
         'step4': 'Spieler-Übersichten Anzeigen',
         'step4_desc': 'Laden Sie PDF-Übersichten hoch oder zeigen Sie vorhandene an. Vergleichen Sie Spieler über alle Metriken.',
+        # Form labels
+        'log_new_call': 'Neuen Anruf Protokollieren',
+        'player_not_in_database': 'Spieler nicht in der Datenbank',
+        'player_name': 'Spielername',
+        'enter_player_name': 'Spielernamen eingeben',
+        'conference': 'Konferenz',
+        'team': 'Team',
+        'position': 'Position',
+        'search_player': 'Spieler Suchen',
+        'call_date': 'Anrufdatum',
+        'call_type': 'Anruftyp',
+        'duration_minutes': 'Dauer (Minuten)',
+        'participants': 'Teilnehmer',
+        'list_participants': 'Liste aller Teilnehmer am Anruf',
+        'call_notes': 'Anrufnotizen',
+        'general_notes': 'Allgemeine Notizen zum Anruf',
+        'agent_assessment': 'Agentenbewertung',
+        'agent_name': 'Agentenname',
+        'or_enter_new_agent': 'Oder neuen Agentennamen eingeben',
+        'leave_empty_if_using_dropdown': 'Leer lassen, wenn Sie das Dropdown-Menü oben verwenden',
+        'relationship': 'Beziehung',
+        'relationship_other': 'Beziehung (Andere)',
+        'specify_if_other': "Angeben, wenn 'Andere' ausgewählt wurde",
+        'agent_professionalism': 'Agentenprofessionalität (1-10)',
+        'agent_responsiveness': 'Agentenreaktionsfähigkeit (1-10)',
+        'reasonable_expectations': 'Angemessene Erwartungen (1-10)',
+        'transparency_honesty': 'Transparenz/Ehrlichkeit (1-10)',
+        'negotiation_style': 'Verhandlungsstil (1-10)',
+        'negotiation_help': '1 = Aggressiv, 10 = Kollaborativ',
+        'agent_notes': 'Agentennotizen',
+        'player_notes_section': 'Spielernotizen',
+        'player_notes_field': 'Spielernotizen',
+        'general_notes_player': 'Allgemeine Notizen zum Spieler',
+        'personality_self_awareness': 'Persönlichkeit und Selbstbewusstsein',
+        'how_they_carry': 'Wie Sie Sich Präsentieren',
+        'how_they_carry_placeholder': 'Beschreiben Sie, wie sich der Spieler präsentiert',
+        'preparation_level': 'Wie gut sind sie vorbereitet? (1-10)',
+        'preparation_help': 'Kenntnis von Portland Thorns und Bereitschaft, Fragen zu stellen',
+        'preparation_notes': 'Vorbereitungsnotizen',
+        'preparation_notes_placeholder': 'Welche Fragen haben sie gestellt? Was wussten sie?',
+        'how_they_view': 'Wie Sie Sich Sehen',
+        'how_they_view_placeholder': 'Wie beschreibt sich der Spieler?',
+        'what_important': 'Was Ist Wichtig Für Sie',
+        'what_important_placeholder': 'Was ist für diesen Spieler am wichtigsten?',
+        'mindset_growth': 'Einstellung zum Wachstum',
+        'mindset_growth_placeholder': 'Wie gehen sie an Lernen und Verbesserung heran?',
+        'has_big_injuries': 'Hat Große Verletzungen',
+        'injury_periods': 'Verletzungsperioden',
+        'injury_periods_placeholder': 'Beschreiben Sie die Verletzungshistorie und Erholungsperioden',
+        'personality_traits': 'Persönlichkeitsmerkmale',
+        'other_traits': 'Andere Merkmale (durch Kommas getrennt)',
+        'key_talking_points_section': 'Wichtige Gesprächspunkte',
+        'interest_level': 'Interessensniveau an Portland',
+        'timeline': 'Zeitplan',
+        'timeline_custom': 'Zeitplan (Benutzerdefiniert)',
+        'enter_custom_timeline': 'Benutzerdefinierten Zeitplan eingeben',
+        'salary_expectations': 'Gehaltserwartungen',
+        'if_discussed': 'Falls besprochen',
+        'other_opportunities': 'Andere Möglichkeiten',
+        'other_opportunities_placeholder': 'Andere Teams/Möglichkeiten erwähnt',
+        'key_talking_points': 'Wichtige Gesprächspunkte',
+        'main_discussion_points': 'Hauptdiskussionspunkte',
+        'red_flags_concerns': 'Rote Flaggen und Bedenken',
+        'severity': 'Schweregrad',
+        'red_flags': 'Rote Flaggen / Bedenken',
+        'any_concerns': 'Irgendwelche Bedenken oder rote Flaggen',
+        'overall_assessment': 'Gesamtbewertung',
+        'assessment_summary': 'Bewertungszusammenfassung',
+        'total_assessment_score': 'Gesamtbewertungspunktzahl',
+        'assessment_percentage': 'Bewertungsprozentsatz',
+        'grade': 'Note',
+        'recommendation': 'Empfehlung',
+        'summary_notes': 'Zusammenfassungsnotizen',
+        'overall_impression': 'Gesamteindruck und Zusammenfassung',
+        'next_steps': 'Nächste Schritte',
+        'follow_up_needed': 'Nachfassung Erforderlich',
+        'follow_up_date': 'Nachfassdatum',
+        'action_items': 'Aktionspunkte',
+        'what_needs_happen': 'Was muss als Nächstes passieren?',
+        'save_call_log': 'Anrufprotokoll Speichern',
+        'save_draft': 'Entwurf Speichern',
+        'save_progress': 'Fortschritt Speichern',
     },
     'Italian': {
         'title': 'Portland Thorns - Sistema di Registro Chiamate',
@@ -243,6 +653,88 @@ TRANSLATIONS = {
         'step3_desc': 'File PDF e CSV disponibili dopo il salvataggio. Visualizza la cronologia delle chiamate in qualsiasi momento.',
         'step4': 'Visualizzare Panoramiche Giocatori',
         'step4_desc': 'Carica panoramiche PDF o visualizza quelle esistenti. Confronta i giocatori su tutte le metriche.',
+        # Form labels
+        'log_new_call': 'Registrare Nuova Chiamata',
+        'player_not_in_database': 'Giocatore non nel database',
+        'player_name': 'Nome del Giocatore',
+        'enter_player_name': 'Inserisci il nome del giocatore',
+        'conference': 'Conferenza',
+        'team': 'Squadra',
+        'position': 'Posizione',
+        'search_player': 'Cerca Giocatore',
+        'call_date': 'Data della Chiamata',
+        'call_type': 'Tipo di Chiamata',
+        'duration_minutes': 'Durata (minuti)',
+        'participants': 'Partecipanti',
+        'list_participants': 'Elenca tutti i partecipanti alla chiamata',
+        'call_notes': 'Note della Chiamata',
+        'general_notes': 'Note generali sulla chiamata',
+        'agent_assessment': 'Valutazione dell\'Agente',
+        'agent_name': 'Nome dell\'Agente',
+        'or_enter_new_agent': 'O inserisci un nuovo nome di agente',
+        'leave_empty_if_using_dropdown': 'Lascia vuoto se usi il menu a discesa sopra',
+        'relationship': 'Relazione',
+        'relationship_other': 'Relazione (Altro)',
+        'specify_if_other': "Specifica se 'Altro' è stato selezionato",
+        'agent_professionalism': 'Professionalità dell\'Agente (1-10)',
+        'agent_responsiveness': 'Reattività dell\'Agente (1-10)',
+        'reasonable_expectations': 'Aspettative Ragionevoli (1-10)',
+        'transparency_honesty': 'Trasparenza/Onestà (1-10)',
+        'negotiation_style': 'Stile di Negoziazione (1-10)',
+        'negotiation_help': '1 = Aggressivo, 10 = Collaborativo',
+        'agent_notes': 'Note dell\'Agente',
+        'player_notes_section': 'Note del Giocatore',
+        'player_notes_field': 'Note del Giocatore',
+        'general_notes_player': 'Note generali sul giocatore',
+        'personality_self_awareness': 'Personalità e Autoconsapevolezza',
+        'how_they_carry': 'Come Si Presentano',
+        'how_they_carry_placeholder': 'Descrivi come si presenta il giocatore',
+        'preparation_level': 'Quanto sono preparati? (1-10)',
+        'preparation_help': 'Conoscenza di Portland Thorns e prontezza a fare domande',
+        'preparation_notes': 'Note di Preparazione',
+        'preparation_notes_placeholder': 'Che domande hanno fatto? Cosa sapevano?',
+        'how_they_view': 'Come Si Vedono',
+        'how_they_view_placeholder': 'Come si descrive il giocatore?',
+        'what_important': 'Cosa È Importante Per Loro',
+        'what_important_placeholder': 'Cosa conta di più per questo giocatore?',
+        'mindset_growth': 'Mentalità Verso la Crescita',
+        'mindset_growth_placeholder': 'Come affrontano l\'apprendimento e il miglioramento?',
+        'has_big_injuries': 'Ha Lesioni Importanti',
+        'injury_periods': 'Periodi di Lesione',
+        'injury_periods_placeholder': 'Descrivi la storia delle lesioni e i periodi di recupero',
+        'personality_traits': 'Tratti di Personalità',
+        'other_traits': 'Altri tratti (separati da virgole)',
+        'key_talking_points_section': 'Punti Chiave della Conversazione',
+        'interest_level': 'Livello di Interesse in Portland',
+        'timeline': 'Cronologia',
+        'timeline_custom': 'Cronologia (Personalizzata)',
+        'enter_custom_timeline': 'Inserisci cronologia personalizzata',
+        'salary_expectations': 'Aspettative Salariali',
+        'if_discussed': 'Se discusso',
+        'other_opportunities': 'Altre Opportunità',
+        'other_opportunities_placeholder': 'Altri team/opportunità menzionate',
+        'key_talking_points': 'Punti Chiave della Conversazione',
+        'main_discussion_points': 'Punti principali di discussione',
+        'red_flags_concerns': 'Bandiere Rosse e Preoccupazioni',
+        'severity': 'Gravità',
+        'red_flags': 'Bandiere Rosse / Preoccupazioni',
+        'any_concerns': 'Qualsiasi preoccupazione o bandiera rossa',
+        'overall_assessment': 'Valutazione Complessiva',
+        'assessment_summary': 'Riepilogo della Valutazione',
+        'total_assessment_score': 'Punteggio Totale della Valutazione',
+        'assessment_percentage': 'Percentuale della Valutazione',
+        'grade': 'Voto',
+        'recommendation': 'Raccomandazione',
+        'summary_notes': 'Note di Riepilogo',
+        'overall_impression': 'Impressione generale e riepilogo',
+        'next_steps': 'Prossimi Passi',
+        'follow_up_needed': 'Follow-up Necessario',
+        'follow_up_date': 'Data di Follow-up',
+        'action_items': 'Elementi di Azione',
+        'what_needs_happen': 'Cosa deve succedere dopo?',
+        'save_call_log': 'Salva Registro Chiamata',
+        'save_draft': 'Salva Bozza',
+        'save_progress': 'Salva Progresso',
     },
 }
 
@@ -1074,14 +1566,14 @@ if page == "Log New Call":
         
         st.markdown("---")
     
-    st.header("📞 Log New Call")
+    st.header(f"📞 {t('log_new_call')}")
     
     # Player selection OUTSIDE form so it updates reactively
-    use_custom_player = st.checkbox("Player not in database", key="use_custom_player")
+    use_custom_player = st.checkbox(t('player_not_in_database'), key="use_custom_player")
     
     if use_custom_player:
         # Custom player entry
-        player_name = st.text_input("Player Name", key="custom_player_name", placeholder="Enter player name")
+        player_name = st.text_input(t('player_name'), key="custom_player_name", placeholder=t('enter_player_name'))
         # Clear auto-populated fields and filters for custom players
         st.session_state.selected_player_team = ''
         st.session_state.selected_player_conference = ''
@@ -1106,7 +1598,7 @@ if page == "Log New Call":
         with col_conf:
             # Conference dropdown
             conference_filter = st.selectbox(
-                "Conference",
+                t('conference'),
                 [""] + conferences_list,
                 key="filter_conference_select",
                 index=0 if not st.session_state.get('filter_conference') else (conferences_list.index(st.session_state.filter_conference) + 1 if st.session_state.filter_conference in conferences_list else 0)
@@ -1124,14 +1616,14 @@ if page == "Log New Call":
                     current_team = ''
                 
                 team_filter = st.selectbox(
-                    "Team",
+                    t('team'),
                     [""] + teams_list,
                     key="filter_team_select",
                     index=0 if not current_team else (teams_list.index(current_team) + 1 if current_team in teams_list else 0)
                 )
                 st.session_state.filter_team = team_filter
             else:
-                st.selectbox("Team", [""], key="filter_team_select_disabled", disabled=True)
+                st.selectbox(t('team'), [""], key="filter_team_select_disabled", disabled=True)
                 st.session_state.filter_team = ''
         
         # Player selection (filtered by team if selected, otherwise by conference, otherwise all)
@@ -1152,14 +1644,14 @@ if page == "Log New Call":
         # Search functionality
         col_search, col_select = st.columns([2, 3])
         with col_search:
-            player_search = st.text_input("🔍 Search Player", key="player_search")
+            player_search = st.text_input(f"🔍 {t('search_player')}", key="player_search")
         with col_select:
             if player_search:
                 filtered_players = [p for p in available_players if player_search.lower() in p.lower()]
             else:
                 filtered_players = available_players
             
-            player_name = st.selectbox("Player Name", [""] + filtered_players[:200], key="player_select")  # Increased limit since we're filtering
+            player_name = st.selectbox(t('player_name'), [""] + filtered_players[:200], key="player_select")  # Increased limit since we're filtering
     
     # Auto-populate team, conference, and position when player is selected (reactive)
     if player_name and player_name in player_info_dict:
@@ -1176,11 +1668,11 @@ if page == "Log New Call":
         # Show auto-populated info
         col_info1, col_info2, col_info3 = st.columns(3)
         with col_info1:
-            st.info(f"**Team**: {auto_team}")
+            st.info(f"**{t('team')}**: {auto_team}")
         with col_info2:
-            st.info(f"**Conference**: {auto_conference}")
+            st.info(f"**{t('conference')}**: {auto_conference}")
         with col_info3:
-            st.info(f"**Position**: {auto_position}")
+            st.info(f"**{t('position')}**: {auto_position}")
     elif not player_name:
         st.session_state.selected_player_team = ''
         st.session_state.selected_player_conference = ''
@@ -1188,11 +1680,11 @@ if page == "Log New Call":
         # Show info boxes even when no player selected
         col_info1, col_info2, col_info3 = st.columns(3)
         with col_info1:
-            st.info("**Team**: -")
+            st.info(f"**{t('team')}**: -")
         with col_info2:
-            st.info("**Conference**: -")
+            st.info(f"**{t('conference')}**: -")
         with col_info3:
-            st.info("**Position**: -")
+            st.info(f"**{t('position')}**: -")
     
     st.markdown("---")
     
@@ -1200,9 +1692,9 @@ if page == "Log New Call":
     col1, col2 = st.columns(2)
     
     with col1:
-        call_date = st.date_input("Call Date", value=st.session_state.get('form1_call_date', datetime.now().date()))
-        call_type = st.selectbox("Call Type", ["Player Call", "Agent Call", "Both"], index=["Player Call", "Agent Call", "Both"].index(st.session_state.get('form1_call_type', "Player Call")) if st.session_state.get('form1_call_type', "Player Call") in ["Player Call", "Agent Call", "Both"] else 0)
-        duration = st.number_input("Duration (minutes)", min_value=0, max_value=300, value=st.session_state.get('form1_duration', 30))
+        call_date = st.date_input(t('call_date'), value=st.session_state.get('form1_call_date', datetime.now().date()))
+        call_type = st.selectbox(t('call_type'), ["Player Call", "Agent Call", "Both"], index=["Player Call", "Agent Call", "Both"].index(st.session_state.get('form1_call_type', "Player Call")) if st.session_state.get('form1_call_type', "Player Call") in ["Player Call", "Agent Call", "Both"] else 0)
+        duration = st.number_input(t('duration_minutes'), min_value=0, max_value=300, value=st.session_state.get('form1_duration', 30))
         
         # Use filter values if manually selected, otherwise use auto-populated values from player selection
         # Priority: filter values > auto-populated > form1 values
@@ -1217,38 +1709,38 @@ if page == "Log New Call":
         position_profile = st.session_state.selected_player_position
     
     with col2:
-        participants = st.text_area("Participants", value=st.session_state.get('form1_participants', ''), placeholder="List all participants in the call")
-        call_notes = st.text_area("Call Notes", value=st.session_state.get('form1_call_notes', ''), placeholder="General notes about the call")
+        participants = st.text_area(t('participants'), value=st.session_state.get('form1_participants', ''), placeholder=t('list_participants'))
+        call_notes = st.text_area(t('call_notes'), value=st.session_state.get('form1_call_notes', ''), placeholder=t('general_notes'))
     
-    st.markdown("### Agent Assessment")
+    st.markdown(f"### {t('agent_assessment')}")
     # Agent name with dropdown + custom entry
     agent_options = [""] + agents_list
-    agent_selected = st.selectbox("Agent Name", agent_options, key="agent_select", index=agent_options.index(st.session_state.get('form1_agent_selected', '')) if st.session_state.get('form1_agent_selected', '') in agent_options else 0)
-    agent_custom = st.text_input("Or enter new agent name", value=st.session_state.get('form1_agent_custom', ''), placeholder="Leave empty if using dropdown above", key="agent_custom")
+    agent_selected = st.selectbox(t('agent_name'), agent_options, key="agent_select", index=agent_options.index(st.session_state.get('form1_agent_selected', '')) if st.session_state.get('form1_agent_selected', '') in agent_options else 0)
+    agent_custom = st.text_input(t('or_enter_new_agent'), value=st.session_state.get('form1_agent_custom', ''), placeholder=t('leave_empty_if_using_dropdown'), key="agent_custom")
     
     # Use custom if provided, otherwise use selected
     agent_name = agent_custom.strip() if agent_custom.strip() else agent_selected
     relationship = st.selectbox(
-        "Relationship",
+        t('relationship'),
         ["Professional Agent", "Family Member", "Parent", "Guardian", "Other"],
         index=["Professional Agent", "Family Member", "Parent", "Guardian", "Other"].index(st.session_state.get('form1_relationship', "Professional Agent")) if st.session_state.get('form1_relationship', "Professional Agent") in ["Professional Agent", "Family Member", "Parent", "Guardian", "Other"] else 0,
         help="Select the relationship of the person representing the player"
     )
-    relationship_other = st.text_input("Relationship (Other)", value=st.session_state.get('form1_relationship_other', ''), placeholder="Specify if 'Other' selected", disabled=(relationship != "Other"))
+    relationship_other = st.text_input(t('relationship_other'), value=st.session_state.get('form1_relationship_other', ''), placeholder=t('specify_if_other'), disabled=(relationship != "Other"))
     
     col6, col7, col8, col9, col10 = st.columns(5)
     with col6:
-        agent_professionalism = st.slider("Agent Professionalism (1-10)", 1, 10, st.session_state.get('form1_agent_professionalism', 5))
+        agent_professionalism = st.slider(t('agent_professionalism'), 1, 10, st.session_state.get('form1_agent_professionalism', 5))
     with col7:
-        agent_responsiveness = st.slider("Agent Responsiveness (1-10)", 1, 10, st.session_state.get('form1_agent_responsiveness', 5))
+        agent_responsiveness = st.slider(t('agent_responsiveness'), 1, 10, st.session_state.get('form1_agent_responsiveness', 5))
     with col8:
-        agent_expectations = st.slider("Reasonable Expectations (1-10)", 1, 10, st.session_state.get('form1_agent_expectations', 5))
+        agent_expectations = st.slider(t('reasonable_expectations'), 1, 10, st.session_state.get('form1_agent_expectations', 5))
     with col9:
-        agent_transparency = st.slider("Transparency/Honesty (1-10)", 1, 10, st.session_state.get('form1_agent_transparency', 5))
+        agent_transparency = st.slider(t('transparency_honesty'), 1, 10, st.session_state.get('form1_agent_transparency', 5))
     with col10:
-        agent_negotiation_style = st.slider("Negotiation Style (1-10)", 1, 10, st.session_state.get('form1_agent_negotiation_style', 5), help="1 = Aggressive, 10 = Collaborative")
+        agent_negotiation_style = st.slider(t('negotiation_style'), 1, 10, st.session_state.get('form1_agent_negotiation_style', 5), help=t('negotiation_help'))
     
-    agent_notes = st.text_area("Agent Notes", value=st.session_state.get('form1_agent_notes', ''))
+    agent_notes = st.text_area(t('agent_notes'), value=st.session_state.get('form1_agent_notes', ''))
     
     # Store values in session state for form submission
     st.session_state.form1_call_date = call_date
@@ -1273,76 +1765,76 @@ if page == "Log New Call":
     st.session_state.form1_agent_notes = agent_notes
     
     # Continue with remaining fields (no form wrapper for reactive updates)
-    st.markdown("### Player Notes")
-    player_notes = st.text_area("Player Notes", value=st.session_state.get('form2_player_notes', ''), placeholder="General notes about the player")
+    st.markdown(f"### {t('player_notes_section')}")
+    player_notes = st.text_area(t('player_notes_field'), value=st.session_state.get('form2_player_notes', ''), placeholder=t('general_notes_player'))
     st.session_state.form2_player_notes = player_notes
     
-    st.markdown("### Personality")
+    st.markdown(f"### {t('personality_self_awareness')}")
     how_they_carry_themselves = st.text_area(
-        "How do they carry themselves?",
-        placeholder="Describe their demeanor, presence, communication style"
+        t('how_they_carry'),
+        placeholder=t('how_they_carry_placeholder')
     )
-    preparation_level = st.slider("How prepared are they? (1-10)", 1, 10, 5, help="Knowledge of Portland Thorns and readiness to ask questions")
+    preparation_level = st.slider(t('preparation_level'), 1, 10, 5, help=t('preparation_help'))
     preparation_notes = st.text_area(
-        "Preparation Notes",
-        placeholder="What did they know about Portland? What questions did they ask?"
+        t('preparation_notes'),
+        placeholder=t('preparation_notes_placeholder')
     )
     
     st.markdown("### Self Awareness / Player Identity")
     how_they_view_themselves = st.text_area(
-        "How do they view themselves?",
-        placeholder="Their self-perception, strengths they emphasize, role they see themselves in"
+        t('how_they_view'),
+        placeholder=t('how_they_view_placeholder')
     )
     what_is_important_to_them = st.text_area(
-        "What is important to them?",
-        placeholder="Values, priorities, what matters most to them"
+        t('what_important'),
+        placeholder=t('what_important_placeholder')
     )
     mindset_towards_growth = st.text_area(
-        "What is their mindset towards growth?",
-        placeholder="Openness to feedback, learning attitude, development focus"
+        t('mindset_growth'),
+        placeholder=t('mindset_growth_placeholder')
     )
     
     st.markdown("### Injuries")
     has_big_injuries = st.selectbox(
-        "Have they had any big injuries?",
+        t('has_big_injuries'),
         ["No", "Yes", "Unknown"]
     )
     injury_periods = st.text_area(
-        "What were those periods like?",
-        placeholder="Describe the injury periods, recovery process, mental/emotional impact",
+        t('injury_periods'),
+        placeholder=t('injury_periods_placeholder'),
         disabled=(has_big_injuries != "Yes")
     )
     
-    st.markdown("### Additional Personality Traits")
+    st.markdown(f"### {t('personality_traits')}")
     personality_traits = st.multiselect(
         "Select applicable traits",
         ["Competitive", "Resilient", "Humble", "Driven", "Team-first", "Self-aware", "Confident", "Focused", "Adaptable", "Other"]
     )
-    other_traits = st.text_input("Other traits (comma-separated)")
+    other_traits = st.text_input(t('other_traits'))
     
-    st.markdown("### Key Talking Points")
-    interest_level = st.selectbox("Interest Level in Portland", ["Very High", "High", "Medium", "Low", "Very Low", "Unknown"])
+    st.markdown(f"### {t('key_talking_points_section')}")
+    interest_level = st.selectbox(t('interest_level'), ["Very High", "High", "Medium", "Low", "Very Low", "Unknown"])
     
     # Timeline dropdown with custom option
     timeline_options = ["Immediately", "3 months", "6 months", "1 year", "Other"]
-    timeline_selected = st.selectbox("Timeline", timeline_options, index=timeline_options.index(st.session_state.get('form2_timeline_selected', 'Immediately')) if st.session_state.get('form2_timeline_selected', 'Immediately') in timeline_options else 0)
+    timeline_selected = st.selectbox(t('timeline'), timeline_options, index=timeline_options.index(st.session_state.get('form2_timeline_selected', 'Immediately')) if st.session_state.get('form2_timeline_selected', 'Immediately') in timeline_options else 0)
     st.session_state.form2_timeline_selected = timeline_selected
     
     if timeline_selected == "Other":
-        timeline_custom = st.text_input("Timeline (Custom)", value=st.session_state.get('form2_timeline_custom', ''), placeholder="Enter custom timeline")
+        timeline_custom = st.text_input(t('timeline_custom'), value=st.session_state.get('form2_timeline_custom', ''), placeholder=t('enter_custom_timeline'))
         st.session_state.form2_timeline_custom = timeline_custom
         timeline = timeline_custom
     else:
         timeline = timeline_selected
         st.session_state.form2_timeline_custom = ''
     
-    salary_expectations = st.text_input("Salary Expectations", placeholder="If discussed")
-    other_opportunities = st.text_area("Other Opportunities", placeholder="Other teams/opportunities mentioned")
-    key_talking_points = st.text_area("Key Talking Points", placeholder="Main discussion points")
+    salary_expectations = st.text_input(t('salary_expectations'), placeholder=t('if_discussed'))
+    other_opportunities = st.text_area(t('other_opportunities'), placeholder=t('other_opportunities_placeholder'))
+    key_talking_points = st.text_area(t('key_talking_points'), placeholder=t('main_discussion_points'))
     
-    st.markdown("### Red Flags & Concerns")
-    red_flag_severity = st.selectbox("Severity", ["None", "Low", "Medium", "High"])
-    red_flags = st.text_area("Red Flags / Concerns", placeholder="Any concerns or red flags")
+    st.markdown(f"### {t('red_flags_concerns')}")
+    red_flag_severity = st.selectbox(t('severity'), ["None", "Low", "Medium", "High"])
+    red_flags = st.text_area(t('red_flags'), placeholder=t('any_concerns'))
     
     # Store form2 values in session state (this happens on every rerun)
     st.session_state.form2_how_they_carry_themselves = how_they_carry_themselves
@@ -1424,31 +1916,31 @@ if page == "Log New Call":
     st.session_state.assessment_percentage = assessment_percentage
     st.session_state.assessment_grade = assessment_grade
     
-    st.markdown("### Assessment Summary")
+    st.markdown(f"### {t('assessment_summary')}")
     col_score1, col_score2, col_score3 = st.columns(3)
     with col_score1:
-        st.metric("Total Assessment Score", f"{assessment_total}/{max_possible}")
+        st.metric(t('total_assessment_score'), f"{assessment_total}/{max_possible}")
     with col_score2:
-        st.metric("Assessment Percentage", f"{assessment_percentage:.1f}%")
+        st.metric(t('assessment_percentage'), f"{assessment_percentage:.1f}%")
     with col_score3:
-        st.metric("Grade", assessment_grade)
+        st.metric(t('grade'), assessment_grade)
     
-    st.markdown("### Overall Assessment")
-    recommendation = st.selectbox("Recommendation", ["Strong Yes", "Yes", "Maybe", "No", "Strong No"])
-    summary_notes = st.text_area("Summary Notes", placeholder="Overall impression and summary")
+    st.markdown(f"### {t('overall_assessment')}")
+    recommendation = st.selectbox(t('recommendation'), ["Strong Yes", "Yes", "Maybe", "No", "Strong No"])
+    summary_notes = st.text_area(t('summary_notes'), placeholder=t('overall_impression'))
     
     # Store Overall Assessment values in session state
     st.session_state.form2_recommendation = recommendation
     st.session_state.form2_summary_notes = summary_notes
     
     # Next Steps section - outside form for reactive updates
-    st.markdown("### Next Steps")
-    follow_up_needed = st.checkbox("Follow-up Needed", value=st.session_state.get('follow_up_needed', False))
+    st.markdown(f"### {t('next_steps')}")
+    follow_up_needed = st.checkbox(t('follow_up_needed'), value=st.session_state.get('follow_up_needed', False))
     st.session_state.follow_up_needed = follow_up_needed
     
     # Always show date input, but disable it when checkbox is unchecked
     follow_up_date = st.date_input(
-        "Follow-up Date", 
+        t('follow_up_date'), 
         value=st.session_state.get('follow_up_date', datetime.now().date()) if st.session_state.get('follow_up_date') else datetime.now().date(),
         disabled=not follow_up_needed
     )
@@ -1457,14 +1949,14 @@ if page == "Log New Call":
     else:
         st.session_state.follow_up_date = None
     
-    action_items = st.text_area("Action Items", value=st.session_state.get('action_items', ''), placeholder="What needs to happen next?")
+    action_items = st.text_area(t('action_items'), value=st.session_state.get('action_items', ''), placeholder=t('what_needs_happen'))
     st.session_state.action_items = action_items
     
     # Sticky Save Draft button in sidebar (always visible as user scrolls)
     with st.sidebar:
         st.markdown("---")
-        st.markdown("### 💾 Save Progress")
-        if st.button("💾 Save Draft", key="save_draft_btn", use_container_width=True, help="Save your progress without submitting. Data will be restored when you return."):
+        st.markdown(f"### 💾 {t('save_progress')}")
+        if st.button(f"💾 {t('save_draft')}", key="save_draft_btn", use_container_width=True, help="Save your progress without submitting. Data will be restored when you return."):
             if save_draft():
                 st.success("✅ Draft saved!")
         
@@ -1480,7 +1972,7 @@ if page == "Log New Call":
     
     # Final form for submission only
     with st.form("call_log_form_final"):
-        submitted = st.form_submit_button("💾 Save Call Log", use_container_width=True)
+        submitted = st.form_submit_button(f"💾 {t('save_call_log')}", use_container_width=True)
         
         if submitted:
             # Get form values from first form (stored in session state or accessed via form context)
