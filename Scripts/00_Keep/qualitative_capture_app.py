@@ -397,23 +397,23 @@ def generate_call_log_pdf(entry):
         return None
     
     try:
-        # Create PDF in memory
+        # Create PDF in memory - reduced margins to fit on one page
         pdf_buffer = BytesIO()
         doc = SimpleDocTemplate(pdf_buffer, pagesize=letter,
-                              rightMargin=0.4*inch, leftMargin=0.4*inch,
-                              topMargin=0.4*inch, bottomMargin=0.4*inch)
+                              rightMargin=0.3*inch, leftMargin=0.3*inch,
+                              topMargin=0.3*inch, bottomMargin=0.3*inch)
         
         # Container for the 'Flowable' objects
         elements = []
         
-        # Define styles
+        # Define styles - reduced sizes to fit on one page
         styles = getSampleStyleSheet()
         title_style = ParagraphStyle(
             'CustomTitle',
             parent=styles['Heading1'],
-            fontSize=16,
+            fontSize=14,
             textColor=colors.HexColor('#1f77b4'),
-            spaceAfter=12,
+            spaceAfter=8,
             borderWidth=0,
             borderPadding=0,
             borderColor=colors.HexColor('#1f77b4'),
@@ -421,61 +421,68 @@ def generate_call_log_pdf(entry):
         heading_style = ParagraphStyle(
             'CustomHeading',
             parent=styles['Heading2'],
-            fontSize=11,
+            fontSize=9,
             textColor=colors.HexColor('#333333'),
-            spaceAfter=6,
-            spaceBefore=8,
+            spaceAfter=4,
+            spaceBefore=6,
         )
         normal_style = ParagraphStyle(
             'CustomNormal',
             parent=styles['Normal'],
-            fontSize=8,
-            spaceAfter=4,
+            fontSize=7,
+            spaceAfter=2,
         )
         small_style = ParagraphStyle(
             'CustomSmall',
             parent=styles['Normal'],
-            fontSize=7,
+            fontSize=6,
             textColor=colors.HexColor('#666666'),
         )
+        
+        # Helper function to get value or N/A
+        def get_value(key, default='N/A'):
+            val = entry.get(key, default)
+            if val is None or val == '' or (isinstance(val, str) and val.strip() == ''):
+                return default
+            return str(val)
         
         # Title
         player_name = escape_text(entry.get('Player Name', 'Unknown Player'))
         title = Paragraph(f"Call Log Report - {player_name}", title_style)
         elements.append(title)
-        elements.append(Spacer(1, 0.1*inch))
+        elements.append(Spacer(1, 0.05*inch))
         
         # Call Information
         elements.append(Paragraph("Call Information", heading_style))
         call_data = [
-            ['Call Date:', escape_text(entry.get('Call Date', 'N/A')), 
-             'Call Type:', escape_text(entry.get('Call Type', 'N/A'))],
+            ['Call Date:', escape_text(get_value('Call Date')), 
+             'Call Type:', escape_text(get_value('Call Type'))],
             ['Duration:', f"{entry.get('Duration (min)', 0)} min", 
-             'Team:', escape_text(entry.get('Team', 'N/A'))],
-            ['Conference:', escape_text(entry.get('Conference', 'N/A')), 
-             'Position:', escape_text(entry.get('Position Profile', 'N/A'))],
-            ['Participants:', escape_text(entry.get('Participants', 'N/A'))],
+             'Team:', escape_text(get_value('Team'))],
+            ['Conference:', escape_text(get_value('Conference')), 
+             'Position:', escape_text(get_value('Position Profile'))],
+            ['Participants:', escape_text(get_value('Participants'))],
         ]
-        call_table = Table(call_data, colWidths=[1.2*inch, 2.3*inch, 1.2*inch, 2.3*inch])
+        call_table = Table(call_data, colWidths=[1.1*inch, 2.4*inch, 1.1*inch, 2.4*inch])
         call_table.setStyle(TableStyle([
             ('FONTNAME', (0, 0), (-1, -1), 'Helvetica'),
-            ('FONTSIZE', (0, 0), (-1, -1), 8),
+            ('FONTSIZE', (0, 0), (-1, -1), 7),
             ('FONTNAME', (0, 0), (0, -1), 'Helvetica-Bold'),
             ('FONTNAME', (2, 0), (2, -1), 'Helvetica-Bold'),
             ('GRID', (0, 0), (-1, -1), 0.5, colors.grey),
             ('VALIGN', (0, 0), (-1, -1), 'TOP'),
-            ('LEFTPADDING', (0, 0), (-1, -1), 3),
-            ('RIGHTPADDING', (0, 0), (-1, -1), 3),
-            ('TOPPADDING', (0, 0), (-1, -1), 3),
-            ('BOTTOMPADDING', (0, 0), (-1, -1), 3),
+            ('LEFTPADDING', (0, 0), (-1, -1), 2),
+            ('RIGHTPADDING', (0, 0), (-1, -1), 2),
+            ('TOPPADDING', (0, 0), (-1, -1), 2),
+            ('BOTTOMPADDING', (0, 0), (-1, -1), 2),
         ]))
         elements.append(call_table)
-        elements.append(Spacer(1, 0.15*inch))
+        elements.append(Spacer(1, 0.1*inch))
         
         # Agent Assessment
         elements.append(Paragraph("Agent Assessment", heading_style))
-        agent_name = escape_text(entry.get('Agent Name', 'N/A'))
-        relationship = escape_text(entry.get('Relationship', 'N/A'))
+        agent_name = escape_text(get_value('Agent Name'))
+        relationship = escape_text(get_value('Relationship'))
         agent_data = [
             ['Agent:', f"{agent_name} ({relationship})"],
             ['Scores:', f"Prof: {entry.get('Agent Professionalism', 'N/A')}/10 | "
@@ -483,29 +490,29 @@ def generate_call_log_pdf(entry):
                        f"Exp: {entry.get('Agent Expectations', 'N/A')}/10 | "
                        f"Trans: {entry.get('Agent Transparency', 'N/A')}/10 | "
                        f"Neg: {entry.get('Agent Negotiation Style', 'N/A')}/10"],
-            ['Notes:', truncate_text(entry.get('Agent Notes', 'N/A'), 100)],
+            ['Notes:', truncate_text(get_value('Agent Notes'), 80)],
         ]
-        agent_table = Table(agent_data, colWidths=[1.2*inch, 5.8*inch])
+        agent_table = Table(agent_data, colWidths=[1.1*inch, 5.9*inch])
         agent_table.setStyle(TableStyle([
             ('FONTNAME', (0, 0), (-1, -1), 'Helvetica'),
-            ('FONTSIZE', (0, 0), (-1, -1), 8),
+            ('FONTSIZE', (0, 0), (-1, -1), 7),
             ('FONTNAME', (0, 0), (0, -1), 'Helvetica-Bold'),
             ('GRID', (0, 0), (-1, -1), 0.5, colors.grey),
             ('VALIGN', (0, 0), (-1, -1), 'TOP'),
-            ('LEFTPADDING', (0, 0), (-1, -1), 3),
-            ('RIGHTPADDING', (0, 0), (-1, -1), 3),
-            ('TOPPADDING', (0, 0), (-1, -1), 3),
-            ('BOTTOMPADDING', (0, 0), (-1, -1), 3),
+            ('LEFTPADDING', (0, 0), (-1, -1), 2),
+            ('RIGHTPADDING', (0, 0), (-1, -1), 2),
+            ('TOPPADDING', (0, 0), (-1, -1), 2),
+            ('BOTTOMPADDING', (0, 0), (-1, -1), 2),
         ]))
         elements.append(agent_table)
-        elements.append(Spacer(1, 0.15*inch))
+        elements.append(Spacer(1, 0.1*inch))
         
         # Player Notes
         elements.append(Paragraph("Player Notes", heading_style))
-        player_notes = truncate_text(entry.get('Player Notes', 'N/A'), 150)
+        player_notes = truncate_text(get_value('Player Notes'), 120)
         notes_para = Paragraph(f"<b>{player_notes}</b>", normal_style)
         elements.append(notes_para)
-        elements.append(Spacer(1, 0.15*inch))
+        elements.append(Spacer(1, 0.1*inch))
         
         # Player Assessment
         elements.append(Paragraph("Player Assessment", heading_style))
@@ -520,10 +527,10 @@ def generate_call_log_pdf(entry):
              'Team Fit:', f"{entry.get('Team Fit', 'N/A')}/10",
              'Overall:', f"{entry.get('Overall Rating', 'N/A')}/10"],
         ]
-        assessment_table = Table(assessment_data, colWidths=[1*inch, 0.8*inch, 1*inch, 0.8*inch, 1*inch, 0.8*inch])
+        assessment_table = Table(assessment_data, colWidths=[0.9*inch, 0.7*inch, 0.9*inch, 0.7*inch, 0.9*inch, 0.7*inch])
         assessment_table.setStyle(TableStyle([
             ('FONTNAME', (0, 0), (-1, -1), 'Helvetica'),
-            ('FONTSIZE', (0, 0), (-1, -1), 8),
+            ('FONTSIZE', (0, 0), (-1, -1), 7),
             ('FONTNAME', (0, 0), (0, -1), 'Helvetica-Bold'),
             ('FONTNAME', (2, 0), (2, -1), 'Helvetica-Bold'),
             ('FONTNAME', (4, 0), (4, -1), 'Helvetica-Bold'),
@@ -540,15 +547,15 @@ def generate_call_log_pdf(entry):
         grade = entry.get('Assessment Grade', 'N/A')
         total_text = f"<b>Total:</b> {total_score}/90 ({total_pct}%) | <b>Grade:</b> {grade}"
         elements.append(Paragraph(total_text, normal_style))
-        elements.append(Spacer(1, 0.15*inch))
+        elements.append(Spacer(1, 0.1*inch))
         
         # Personality & Self Awareness
         elements.append(Paragraph("Personality & Self Awareness", heading_style))
         personality_items = [
-            ('Carry themselves:', entry.get('How They Carry Themselves', 'N/A'), 80),
-            ('View themselves:', entry.get('How They View Themselves', 'N/A'), 80),
-            ('Important:', entry.get('What Is Important To Them', 'N/A'), 80),
-            ('Growth mindset:', entry.get('Mindset Towards Growth', 'N/A'), 80),
+            ('Carry themselves:', get_value('How They Carry Themselves'), 60),
+            ('View themselves:', get_value('How They View Themselves'), 60),
+            ('Important:', get_value('What Is Important To Them'), 60),
+            ('Growth mindset:', get_value('Mindset Towards Growth'), 60),
         ]
         for label, value, max_len in personality_items:
             text = truncate_text(value, max_len)
@@ -556,25 +563,26 @@ def generate_call_log_pdf(entry):
             elements.append(para)
         # Preparation (special format)
         prep_level = entry.get('Preparation Level', 'N/A')
-        prep_notes = truncate_text(entry.get('Preparation Notes', 'N/A'), 60)
+        prep_notes = truncate_text(get_value('Preparation Notes'), 50)
         prep_text = f"{prep_level}/10 - {prep_notes}"
         elements.append(Paragraph(f"<b>Preparation:</b> {escape_text(prep_text)}", normal_style))
-        elements.append(Spacer(1, 0.15*inch))
+        elements.append(Spacer(1, 0.1*inch))
         
-        # Key Talking Points
+        # Key Talking Points - more compact layout
         elements.append(Paragraph("Key Talking Points", heading_style))
         talking_data = [
-            ['Interest:', escape_text(entry.get('Interest Level', 'N/A')), 
-             'Timeline:', escape_text(entry.get('Timeline', 'N/A'))],
-            ['Salary:', escape_text(entry.get('Salary Expectations', 'N/A'))],
-            ['Other Opps:', truncate_text(entry.get('Other Opportunities', 'N/A'), 100)],
-            ['Talking Points:', truncate_text(entry.get('Key Talking Points', 'N/A'), 100)],
+            ['Interest:', escape_text(get_value('Interest Level')), 
+             'Timeline:', escape_text(get_value('Timeline'))],
+            ['Salary:', escape_text(truncate_text(get_value('Salary Expectations'), 50))],
+            ['Other Opps:', escape_text(truncate_text(get_value('Other Opportunities'), 50))],
+            ['Talking Points:', escape_text(truncate_text(get_value('Key Talking Points'), 80))],
         ]
-        talking_table = Table(talking_data, colWidths=[1*inch, 5*inch])
+        talking_table = Table(talking_data, colWidths=[0.9*inch, 2.8*inch, 0.9*inch, 2.4*inch])
         talking_table.setStyle(TableStyle([
             ('FONTNAME', (0, 0), (-1, -1), 'Helvetica'),
-            ('FONTSIZE', (0, 0), (-1, -1), 8),
+            ('FONTSIZE', (0, 0), (-1, -1), 7),
             ('FONTNAME', (0, 0), (0, -1), 'Helvetica-Bold'),
+            ('FONTNAME', (2, 0), (2, -1), 'Helvetica-Bold'),
             ('GRID', (0, 0), (-1, -1), 0.5, colors.grey),
             ('VALIGN', (0, 0), (-1, -1), 'TOP'),
             ('LEFTPADDING', (0, 0), (-1, -1), 2),
@@ -586,18 +594,18 @@ def generate_call_log_pdf(entry):
             ('SPAN', (1, 3), (1, 3)),
         ]))
         elements.append(talking_table)
-        elements.append(Spacer(1, 0.15*inch))
+        elements.append(Spacer(1, 0.1*inch))
         
         # Red Flags & Assessment
         elements.append(Paragraph("Red Flags & Assessment", heading_style))
-        red_flag_severity = escape_text(entry.get('Red Flag Severity', 'N/A'))
-        red_flags = truncate_text(entry.get('Red Flags', 'N/A'), 100)
-        recommendation = escape_text(entry.get('Recommendation', 'N/A'))
-        summary = truncate_text(entry.get('Summary Notes', 'N/A'), 120)
+        red_flag_severity = escape_text(get_value('Red Flag Severity'))
+        red_flags = truncate_text(get_value('Red Flags'), 80)
+        recommendation = escape_text(get_value('Recommendation'))
+        summary = truncate_text(get_value('Summary Notes'), 90)
         elements.append(Paragraph(f"<b>Red Flags:</b> {red_flag_severity} - {red_flags}", normal_style))
         elements.append(Paragraph(f"<b>Recommendation:</b> {recommendation}", normal_style))
         elements.append(Paragraph(f"<b>Summary:</b> {summary}", normal_style))
-        elements.append(Spacer(1, 0.15*inch))
+        elements.append(Spacer(1, 0.1*inch))
         
         # Next Steps
         elements.append(Paragraph("Next Steps", heading_style))
@@ -605,14 +613,14 @@ def generate_call_log_pdf(entry):
         follow_up_date = entry.get('Follow-up Date', '')
         if follow_up == 'Yes' and follow_up_date:
             follow_up += f" - {follow_up_date}"
-        action_items = truncate_text(entry.get('Action Items', 'N/A'), 100)
+        action_items = truncate_text(get_value('Action Items'), 80)
         elements.append(Paragraph(f"<b>Follow-up:</b> {follow_up}", normal_style))
         elements.append(Paragraph(f"<b>Action Items:</b> {action_items}", normal_style))
-        elements.append(Spacer(1, 0.1*inch))
+        elements.append(Spacer(1, 0.05*inch))
         
         # Footer
-        call_notes = truncate_text(entry.get('Call Notes', 'N/A'), 80)
-        created_at = escape_text(entry.get('Created At', 'N/A'))
+        call_notes = truncate_text(get_value('Call Notes'), 60)
+        created_at = escape_text(get_value('Created At'))
         footer_text = f"Call Notes: {call_notes} | Created: {created_at}"
         elements.append(Paragraph(footer_text, small_style))
         
