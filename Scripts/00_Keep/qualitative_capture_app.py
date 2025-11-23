@@ -32,6 +32,228 @@ st.set_page_config(
     layout="wide"
 )
 
+# Language translations
+TRANSLATIONS = {
+    'English': {
+        'title': 'Portland Thorns - Call Log System',
+        'welcome_title': 'Welcome - Getting Started',
+        'what_app_does': 'What This App Does',
+        'what_app_does_desc': 'This system helps you capture and organize qualitative information from player and agent calls:',
+        'log_calls': 'Log Calls: Record detailed information from conversations with players and agents',
+        'track_assessments': 'Track Assessments: Rate players on communication, maturity, coachability, and more',
+        'generate_reports': 'Generate Reports: Download PDF summaries and CSV exports',
+        'view_history': 'View History: Review past calls and player summaries',
+        'player_overviews': 'Player Overviews: View detailed scouting reports with charts and comparisons',
+        'first_steps': 'First Steps',
+        'upload_database': 'Upload Player Database (if not already done)',
+        'upload_database_desc': 'Use the sidebar uploader to add your shortlist Excel file. This enables player selection and auto-population.',
+        'log_first_call': 'Log Your First Call',
+        'log_first_call_desc': 'Select a player from the database (or enter custom player). Fill out the call details and assessments. Save to generate PDF and CSV files.',
+        'explore_features': 'Explore Features',
+        'explore_features_desc': 'View call history to see all logged calls. Check player summaries for aggregated insights. Upload and view player overview PDFs.',
+        'tips': 'Tips',
+        'save_draft_tip': 'Use "Save Draft" to save progress without submitting',
+        'search_tip': 'Search players by name in the player selection dropdown',
+        'download_tip': 'Download PDFs and CSVs after each call for your records',
+        'autopopulate_tip': 'Conference and Team auto-populate when you select a player',
+        'ready_to_start': 'Ready to start? Close this section and begin logging your first call!',
+        'got_it': 'Got it! Hide this message',
+        'quick_start': 'Quick Start Guide',
+        'how_to_use': 'How to Use This App',
+        'step1': 'Upload Player Database (First Time Only)',
+        'step1_desc': 'Upload your shortlist Excel file in the sidebar above. File will be saved permanently.',
+        'step2': 'Log a New Call',
+        'step2_desc': 'Select Conference → Team → Player. Fill out call details and assessments. Click "Save Call Log" at the bottom.',
+        'step3': 'Download Results',
+        'step3_desc': 'PDF and CSV files available after saving. View call history anytime.',
+        'step4': 'View Player Overviews',
+        'step4_desc': 'Upload PDF overviews or view existing ones. Compare players across metrics.',
+    },
+    'Spanish': {
+        'title': 'Portland Thorns - Sistema de Registro de Llamadas',
+        'welcome_title': 'Bienvenido - Comenzar',
+        'what_app_does': 'Qué Hace Esta Aplicación',
+        'what_app_does_desc': 'Este sistema te ayuda a capturar y organizar información cualitativa de llamadas con jugadores y agentes:',
+        'log_calls': 'Registrar Llamadas: Registra información detallada de conversaciones con jugadores y agentes',
+        'track_assessments': 'Seguir Evaluaciones: Califica jugadores en comunicación, madurez, capacidad de entrenamiento y más',
+        'generate_reports': 'Generar Informes: Descarga resúmenes PDF y exportaciones CSV',
+        'view_history': 'Ver Historial: Revisa llamadas pasadas y resúmenes de jugadores',
+        'player_overviews': 'Resúmenes de Jugadores: Ver informes de scouting detallados con gráficos y comparaciones',
+        'first_steps': 'Primeros Pasos',
+        'upload_database': 'Subir Base de Datos de Jugadores (si aún no se ha hecho)',
+        'upload_database_desc': 'Usa el cargador en la barra lateral para agregar tu archivo Excel de lista corta. Esto permite la selección de jugadores y auto-completado.',
+        'log_first_call': 'Registrar Tu Primera Llamada',
+        'log_first_call_desc': 'Selecciona un jugador de la base de datos (o ingresa un jugador personalizado). Completa los detalles de la llamada y evaluaciones. Guarda para generar archivos PDF y CSV.',
+        'explore_features': 'Explorar Funciones',
+        'explore_features_desc': 'Ver historial de llamadas para ver todas las llamadas registradas. Revisa resúmenes de jugadores para información agregada. Sube y visualiza PDFs de resúmenes de jugadores.',
+        'tips': 'Consejos',
+        'save_draft_tip': 'Usa "Guardar Borrador" para guardar el progreso sin enviar',
+        'search_tip': 'Busca jugadores por nombre en el menú desplegable de selección',
+        'download_tip': 'Descarga PDFs y CSVs después de cada llamada para tus registros',
+        'autopopulate_tip': 'Conferencia y Equipo se auto-completan cuando seleccionas un jugador',
+        'ready_to_start': '¿Listo para comenzar? ¡Cierra esta sección y comienza a registrar tu primera llamada!',
+        'got_it': '¡Entendido! Ocultar este mensaje',
+        'quick_start': 'Guía de Inicio Rápido',
+        'how_to_use': 'Cómo Usar Esta Aplicación',
+        'step1': 'Subir Base de Datos de Jugadores (Solo Primera Vez)',
+        'step1_desc': 'Sube tu archivo Excel de lista corta en la barra lateral arriba. El archivo se guardará permanentemente.',
+        'step2': 'Registrar una Nueva Llamada',
+        'step2_desc': 'Selecciona Conferencia → Equipo → Jugador. Completa los detalles de la llamada y evaluaciones. Haz clic en "Guardar Registro de Llamada" al final.',
+        'step3': 'Descargar Resultados',
+        'step3_desc': 'Archivos PDF y CSV disponibles después de guardar. Ver historial de llamadas en cualquier momento.',
+        'step4': 'Ver Resúmenes de Jugadores',
+        'step4_desc': 'Sube resúmenes PDF o visualiza los existentes. Compara jugadores en todas las métricas.',
+    },
+    'French': {
+        'title': 'Portland Thorns - Système de Journal d\'Appels',
+        'welcome_title': 'Bienvenue - Pour Commencer',
+        'what_app_does': 'Ce Que Fait Cette Application',
+        'what_app_does_desc': 'Ce système vous aide à capturer et organiser les informations qualitatives des appels avec les joueurs et agents:',
+        'log_calls': 'Enregistrer les Appels: Enregistrez des informations détaillées des conversations avec les joueurs et agents',
+        'track_assessments': 'Suivre les Évaluations: Évaluez les joueurs sur la communication, la maturité, la capacité d\'entraînement et plus',
+        'generate_reports': 'Générer des Rapports: Téléchargez des résumés PDF et des exportations CSV',
+        'view_history': 'Voir l\'Historique: Consultez les appels passés et les résumés des joueurs',
+        'player_overviews': 'Aperçus des Joueurs: Consultez des rapports de recrutement détaillés avec graphiques et comparaisons',
+        'first_steps': 'Premières Étapes',
+        'upload_database': 'Télécharger la Base de Données des Joueurs (si pas déjà fait)',
+        'upload_database_desc': 'Utilisez le chargeur dans la barre latérale pour ajouter votre fichier Excel de liste courte. Cela permet la sélection des joueurs et le remplissage automatique.',
+        'log_first_call': 'Enregistrer Votre Premier Appel',
+        'log_first_call_desc': 'Sélectionnez un joueur de la base de données (ou entrez un joueur personnalisé). Remplissez les détails de l\'appel et les évaluations. Enregistrez pour générer des fichiers PDF et CSV.',
+        'explore_features': 'Explorer les Fonctionnalités',
+        'explore_features_desc': 'Consultez l\'historique des appels pour voir tous les appels enregistrés. Vérifiez les résumés des joueurs pour des informations agrégées. Téléchargez et consultez les PDFs des aperçus des joueurs.',
+        'tips': 'Conseils',
+        'save_draft_tip': 'Utilisez "Enregistrer le Brouillon" pour sauvegarder la progression sans soumettre',
+        'search_tip': 'Recherchez les joueurs par nom dans le menu déroulant de sélection',
+        'download_tip': 'Téléchargez les PDFs et CSVs après chaque appel pour vos dossiers',
+        'autopopulate_tip': 'La Conférence et l\'Équipe se remplissent automatiquement lorsque vous sélectionnez un joueur',
+        'ready_to_start': 'Prêt à commencer? Fermez cette section et commencez à enregistrer votre premier appel!',
+        'got_it': 'Compris! Masquer ce message',
+        'quick_start': 'Guide de Démarrage Rapide',
+        'how_to_use': 'Comment Utiliser Cette Application',
+        'step1': 'Télécharger la Base de Données des Joueurs (Première Fois Seulement)',
+        'step1_desc': 'Téléchargez votre fichier Excel de liste courte dans la barre latérale ci-dessus. Le fichier sera sauvegardé en permanence.',
+        'step2': 'Enregistrer un Nouvel Appel',
+        'step2_desc': 'Sélectionnez Conférence → Équipe → Joueur. Remplissez les détails de l\'appel et les évaluations. Cliquez sur "Enregistrer le Journal d\'Appel" en bas.',
+        'step3': 'Télécharger les Résultats',
+        'step3_desc': 'Fichiers PDF et CSV disponibles après l\'enregistrement. Consultez l\'historique des appels à tout moment.',
+        'step4': 'Voir les Aperçus des Joueurs',
+        'step4_desc': 'Téléchargez les aperçus PDF ou consultez les existants. Comparez les joueurs sur toutes les métriques.',
+    },
+    'Portuguese': {
+        'title': 'Portland Thorns - Sistema de Registro de Chamadas',
+        'welcome_title': 'Bem-vindo - Começando',
+        'what_app_does': 'O Que Esta Aplicação Faz',
+        'what_app_does_desc': 'Este sistema ajuda você a capturar e organizar informações qualitativas de chamadas com jogadores e agentes:',
+        'log_calls': 'Registrar Chamadas: Registre informações detalhadas de conversas com jogadores e agentes',
+        'track_assessments': 'Acompanhar Avaliações: Avalie jogadores em comunicação, maturidade, capacidade de treinamento e mais',
+        'generate_reports': 'Gerar Relatórios: Baixe resumos PDF e exportações CSV',
+        'view_history': 'Ver Histórico: Revise chamadas passadas e resumos de jogadores',
+        'player_overviews': 'Visões Gerais dos Jogadores: Veja relatórios de scouting detalhados com gráficos e comparações',
+        'first_steps': 'Primeiros Passos',
+        'upload_database': 'Carregar Banco de Dados de Jogadores (se ainda não feito)',
+        'upload_database_desc': 'Use o carregador na barra lateral para adicionar seu arquivo Excel de lista curta. Isso permite a seleção de jogadores e preenchimento automático.',
+        'log_first_call': 'Registrar Sua Primeira Chamada',
+        'log_first_call_desc': 'Selecione um jogador do banco de dados (ou insira um jogador personalizado). Preencha os detalhes da chamada e avaliações. Salve para gerar arquivos PDF e CSV.',
+        'explore_features': 'Explorar Recursos',
+        'explore_features_desc': 'Veja o histórico de chamadas para ver todas as chamadas registradas. Verifique resumos de jogadores para insights agregados. Carregue e visualize PDFs de visões gerais dos jogadores.',
+        'tips': 'Dicas',
+        'save_draft_tip': 'Use "Salvar Rascunho" para salvar o progresso sem enviar',
+        'search_tip': 'Pesquise jogadores por nome no menu suspenso de seleção',
+        'download_tip': 'Baixe PDFs e CSVs após cada chamada para seus registros',
+        'autopopulate_tip': 'Conferência e Time são preenchidos automaticamente quando você seleciona um jogador',
+        'ready_to_start': 'Pronto para começar? Feche esta seção e comece a registrar sua primeira chamada!',
+        'got_it': 'Entendi! Ocultar esta mensagem',
+        'quick_start': 'Guia de Início Rápido',
+        'how_to_use': 'Como Usar Esta Aplicação',
+        'step1': 'Carregar Banco de Dados de Jogadores (Apenas Primeira Vez)',
+        'step1_desc': 'Carregue seu arquivo Excel de lista curta na barra lateral acima. O arquivo será salvo permanentemente.',
+        'step2': 'Registrar uma Nova Chamada',
+        'step2_desc': 'Selecione Conferência → Time → Jogador. Preencha os detalhes da chamada e avaliações. Clique em "Salvar Registro de Chamada" na parte inferior.',
+        'step3': 'Baixar Resultados',
+        'step3_desc': 'Arquivos PDF e CSV disponíveis após salvar. Veja o histórico de chamadas a qualquer momento.',
+        'step4': 'Ver Visões Gerais dos Jogadores',
+        'step4_desc': 'Carregue visões gerais PDF ou visualize as existentes. Compare jogadores em todas as métricas.',
+    },
+    'German': {
+        'title': 'Portland Thorns - Anrufprotokoll-System',
+        'welcome_title': 'Willkommen - Erste Schritte',
+        'what_app_does': 'Was Diese App Macht',
+        'what_app_does_desc': 'Dieses System hilft Ihnen, qualitative Informationen aus Gesprächen mit Spielern und Agenten zu erfassen und zu organisieren:',
+        'log_calls': 'Anrufe Protokollieren: Erfassen Sie detaillierte Informationen aus Gesprächen mit Spielern und Agenten',
+        'track_assessments': 'Bewertungen Verfolgen: Bewerten Sie Spieler in Kommunikation, Reife, Trainierbarkeit und mehr',
+        'generate_reports': 'Berichte Generieren: Laden Sie PDF-Zusammenfassungen und CSV-Exporte herunter',
+        'view_history': 'Verlauf Anzeigen: Überprüfen Sie vergangene Anrufe und Spielerzusammenfassungen',
+        'player_overviews': 'Spieler-Übersichten: Sehen Sie detaillierte Scouting-Berichte mit Diagrammen und Vergleichen',
+        'first_steps': 'Erste Schritte',
+        'upload_database': 'Spielerdatenbank Hochladen (falls noch nicht geschehen)',
+        'upload_database_desc': 'Verwenden Sie den Uploader in der Seitenleiste, um Ihre Excel-Shortlist-Datei hinzuzufügen. Dies ermöglicht die Spielerauswahl und automatisches Ausfüllen.',
+        'log_first_call': 'Ihren Ersten Anruf Protokollieren',
+        'log_first_call_desc': 'Wählen Sie einen Spieler aus der Datenbank (oder geben Sie einen benutzerdefinierten Spieler ein). Füllen Sie die Anrufdetails und Bewertungen aus. Speichern Sie, um PDF- und CSV-Dateien zu generieren.',
+        'explore_features': 'Funktionen Erkunden',
+        'explore_features_desc': 'Sehen Sie den Anrufverlauf, um alle protokollierten Anrufe zu sehen. Überprüfen Sie Spielerzusammenfassungen für aggregierte Erkenntnisse. Laden Sie Spieler-Übersichts-PDFs hoch und anzeigen.',
+        'tips': 'Tipps',
+        'save_draft_tip': 'Verwenden Sie "Entwurf Speichern", um den Fortschritt ohne Übermittlung zu speichern',
+        'search_tip': 'Suchen Sie Spieler nach Namen im Spielerauswahl-Dropdown',
+        'download_tip': 'Laden Sie PDFs und CSVs nach jedem Anruf für Ihre Aufzeichnungen herunter',
+        'autopopulate_tip': 'Konferenz und Team werden automatisch ausgefüllt, wenn Sie einen Spieler auswählen',
+        'ready_to_start': 'Bereit zum Starten? Schließen Sie diesen Abschnitt und beginnen Sie mit der Protokollierung Ihres ersten Anrufs!',
+        'got_it': 'Verstanden! Diese Nachricht ausblenden',
+        'quick_start': 'Schnellstart-Anleitung',
+        'how_to_use': 'Wie Man Diese App Verwendet',
+        'step1': 'Spielerdatenbank Hochladen (Nur Beim Ersten Mal)',
+        'step1_desc': 'Laden Sie Ihre Excel-Shortlist-Datei in der Seitenleiste oben hoch. Die Datei wird dauerhaft gespeichert.',
+        'step2': 'Einen Neuen Anruf Protokollieren',
+        'step2_desc': 'Wählen Sie Konferenz → Team → Spieler. Füllen Sie die Anrufdetails und Bewertungen aus. Klicken Sie unten auf "Anrufprotokoll Speichern".',
+        'step3': 'Ergebnisse Herunterladen',
+        'step3_desc': 'PDF- und CSV-Dateien stehen nach dem Speichern zur Verfügung. Sehen Sie den Anrufverlauf jederzeit ein.',
+        'step4': 'Spieler-Übersichten Anzeigen',
+        'step4_desc': 'Laden Sie PDF-Übersichten hoch oder zeigen Sie vorhandene an. Vergleichen Sie Spieler über alle Metriken.',
+    },
+    'Italian': {
+        'title': 'Portland Thorns - Sistema di Registro Chiamate',
+        'welcome_title': 'Benvenuto - Iniziare',
+        'what_app_does': 'Cosa Fa Questa Applicazione',
+        'what_app_does_desc': 'Questo sistema ti aiuta a catturare e organizzare informazioni qualitative dalle chiamate con giocatori e agenti:',
+        'log_calls': 'Registrare Chiamate: Registra informazioni dettagliate dalle conversazioni con giocatori e agenti',
+        'track_assessments': 'Tracciare Valutazioni: Valuta i giocatori su comunicazione, maturità, allenabilità e altro',
+        'generate_reports': 'Generare Report: Scarica riassunti PDF ed esportazioni CSV',
+        'view_history': 'Visualizzare Cronologia: Rivedi chiamate passate e riassunti dei giocatori',
+        'player_overviews': 'Panoramiche Giocatori: Visualizza report di scouting dettagliati con grafici e confronti',
+        'first_steps': 'Primi Passi',
+        'upload_database': 'Caricare Database Giocatori (se non già fatto)',
+        'upload_database_desc': 'Usa il caricatore nella barra laterale per aggiungere il tuo file Excel della lista corta. Questo abilita la selezione dei giocatori e il completamento automatico.',
+        'log_first_call': 'Registrare la Tua Prima Chiamata',
+        'log_first_call_desc': 'Seleziona un giocatore dal database (o inserisci un giocatore personalizzato). Compila i dettagli della chiamata e le valutazioni. Salva per generare file PDF e CSV.',
+        'explore_features': 'Esplorare Funzionalità',
+        'explore_features_desc': 'Visualizza la cronologia delle chiamate per vedere tutte le chiamate registrate. Controlla i riassunti dei giocatori per informazioni aggregate. Carica e visualizza PDF delle panoramiche dei giocatori.',
+        'tips': 'Suggerimenti',
+        'save_draft_tip': 'Usa "Salva Bozza" per salvare il progresso senza inviare',
+        'search_tip': 'Cerca giocatori per nome nel menu a discesa di selezione',
+        'download_tip': 'Scarica PDF e CSV dopo ogni chiamata per i tuoi registri',
+        'autopopulate_tip': 'Conferenza e Squadra si compilano automaticamente quando selezioni un giocatore',
+        'ready_to_start': 'Pronto per iniziare? Chiudi questa sezione e inizia a registrare la tua prima chiamata!',
+        'got_it': 'Capito! Nascondi questo messaggio',
+        'quick_start': 'Guida di Avvio Rapido',
+        'how_to_use': 'Come Usare Questa Applicazione',
+        'step1': 'Caricare Database Giocatori (Solo Prima Volta)',
+        'step1_desc': 'Carica il tuo file Excel della lista corta nella barra laterale sopra. Il file verrà salvato permanentemente.',
+        'step2': 'Registrare una Nuova Chiamata',
+        'step2_desc': 'Seleziona Conferenza → Squadra → Giocatore. Compila i dettagli della chiamata e le valutazioni. Clicca "Salva Registro Chiamata" in fondo.',
+        'step3': 'Scaricare Risultati',
+        'step3_desc': 'File PDF e CSV disponibili dopo il salvataggio. Visualizza la cronologia delle chiamate in qualsiasi momento.',
+        'step4': 'Visualizzare Panoramiche Giocatori',
+        'step4_desc': 'Carica panoramiche PDF o visualizza quelle esistenti. Confronta i giocatori su tutte le metriche.',
+    },
+}
+
+# Initialize language in session state
+if 'language' not in st.session_state:
+    st.session_state.language = 'English'
+
+def t(key):
+    """Get translation for current language."""
+    return TRANSLATIONS.get(st.session_state.language, TRANSLATIONS['English']).get(key, key)
+
 # Data storage - use relative paths for Streamlit Cloud compatibility
 # On Streamlit Cloud, the app runs from the repo root
 # For local development, detect the base directory from script location
@@ -717,30 +939,40 @@ if PLAYER_DB_FILE and PLAYER_DB_FILE.exists():
 # Quick Start Guide in Sidebar
 with st.sidebar:
     st.markdown("---")
-    st.markdown("### 🚀 Quick Start Guide")
-    with st.expander("📖 How to Use This App", expanded=False):
-        st.markdown("""
-        **1. Upload Player Database** (First Time Only)
-        - Upload your shortlist Excel file in the sidebar above
-        - File will be saved permanently
+    st.markdown(f"### 🚀 {t('quick_start')}")
+    with st.expander(f"📖 {t('how_to_use')}", expanded=False):
+        st.markdown(f"""
+        **{t('step1')}**
+        - {t('step1_desc')}
         
-        **2. Log a New Call**
-        - Select Conference → Team → Player
-        - Fill out call details and assessments
-        - Click "Save Call Log" at the bottom
+        **{t('step2')}**
+        - {t('step2_desc')}
         
-        **3. Download Results**
-        - PDF and CSV files available after saving
-        - View call history anytime
+        **{t('step3')}**
+        - {t('step3_desc')}
         
-        **4. View Player Overviews**
-        - Upload PDF overviews or view existing ones
-        - Compare players across metrics
+        **{t('step4')}**
+        - {t('step4_desc')}
         """)
     st.markdown("---")
 
+# Language selector at the top
+col_lang1, col_lang2, col_lang3 = st.columns([1, 2, 1])
+with col_lang2:
+    selected_language = st.selectbox(
+        "🌐 Language / Idioma / Langue / Idioma / Sprache / Lingua",
+        ['English', 'Spanish', 'French', 'Portuguese', 'German', 'Italian'],
+        index=['English', 'Spanish', 'French', 'Portuguese', 'German', 'Italian'].index(st.session_state.language),
+        key='language_selector'
+    )
+    if selected_language != st.session_state.language:
+        st.session_state.language = selected_language
+        st.rerun()
+
+st.markdown("---")
+
 # Main app
-st.title("⚽ Portland Thorns - Call Log System")
+st.title(f"⚽ {t('title')}")
 st.markdown("---")
 
 # Initialize welcome state
@@ -803,45 +1035,40 @@ if page == "Log New Call":
     
     # Show welcome only on Log New Call page
     if st.session_state.show_welcome:
-        with st.expander("👋 Welcome - Getting Started", expanded=True):
-            st.markdown("""
-            ### What This App Does
+        with st.expander(f"👋 {t('welcome_title')}", expanded=True):
+            st.markdown(f"""
+            ### {t('what_app_does')}
             
-            This system helps you capture and organize qualitative information from player and agent calls:
+            {t('what_app_does_desc')}
             
-            - **📞 Log Calls**: Record detailed information from conversations with players and agents
-            - **📊 Track Assessments**: Rate players on communication, maturity, coachability, and more
-            - **📄 Generate Reports**: Download PDF summaries and CSV exports
-            - **🔍 View History**: Review past calls and player summaries
-            - **📈 Player Overviews**: View detailed scouting reports with charts and comparisons
+            - **📞 {t('log_calls')}**
+            - **📊 {t('track_assessments')}**
+            - **📄 {t('generate_reports')}**
+            - **🔍 {t('view_history')}**
+            - **📈 {t('player_overviews')}**
             
-            ### First Steps
+            ### {t('first_steps')}
             
-            1. **Upload Player Database** (if not already done)
-               - Use the sidebar uploader to add your shortlist Excel file
-               - This enables player selection and auto-population
+            1. **{t('upload_database')}**
+               - {t('upload_database_desc')}
             
-            2. **Log Your First Call**
-               - Select a player from the database (or enter custom player)
-               - Fill out the call details and assessments
-               - Save to generate PDF and CSV files
+            2. **{t('log_first_call')}**
+               - {t('log_first_call_desc')}
             
-            3. **Explore Features**
-               - View call history to see all logged calls
-               - Check player summaries for aggregated insights
-               - Upload and view player overview PDFs
+            3. **{t('explore_features')}**
+               - {t('explore_features_desc')}
             
-            ### Tips
+            ### {t('tips')}
             
-            - 💾 Use "Save Draft" to save progress without submitting
-            - 🔍 Search players by name in the player selection dropdown
-            - 📥 Download PDFs and CSVs after each call for your records
-            - 🔄 Conference and Team auto-populate when you select a player
+            - 💾 {t('save_draft_tip')}
+            - 🔍 {t('search_tip')}
+            - 📥 {t('download_tip')}
+            - 🔄 {t('autopopulate_tip')}
             
-            **Ready to start?** Close this section and begin logging your first call!
+            **{t('ready_to_start')}**
             """)
             
-            if st.button("Got it! Hide this message", key="hide_welcome_log"):
+            if st.button(t('got_it'), key="hide_welcome_log"):
                 st.session_state.show_welcome = False
                 st.rerun()
         
