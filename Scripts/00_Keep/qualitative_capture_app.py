@@ -12,12 +12,21 @@ import json
 from io import BytesIO
 import base64
 
-# Try to import weasyprint for PDF generation
-try:
-    from weasyprint import HTML, CSS
-    WEASYPRINT_AVAILABLE = True
-except ImportError:
-    WEASYPRINT_AVAILABLE = False
+# Weasyprint is optional - only import when actually needed
+# This prevents errors on Streamlit Cloud where system libraries aren't available
+WEASYPRINT_AVAILABLE = False
+def check_weasyprint():
+    """Lazy import of weasyprint to avoid errors on systems without required libraries."""
+    global WEASYPRINT_AVAILABLE
+    if not WEASYPRINT_AVAILABLE:
+        try:
+            from weasyprint import HTML, CSS
+            WEASYPRINT_AVAILABLE = True
+            return HTML, CSS
+        except (ImportError, OSError):
+            WEASYPRINT_AVAILABLE = False
+            return None, None
+    return None, None
 
 # Page config
 st.set_page_config(
@@ -322,7 +331,9 @@ def clear_draft():
 
 def generate_call_log_pdf(entry):
     """Generate PDF from call log entry."""
-    if not WEASYPRINT_AVAILABLE:
+    # Lazy import weasyprint to avoid errors on systems without required libraries
+    HTML, CSS = check_weasyprint()
+    if HTML is None or CSS is None:
         return None
     
     try:
@@ -1078,17 +1089,16 @@ if page == "Log New Call":
                 st.success("✅ Call log saved successfully!")
                 
                 # Store PDF data in session state for download outside form
-                if WEASYPRINT_AVAILABLE:
-                    pdf_bytes = generate_call_log_pdf(new_entry)
-                    if pdf_bytes:
-                        player_name_safe = new_entry['Player Name'].replace('/', '_').replace('\\', '_')
-                        pdf_filename = f"Call_Log_{player_name_safe}_{datetime.now().strftime('%Y%m%d')}.pdf"
-                        st.session_state['pdf_download_data'] = pdf_bytes
-                        st.session_state['pdf_download_filename'] = pdf_filename
-                        st.session_state['show_pdf_download'] = True
+                pdf_bytes = generate_call_log_pdf(new_entry)
+                if pdf_bytes:
+                    player_name_safe = new_entry['Player Name'].replace('/', '_').replace('\\', '_')
+                    pdf_filename = f"Call_Log_{player_name_safe}_{datetime.now().strftime('%Y%m%d')}.pdf"
+                    st.session_state['pdf_download_data'] = pdf_bytes
+                    st.session_state['pdf_download_filename'] = pdf_filename
+                    st.session_state['show_pdf_download'] = True
                 else:
                     st.session_state['show_pdf_download'] = False
-                    st.info("💡 Install weasyprint to enable PDF downloads: `pip3 install weasyprint`")
+                    st.info("💡 PDF generation is not available on this system. CSV export is still available.")
     
     # PDF download button (outside form)
     if st.session_state.get('show_pdf_download', False):

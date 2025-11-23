@@ -1,6 +1,7 @@
 streamlit>=1.28.0
 pandas>=2.0.0
 openpyxl>=3.1.0
-weasyprint>=60.0
 markdown>=3.4.0
+# Note: weasyprint is optional and not included due to system library dependencies
+# PDF generation will be disabled on Streamlit Cloud, but CSV export remains available
 
