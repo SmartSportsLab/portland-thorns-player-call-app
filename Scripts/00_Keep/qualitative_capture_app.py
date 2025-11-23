@@ -12,21 +12,18 @@ import json
 from io import BytesIO
 import base64
 
-# Weasyprint is optional - only import when actually needed
-# This prevents errors on Streamlit Cloud where system libraries aren't available
-WEASYPRINT_AVAILABLE = False
-def check_weasyprint():
-    """Lazy import of weasyprint to avoid errors on systems without required libraries."""
-    global WEASYPRINT_AVAILABLE
-    if not WEASYPRINT_AVAILABLE:
-        try:
-            from weasyprint import HTML, CSS
-            WEASYPRINT_AVAILABLE = True
-            return HTML, CSS
-        except (ImportError, OSError):
-            WEASYPRINT_AVAILABLE = False
-            return None, None
-    return None, None
+# ReportLab for PDF generation (works on Streamlit Cloud)
+PDF_AVAILABLE = False
+try:
+    from reportlab.lib.pagesizes import letter
+    from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
+    from reportlab.lib.units import inch
+    from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Table, TableStyle, PageBreak
+    from reportlab.lib import colors
+    from reportlab.lib.enums import TA_LEFT, TA_CENTER
+    PDF_AVAILABLE = True
+except ImportError:
+    PDF_AVAILABLE = False
 
 # Page config
 st.set_page_config(
@@ -329,163 +326,253 @@ def clear_draft():
     except Exception as e:
         pass
 
+def escape_text(text):
+    """Escape special characters for ReportLab Paragraph."""
+    if text is None:
+        return "N/A"
+    text = str(text)
+    # Replace common special characters
+    text = text.replace('&', '&amp;')
+    text = text.replace('<', '&lt;')
+    text = text.replace('>', '&gt;')
+    return text
+
+def truncate_text(text, max_len):
+    """Truncate text to max length."""
+    text = str(text) if text is not None else "N/A"
+    if len(text) > max_len:
+        return text[:max_len] + "..."
+    return text
+
 def generate_call_log_pdf(entry):
-    """Generate PDF from call log entry."""
-    # Lazy import weasyprint to avoid errors on systems without required libraries
-    HTML, CSS = check_weasyprint()
-    if HTML is None or CSS is None:
+    """Generate PDF from call log entry using ReportLab."""
+    if not PDF_AVAILABLE:
         return None
     
     try:
-        # Format the data into HTML (compact for single page)
-        html_content = f"""
-        <div style="font-family: Arial, sans-serif; padding: 10px;">
-            <h1 style="color: #1f77b4; border-bottom: 2px solid #1f77b4; padding-bottom: 5px; margin-bottom: 8px; font-size: 16px;">
-                Call Log Report - {entry.get('Player Name', 'Unknown Player')}
-            </h1>
-            
-            <div style="margin-top: 8px;">
-                <h2 style="color: #333; font-size: 11px; margin-top: 8px; margin-bottom: 4px; font-weight: bold;">Call Information</h2>
-                <table style="width: 100%; border-collapse: collapse; margin-bottom: 6px; font-size: 8px;">
-                    <tr><td style="padding: 3px; border-bottom: 1px solid #ddd; font-weight: bold; width: 120px;">Call Date:</td><td style="padding: 3px; border-bottom: 1px solid #ddd;">{entry.get('Call Date', 'N/A')}</td><td style="padding: 3px; border-bottom: 1px solid #ddd; font-weight: bold; width: 120px;">Call Type:</td><td style="padding: 3px; border-bottom: 1px solid #ddd;">{entry.get('Call Type', 'N/A')}</td></tr>
-                    <tr><td style="padding: 3px; border-bottom: 1px solid #ddd; font-weight: bold;">Duration:</td><td style="padding: 3px; border-bottom: 1px solid #ddd;">{entry.get('Duration (min)', 0)} min</td><td style="padding: 3px; border-bottom: 1px solid #ddd; font-weight: bold;">Team:</td><td style="padding: 3px; border-bottom: 1px solid #ddd;">{entry.get('Team', 'N/A')}</td></tr>
-                    <tr><td style="padding: 3px; border-bottom: 1px solid #ddd; font-weight: bold;">Conference:</td><td style="padding: 3px; border-bottom: 1px solid #ddd;">{entry.get('Conference', 'N/A')}</td><td style="padding: 3px; border-bottom: 1px solid #ddd; font-weight: bold;">Position:</td><td style="padding: 3px; border-bottom: 1px solid #ddd;">{entry.get('Position Profile', 'N/A')}</td></tr>
-                    <tr><td style="padding: 3px; border-bottom: 1px solid #ddd; font-weight: bold;">Participants:</td><td style="padding: 3px; border-bottom: 1px solid #ddd;" colspan="3">{entry.get('Participants', 'N/A')}</td></tr>
-                </table>
-            </div>
-            
-            <div style="margin-top: 8px;">
-                <h2 style="color: #333; font-size: 11px; margin-top: 8px; margin-bottom: 4px; font-weight: bold;">Agent Assessment</h2>
-                <table style="width: 100%; border-collapse: collapse; margin-bottom: 6px; font-size: 8px;">
-                    <tr><td style="padding: 3px; border-bottom: 1px solid #ddd; font-weight: bold; width: 120px;">Agent:</td><td style="padding: 3px; border-bottom: 1px solid #ddd;">{entry.get('Agent Name', 'N/A')} ({entry.get('Relationship', 'N/A')})</td></tr>
-                    <tr><td style="padding: 3px; border-bottom: 1px solid #ddd; font-weight: bold;">Scores:</td><td style="padding: 3px; border-bottom: 1px solid #ddd;">Prof: {entry.get('Agent Professionalism', 'N/A')}/10 | Resp: {entry.get('Agent Responsiveness', 'N/A')}/10 | Exp: {entry.get('Agent Expectations', 'N/A')}/10 | Trans: {entry.get('Agent Transparency', 'N/A')}/10 | Neg: {entry.get('Agent Negotiation Style', 'N/A')}/10</td></tr>
-                    <tr><td style="padding: 3px; border-bottom: 1px solid #ddd; font-weight: bold;">Notes:</td><td style="padding: 3px; border-bottom: 1px solid #ddd;">{entry.get('Agent Notes', 'N/A')[:100]}{'...' if len(str(entry.get('Agent Notes', ''))) > 100 else ''}</td></tr>
-                </table>
-            </div>
-            
-            <div style="margin-top: 8px;">
-                <h2 style="color: #333; font-size: 11px; margin-top: 8px; margin-bottom: 4px; font-weight: bold;">Player Notes</h2>
-                <p style="margin: 2px 0 4px 0; padding: 4px; background-color: #f9f9f9; border-left: 2px solid #1f77b4; font-size: 8px;">{entry.get('Player Notes', 'N/A')[:150]}{'...' if len(str(entry.get('Player Notes', ''))) > 150 else ''}</p>
-            </div>
-            
-            <div style="margin-top: 8px;">
-                <h2 style="color: #333; font-size: 11px; margin-top: 8px; margin-bottom: 4px; font-weight: bold;">Player Assessment</h2>
-                <table style="width: 100%; border-collapse: collapse; margin-bottom: 4px; font-size: 8px;">
-                    <tr>
-                        <td style="padding: 2px; border-bottom: 1px solid #ddd; font-weight: bold; width: 100px;">Comm:</td><td style="padding: 2px; border-bottom: 1px solid #ddd;">{entry.get('Communication', 'N/A')}/10</td>
-                        <td style="padding: 2px; border-bottom: 1px solid #ddd; font-weight: bold; width: 100px;">Maturity:</td><td style="padding: 2px; border-bottom: 1px solid #ddd;">{entry.get('Maturity', 'N/A')}/10</td>
-                        <td style="padding: 2px; border-bottom: 1px solid #ddd; font-weight: bold; width: 100px;">Coach:</td><td style="padding: 2px; border-bottom: 1px solid #ddd;">{entry.get('Coachability', 'N/A')}/10</td>
-                    </tr>
-                    <tr>
-                        <td style="padding: 2px; border-bottom: 1px solid #ddd; font-weight: bold;">Leader:</td><td style="padding: 2px; border-bottom: 1px solid #ddd;">{entry.get('Leadership', 'N/A')}/10</td>
-                        <td style="padding: 2px; border-bottom: 1px solid #ddd; font-weight: bold;">Work Ethic:</td><td style="padding: 2px; border-bottom: 1px solid #ddd;">{entry.get('Work Ethic', 'N/A')}/10</td>
-                        <td style="padding: 2px; border-bottom: 1px solid #ddd; font-weight: bold;">Conf:</td><td style="padding: 2px; border-bottom: 1px solid #ddd;">{entry.get('Confidence', 'N/A')}/10</td>
-                    </tr>
-                    <tr>
-                        <td style="padding: 2px; border-bottom: 1px solid #ddd; font-weight: bold;">Tactical:</td><td style="padding: 2px; border-bottom: 1px solid #ddd;">{entry.get('Tactical Knowledge', 'N/A')}/10</td>
-                        <td style="padding: 2px; border-bottom: 1px solid #ddd; font-weight: bold;">Team Fit:</td><td style="padding: 2px; border-bottom: 1px solid #ddd;">{entry.get('Team Fit', 'N/A')}/10</td>
-                        <td style="padding: 2px; border-bottom: 1px solid #ddd; font-weight: bold;">Overall:</td><td style="padding: 2px; border-bottom: 1px solid #ddd;">{entry.get('Overall Rating', 'N/A')}/10</td>
-                    </tr>
-                </table>
-                <p style="margin: 2px 0; font-size: 8px;"><strong>Total:</strong> {entry.get('Assessment Total Score', 'N/A')}/90 ({entry.get('Assessment Percentage', 'N/A')}%) | <strong>Grade:</strong> {entry.get('Assessment Grade', 'N/A')}</p>
-            </div>
-            
-            <div style="margin-top: 8px;">
-                <h2 style="color: #333; font-size: 11px; margin-top: 8px; margin-bottom: 4px; font-weight: bold;">Personality & Self Awareness</h2>
-                <p style="margin: 2px 0; font-size: 8px;"><strong>Carry themselves:</strong> {str(entry.get('How They Carry Themselves', 'N/A'))[:80]}{'...' if len(str(entry.get('How They Carry Themselves', ''))) > 80 else ''}</p>
-                <p style="margin: 2px 0; font-size: 8px;"><strong>View themselves:</strong> {str(entry.get('How They View Themselves', 'N/A'))[:80]}{'...' if len(str(entry.get('How They View Themselves', ''))) > 80 else ''}</p>
-                <p style="margin: 2px 0; font-size: 8px;"><strong>Important:</strong> {str(entry.get('What Is Important To Them', 'N/A'))[:80]}{'...' if len(str(entry.get('What Is Important To Them', ''))) > 80 else ''}</p>
-                <p style="margin: 2px 0; font-size: 8px;"><strong>Growth mindset:</strong> {str(entry.get('Mindset Towards Growth', 'N/A'))[:80]}{'...' if len(str(entry.get('Mindset Towards Growth', ''))) > 80 else ''}</p>
-                <p style="margin: 2px 0; font-size: 8px;"><strong>Preparation:</strong> {entry.get('Preparation Level', 'N/A')}/10 - {str(entry.get('Preparation Notes', 'N/A'))[:60]}{'...' if len(str(entry.get('Preparation Notes', ''))) > 60 else ''}</p>
-            </div>
-            
-            <div style="margin-top: 8px;">
-                <h2 style="color: #333; font-size: 11px; margin-top: 8px; margin-bottom: 4px; font-weight: bold;">Key Talking Points</h2>
-                <table style="width: 100%; border-collapse: collapse; margin-bottom: 4px; font-size: 8px;">
-                    <tr><td style="padding: 2px; border-bottom: 1px solid #ddd; font-weight: bold; width: 100px;">Interest:</td><td style="padding: 2px; border-bottom: 1px solid #ddd;">{entry.get('Interest Level', 'N/A')}</td><td style="padding: 2px; border-bottom: 1px solid #ddd; font-weight: bold; width: 100px;">Timeline:</td><td style="padding: 2px; border-bottom: 1px solid #ddd;">{entry.get('Timeline', 'N/A')}</td></tr>
-                    <tr><td style="padding: 2px; border-bottom: 1px solid #ddd; font-weight: bold;">Salary:</td><td style="padding: 2px; border-bottom: 1px solid #ddd;" colspan="3">{entry.get('Salary Expectations', 'N/A')}</td></tr>
-                    <tr><td style="padding: 2px; border-bottom: 1px solid #ddd; font-weight: bold;">Other Opps:</td><td style="padding: 2px; border-bottom: 1px solid #ddd;" colspan="3">{str(entry.get('Other Opportunities', 'N/A'))[:100]}{'...' if len(str(entry.get('Other Opportunities', ''))) > 100 else ''}</td></tr>
-                    <tr><td style="padding: 2px; border-bottom: 1px solid #ddd; font-weight: bold;">Talking Points:</td><td style="padding: 2px; border-bottom: 1px solid #ddd;" colspan="3">{str(entry.get('Key Talking Points', 'N/A'))[:100]}{'...' if len(str(entry.get('Key Talking Points', ''))) > 100 else ''}</td></tr>
-                </table>
-            </div>
-            
-            <div style="margin-top: 8px;">
-                <h2 style="color: #333; font-size: 11px; margin-top: 8px; margin-bottom: 4px; font-weight: bold;">Red Flags & Assessment</h2>
-                <p style="margin: 2px 0; font-size: 8px;"><strong>Red Flags:</strong> {entry.get('Red Flag Severity', 'N/A')} - {str(entry.get('Red Flags', 'N/A'))[:100]}{'...' if len(str(entry.get('Red Flags', ''))) > 100 else ''}</p>
-                <p style="margin: 2px 0; font-size: 8px;"><strong>Recommendation:</strong> {entry.get('Recommendation', 'N/A')}</p>
-                <p style="margin: 2px 0; font-size: 8px;"><strong>Summary:</strong> {str(entry.get('Summary Notes', 'N/A'))[:120]}{'...' if len(str(entry.get('Summary Notes', ''))) > 120 else ''}</p>
-            </div>
-            
-            <div style="margin-top: 8px;">
-                <h2 style="color: #333; font-size: 11px; margin-top: 8px; margin-bottom: 4px; font-weight: bold;">Next Steps</h2>
-                <p style="margin: 2px 0; font-size: 8px;"><strong>Follow-up:</strong> {'Yes' if entry.get('Follow-up Needed') else 'No'}{f' - {entry.get("Follow-up Date", "N/A")}' if entry.get('Follow-up Needed') else ''}</p>
-                <p style="margin: 2px 0; font-size: 8px;"><strong>Action Items:</strong> {str(entry.get('Action Items', 'N/A'))[:100]}{'...' if len(str(entry.get('Action Items', ''))) > 100 else ''}</p>
-            </div>
-            
-            <div style="margin-top: 6px; padding-top: 4px; border-top: 1px solid #ddd; color: #666; font-size: 7px;">
-                <p style="margin: 1px 0;">Call Notes: {str(entry.get('Call Notes', 'N/A'))[:80]}{'...' if len(str(entry.get('Call Notes', ''))) > 80 else ''} | Created: {entry.get('Created At', 'N/A')}</p>
-            </div>
-        </div>
-        """
+        # Create PDF in memory
+        pdf_buffer = BytesIO()
+        doc = SimpleDocTemplate(pdf_buffer, pagesize=letter,
+                              rightMargin=0.4*inch, leftMargin=0.4*inch,
+                              topMargin=0.4*inch, bottomMargin=0.4*inch)
         
-        # Wrap in full HTML document
-        html_document = f"""
-        <!DOCTYPE html>
-        <html>
-        <head>
-            <meta charset="UTF-8">
-            <style>
-                @page {{
-                    size: letter;
-                    margin: 0.4in;
-                }}
-                body {{
-                    font-family: Arial, sans-serif;
-                    line-height: 1.2;
-                    color: #333;
-                    font-size: 8px;
-                }}
-                h1 {{
-                    color: #1f77b4;
-                    border-bottom: 2px solid #1f77b4;
-                    padding-bottom: 3px;
-                    margin-bottom: 5px;
-                    font-size: 14px;
-                }}
-                h2 {{
-                    color: #333;
-                    font-size: 10px;
-                    margin-top: 6px;
-                    margin-bottom: 3px;
-                    font-weight: bold;
-                }}
-                table {{
-                    width: 100%;
-                    border-collapse: collapse;
-                    margin-bottom: 4px;
-                    font-size: 8px;
-                }}
-                td {{
-                    padding: 2px;
-                    border-bottom: 1px solid #ddd;
-                }}
-                p {{
-                    margin: 2px 0;
-                    font-size: 8px;
-                }}
-            </style>
-        </head>
-        <body>
-            {html_content}
-        </body>
-        </html>
-        """
+        # Container for the 'Flowable' objects
+        elements = []
         
-        # Generate PDF bytes
-        pdf_bytes = BytesIO()
-        HTML(string=html_document).write_pdf(pdf_bytes)
-        pdf_bytes.seek(0)
-        return pdf_bytes.getvalue()
+        # Define styles
+        styles = getSampleStyleSheet()
+        title_style = ParagraphStyle(
+            'CustomTitle',
+            parent=styles['Heading1'],
+            fontSize=16,
+            textColor=colors.HexColor('#1f77b4'),
+            spaceAfter=12,
+            borderWidth=0,
+            borderPadding=0,
+            borderColor=colors.HexColor('#1f77b4'),
+        )
+        heading_style = ParagraphStyle(
+            'CustomHeading',
+            parent=styles['Heading2'],
+            fontSize=11,
+            textColor=colors.HexColor('#333333'),
+            spaceAfter=6,
+            spaceBefore=8,
+        )
+        normal_style = ParagraphStyle(
+            'CustomNormal',
+            parent=styles['Normal'],
+            fontSize=8,
+            spaceAfter=4,
+        )
+        small_style = ParagraphStyle(
+            'CustomSmall',
+            parent=styles['Normal'],
+            fontSize=7,
+            textColor=colors.HexColor('#666666'),
+        )
+        
+        # Title
+        player_name = escape_text(entry.get('Player Name', 'Unknown Player'))
+        title = Paragraph(f"Call Log Report - {player_name}", title_style)
+        elements.append(title)
+        elements.append(Spacer(1, 0.1*inch))
+        
+        # Call Information
+        elements.append(Paragraph("Call Information", heading_style))
+        call_data = [
+            ['Call Date:', escape_text(entry.get('Call Date', 'N/A')), 
+             'Call Type:', escape_text(entry.get('Call Type', 'N/A'))],
+            ['Duration:', f"{entry.get('Duration (min)', 0)} min", 
+             'Team:', escape_text(entry.get('Team', 'N/A'))],
+            ['Conference:', escape_text(entry.get('Conference', 'N/A')), 
+             'Position:', escape_text(entry.get('Position Profile', 'N/A'))],
+            ['Participants:', escape_text(entry.get('Participants', 'N/A'))],
+        ]
+        call_table = Table(call_data, colWidths=[1.2*inch, 2.3*inch, 1.2*inch, 2.3*inch])
+        call_table.setStyle(TableStyle([
+            ('FONTNAME', (0, 0), (-1, -1), 'Helvetica'),
+            ('FONTSIZE', (0, 0), (-1, -1), 8),
+            ('FONTNAME', (0, 0), (0, -1), 'Helvetica-Bold'),
+            ('FONTNAME', (2, 0), (2, -1), 'Helvetica-Bold'),
+            ('GRID', (0, 0), (-1, -1), 0.5, colors.grey),
+            ('VALIGN', (0, 0), (-1, -1), 'TOP'),
+            ('LEFTPADDING', (0, 0), (-1, -1), 3),
+            ('RIGHTPADDING', (0, 0), (-1, -1), 3),
+            ('TOPPADDING', (0, 0), (-1, -1), 3),
+            ('BOTTOMPADDING', (0, 0), (-1, -1), 3),
+        ]))
+        elements.append(call_table)
+        elements.append(Spacer(1, 0.15*inch))
+        
+        # Agent Assessment
+        elements.append(Paragraph("Agent Assessment", heading_style))
+        agent_name = escape_text(entry.get('Agent Name', 'N/A'))
+        relationship = escape_text(entry.get('Relationship', 'N/A'))
+        agent_data = [
+            ['Agent:', f"{agent_name} ({relationship})"],
+            ['Scores:', f"Prof: {entry.get('Agent Professionalism', 'N/A')}/10 | "
+                       f"Resp: {entry.get('Agent Responsiveness', 'N/A')}/10 | "
+                       f"Exp: {entry.get('Agent Expectations', 'N/A')}/10 | "
+                       f"Trans: {entry.get('Agent Transparency', 'N/A')}/10 | "
+                       f"Neg: {entry.get('Agent Negotiation Style', 'N/A')}/10"],
+            ['Notes:', truncate_text(entry.get('Agent Notes', 'N/A'), 100)],
+        ]
+        agent_table = Table(agent_data, colWidths=[1.2*inch, 5.8*inch])
+        agent_table.setStyle(TableStyle([
+            ('FONTNAME', (0, 0), (-1, -1), 'Helvetica'),
+            ('FONTSIZE', (0, 0), (-1, -1), 8),
+            ('FONTNAME', (0, 0), (0, -1), 'Helvetica-Bold'),
+            ('GRID', (0, 0), (-1, -1), 0.5, colors.grey),
+            ('VALIGN', (0, 0), (-1, -1), 'TOP'),
+            ('LEFTPADDING', (0, 0), (-1, -1), 3),
+            ('RIGHTPADDING', (0, 0), (-1, -1), 3),
+            ('TOPPADDING', (0, 0), (-1, -1), 3),
+            ('BOTTOMPADDING', (0, 0), (-1, -1), 3),
+        ]))
+        elements.append(agent_table)
+        elements.append(Spacer(1, 0.15*inch))
+        
+        # Player Notes
+        elements.append(Paragraph("Player Notes", heading_style))
+        player_notes = truncate_text(entry.get('Player Notes', 'N/A'), 150)
+        notes_para = Paragraph(f"<b>{player_notes}</b>", normal_style)
+        elements.append(notes_para)
+        elements.append(Spacer(1, 0.15*inch))
+        
+        # Player Assessment
+        elements.append(Paragraph("Player Assessment", heading_style))
+        assessment_data = [
+            ['Comm:', f"{entry.get('Communication', 'N/A')}/10",
+             'Maturity:', f"{entry.get('Maturity', 'N/A')}/10",
+             'Coach:', f"{entry.get('Coachability', 'N/A')}/10"],
+            ['Leader:', f"{entry.get('Leadership', 'N/A')}/10",
+             'Work Ethic:', f"{entry.get('Work Ethic', 'N/A')}/10",
+             'Conf:', f"{entry.get('Confidence', 'N/A')}/10"],
+            ['Tactical:', f"{entry.get('Tactical Knowledge', 'N/A')}/10",
+             'Team Fit:', f"{entry.get('Team Fit', 'N/A')}/10",
+             'Overall:', f"{entry.get('Overall Rating', 'N/A')}/10"],
+        ]
+        assessment_table = Table(assessment_data, colWidths=[1*inch, 0.8*inch, 1*inch, 0.8*inch, 1*inch, 0.8*inch])
+        assessment_table.setStyle(TableStyle([
+            ('FONTNAME', (0, 0), (-1, -1), 'Helvetica'),
+            ('FONTSIZE', (0, 0), (-1, -1), 8),
+            ('FONTNAME', (0, 0), (0, -1), 'Helvetica-Bold'),
+            ('FONTNAME', (2, 0), (2, -1), 'Helvetica-Bold'),
+            ('FONTNAME', (4, 0), (4, -1), 'Helvetica-Bold'),
+            ('GRID', (0, 0), (-1, -1), 0.5, colors.grey),
+            ('VALIGN', (0, 0), (-1, -1), 'TOP'),
+            ('LEFTPADDING', (0, 0), (-1, -1), 2),
+            ('RIGHTPADDING', (0, 0), (-1, -1), 2),
+            ('TOPPADDING', (0, 0), (-1, -1), 2),
+            ('BOTTOMPADDING', (0, 0), (-1, -1), 2),
+        ]))
+        elements.append(assessment_table)
+        total_score = entry.get('Assessment Total Score', 'N/A')
+        total_pct = entry.get('Assessment Percentage', 'N/A')
+        grade = entry.get('Assessment Grade', 'N/A')
+        total_text = f"<b>Total:</b> {total_score}/90 ({total_pct}%) | <b>Grade:</b> {grade}"
+        elements.append(Paragraph(total_text, normal_style))
+        elements.append(Spacer(1, 0.15*inch))
+        
+        # Personality & Self Awareness
+        elements.append(Paragraph("Personality & Self Awareness", heading_style))
+        personality_items = [
+            ('Carry themselves:', entry.get('How They Carry Themselves', 'N/A'), 80),
+            ('View themselves:', entry.get('How They View Themselves', 'N/A'), 80),
+            ('Important:', entry.get('What Is Important To Them', 'N/A'), 80),
+            ('Growth mindset:', entry.get('Mindset Towards Growth', 'N/A'), 80),
+        ]
+        for label, value, max_len in personality_items:
+            text = truncate_text(value, max_len)
+            para = Paragraph(f"<b>{label}</b> {escape_text(text)}", normal_style)
+            elements.append(para)
+        # Preparation (special format)
+        prep_level = entry.get('Preparation Level', 'N/A')
+        prep_notes = truncate_text(entry.get('Preparation Notes', 'N/A'), 60)
+        prep_text = f"{prep_level}/10 - {prep_notes}"
+        elements.append(Paragraph(f"<b>Preparation:</b> {escape_text(prep_text)}", normal_style))
+        elements.append(Spacer(1, 0.15*inch))
+        
+        # Key Talking Points
+        elements.append(Paragraph("Key Talking Points", heading_style))
+        talking_data = [
+            ['Interest:', escape_text(entry.get('Interest Level', 'N/A')), 
+             'Timeline:', escape_text(entry.get('Timeline', 'N/A'))],
+            ['Salary:', escape_text(entry.get('Salary Expectations', 'N/A'))],
+            ['Other Opps:', truncate_text(entry.get('Other Opportunities', 'N/A'), 100)],
+            ['Talking Points:', truncate_text(entry.get('Key Talking Points', 'N/A'), 100)],
+        ]
+        talking_table = Table(talking_data, colWidths=[1*inch, 5*inch])
+        talking_table.setStyle(TableStyle([
+            ('FONTNAME', (0, 0), (-1, -1), 'Helvetica'),
+            ('FONTSIZE', (0, 0), (-1, -1), 8),
+            ('FONTNAME', (0, 0), (0, -1), 'Helvetica-Bold'),
+            ('GRID', (0, 0), (-1, -1), 0.5, colors.grey),
+            ('VALIGN', (0, 0), (-1, -1), 'TOP'),
+            ('LEFTPADDING', (0, 0), (-1, -1), 2),
+            ('RIGHTPADDING', (0, 0), (-1, -1), 2),
+            ('TOPPADDING', (0, 0), (-1, -1), 2),
+            ('BOTTOMPADDING', (0, 0), (-1, -1), 2),
+            ('SPAN', (1, 1), (1, 1)),
+            ('SPAN', (1, 2), (1, 2)),
+            ('SPAN', (1, 3), (1, 3)),
+        ]))
+        elements.append(talking_table)
+        elements.append(Spacer(1, 0.15*inch))
+        
+        # Red Flags & Assessment
+        elements.append(Paragraph("Red Flags & Assessment", heading_style))
+        red_flag_severity = escape_text(entry.get('Red Flag Severity', 'N/A'))
+        red_flags = truncate_text(entry.get('Red Flags', 'N/A'), 100)
+        recommendation = escape_text(entry.get('Recommendation', 'N/A'))
+        summary = truncate_text(entry.get('Summary Notes', 'N/A'), 120)
+        elements.append(Paragraph(f"<b>Red Flags:</b> {red_flag_severity} - {red_flags}", normal_style))
+        elements.append(Paragraph(f"<b>Recommendation:</b> {recommendation}", normal_style))
+        elements.append(Paragraph(f"<b>Summary:</b> {summary}", normal_style))
+        elements.append(Spacer(1, 0.15*inch))
+        
+        # Next Steps
+        elements.append(Paragraph("Next Steps", heading_style))
+        follow_up = 'Yes' if entry.get('Follow-up Needed') else 'No'
+        follow_up_date = entry.get('Follow-up Date', '')
+        if follow_up == 'Yes' and follow_up_date:
+            follow_up += f" - {follow_up_date}"
+        action_items = truncate_text(entry.get('Action Items', 'N/A'), 100)
+        elements.append(Paragraph(f"<b>Follow-up:</b> {follow_up}", normal_style))
+        elements.append(Paragraph(f"<b>Action Items:</b> {action_items}", normal_style))
+        elements.append(Spacer(1, 0.1*inch))
+        
+        # Footer
+        call_notes = truncate_text(entry.get('Call Notes', 'N/A'), 80)
+        created_at = escape_text(entry.get('Created At', 'N/A'))
+        footer_text = f"Call Notes: {call_notes} | Created: {created_at}"
+        elements.append(Paragraph(footer_text, small_style))
+        
+        # Build PDF
+        doc.build(elements)
+        pdf_buffer.seek(0)
+        return pdf_buffer.getvalue()
         
     except Exception as e:
         st.error(f"Error generating PDF: {e}")
@@ -1098,7 +1185,8 @@ if page == "Log New Call":
                     st.session_state['show_pdf_download'] = True
                 else:
                     st.session_state['show_pdf_download'] = False
-                    st.info("💡 PDF generation is not available on this system. CSV export is still available.")
+                    if not PDF_AVAILABLE:
+                        st.info("💡 Install reportlab to enable PDF downloads: `pip install reportlab`")
     
     # PDF download button (outside form)
     if st.session_state.get('show_pdf_download', False):
