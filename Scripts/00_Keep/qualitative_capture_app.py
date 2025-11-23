@@ -1452,9 +1452,9 @@ with st.sidebar:
 col_lang1, col_lang2, col_lang3 = st.columns([1, 2, 1])
 with col_lang2:
     selected_language = st.selectbox(
-        "🌐 Language / Idioma / Langue / Idioma / Sprache / Lingua",
-        ['English', 'Spanish', 'French', 'Portuguese', 'German', 'Italian'],
-        index=['English', 'Spanish', 'French', 'Portuguese', 'German', 'Italian'].index(st.session_state.language),
+        "🌐 Language / Idioma / Langue / Idioma / Sprache / Lingua / العربية",
+        ['English', 'Spanish', 'French', 'Portuguese', 'German', 'Italian', 'Arabic'],
+        index=['English', 'Spanish', 'French', 'Portuguese', 'German', 'Italian', 'Arabic'].index(st.session_state.language) if st.session_state.language in ['English', 'Spanish', 'French', 'Portuguese', 'German', 'Italian', 'Arabic'] else 0,
         key='language_selector'
     )
     if selected_language != st.session_state.language:
