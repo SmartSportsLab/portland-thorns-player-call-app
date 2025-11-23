@@ -902,9 +902,14 @@ if page == "Log New Call":
         call_type = st.selectbox("Call Type", ["Player Call", "Agent Call", "Both"], index=["Player Call", "Agent Call", "Both"].index(st.session_state.get('form1_call_type', "Player Call")) if st.session_state.get('form1_call_type', "Player Call") in ["Player Call", "Agent Call", "Both"] else 0)
         duration = st.number_input("Duration (minutes)", min_value=0, max_value=300, value=st.session_state.get('form1_duration', 30))
         
-        # Use auto-populated values from player selection (no redundant fields)
-        team = st.session_state.get('form1_team', st.session_state.selected_player_team)
-        conference = st.session_state.get('form1_conference', st.session_state.selected_player_conference)
+        # Use filter values if manually selected, otherwise use auto-populated values from player selection
+        # Priority: filter values > auto-populated > form1 values
+        team = (st.session_state.get('filter_team') or 
+                st.session_state.get('form1_team') or 
+                st.session_state.selected_player_team)
+        conference = (st.session_state.get('filter_conference') or 
+                      st.session_state.get('form1_conference') or 
+                      st.session_state.selected_player_conference)
         conference_other = st.session_state.get('form1_conference_other', '')
         # Position Profile removed - using auto-populated position from player selection
         position_profile = st.session_state.selected_player_position
@@ -1188,13 +1193,23 @@ if page == "Log New Call":
                     save_agent_to_database(agent_name_val)
                 # Create new entry - need to get values from first form
                 # Since forms are separate, we'll need to store first form data in session state
-                final_conference = st.session_state.get('form1_conference_other') if st.session_state.get('form1_conference') == "Other" else st.session_state.get('form1_conference', '')
+                # Use filter values if manually selected, otherwise use auto-populated or form1 values
+                final_team = (st.session_state.get('filter_team') or 
+                             st.session_state.get('form1_team') or 
+                             st.session_state.selected_player_team or '')
+                
+                # Conference: check if "Other" was selected, otherwise use filter/auto-populated/form1
+                conference_value = (st.session_state.get('filter_conference') or 
+                                   st.session_state.get('form1_conference') or 
+                                   st.session_state.selected_player_conference or '')
+                final_conference = st.session_state.get('form1_conference_other') if conference_value == "Other" else conference_value
+                
                 final_relationship = st.session_state.get('form1_relationship_other') if st.session_state.get('form1_relationship') == "Other" else st.session_state.get('form1_relationship', '')
                 
                 new_entry = {
                     'Call Date': (st.session_state.get('form1_call_date') or datetime.now().date()).strftime('%Y-%m-%d') if isinstance(st.session_state.get('form1_call_date', None), date) else datetime.now().date().strftime('%Y-%m-%d'),
                     'Player Name': player_name,
-                    'Team': st.session_state.get('form1_team', ''),
+                    'Team': final_team,
                     'Conference': final_conference,
                     'Position Profile': st.session_state.get('form1_position_profile', ''),
                     'Call Type': st.session_state.get('form1_call_type', ''),
