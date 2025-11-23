@@ -714,9 +714,38 @@ if PLAYER_DB_FILE and PLAYER_DB_FILE.exists():
     file_source = "uploaded" if UPLOADED_PLAYER_FILE else "local"
     st.sidebar.success(f"✅ Loaded {len(players_list)} players from:\n`{PLAYER_DB_FILE.name}` ({file_source})")
 
+# Quick Start Guide in Sidebar
+with st.sidebar:
+    st.markdown("---")
+    st.markdown("### 🚀 Quick Start Guide")
+    with st.expander("📖 How to Use This App", expanded=False):
+        st.markdown("""
+        **1. Upload Player Database** (First Time Only)
+        - Upload your shortlist Excel file in the sidebar above
+        - File will be saved permanently
+        
+        **2. Log a New Call**
+        - Select Conference → Team → Player
+        - Fill out call details and assessments
+        - Click "Save Call Log" at the bottom
+        
+        **3. Download Results**
+        - PDF and CSV files available after saving
+        - View call history anytime
+        
+        **4. View Player Overviews**
+        - Upload PDF overviews or view existing ones
+        - Compare players across metrics
+        """)
+    st.markdown("---")
+
 # Main app
 st.title("⚽ Portland Thorns - Call Log System")
 st.markdown("---")
+
+# Initialize welcome state
+if 'show_welcome' not in st.session_state:
+    st.session_state.show_welcome = True
 
 # Sidebar navigation
 # Player Overview PDF Viewer
@@ -771,6 +800,52 @@ if page == "Log New Call":
         """,
         unsafe_allow_html=True
     )
+    
+    # Show welcome only on Log New Call page
+    if st.session_state.show_welcome:
+        with st.expander("👋 Welcome - Getting Started", expanded=True):
+            st.markdown("""
+            ### What This App Does
+            
+            This system helps you capture and organize qualitative information from player and agent calls:
+            
+            - **📞 Log Calls**: Record detailed information from conversations with players and agents
+            - **📊 Track Assessments**: Rate players on communication, maturity, coachability, and more
+            - **📄 Generate Reports**: Download PDF summaries and CSV exports
+            - **🔍 View History**: Review past calls and player summaries
+            - **📈 Player Overviews**: View detailed scouting reports with charts and comparisons
+            
+            ### First Steps
+            
+            1. **Upload Player Database** (if not already done)
+               - Use the sidebar uploader to add your shortlist Excel file
+               - This enables player selection and auto-population
+            
+            2. **Log Your First Call**
+               - Select a player from the database (or enter custom player)
+               - Fill out the call details and assessments
+               - Save to generate PDF and CSV files
+            
+            3. **Explore Features**
+               - View call history to see all logged calls
+               - Check player summaries for aggregated insights
+               - Upload and view player overview PDFs
+            
+            ### Tips
+            
+            - 💾 Use "Save Draft" to save progress without submitting
+            - 🔍 Search players by name in the player selection dropdown
+            - 📥 Download PDFs and CSVs after each call for your records
+            - 🔄 Conference and Team auto-populate when you select a player
+            
+            **Ready to start?** Close this section and begin logging your first call!
+            """)
+            
+            if st.button("Got it! Hide this message", key="hide_welcome_log"):
+                st.session_state.show_welcome = False
+                st.rerun()
+        
+        st.markdown("---")
     
     st.header("📞 Log New Call")
     
