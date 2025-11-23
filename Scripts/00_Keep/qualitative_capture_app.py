@@ -642,11 +642,35 @@ def get_players_by_team(team):
             players.append(player_name)
     return sorted(players)
 
+# File uploader for player database (if file not found)
+UPLOADED_PLAYER_FILE = None
+if not (PLAYER_DB_FILE and PLAYER_DB_FILE.exists()):
+    st.sidebar.markdown("### 📁 Upload Player Database")
+    uploaded_file = st.sidebar.file_uploader(
+        "Upload player database (Excel file)",
+        type=['xlsx', 'xls'],
+        help="Upload a shortlist or conference report Excel file"
+    )
+    
+    if uploaded_file is not None:
+        # Save uploaded file to DATA_DIR
+        uploaded_path = DATA_DIR / uploaded_file.name
+        with open(uploaded_path, 'wb') as f:
+            f.write(uploaded_file.getbuffer())
+        UPLOADED_PLAYER_FILE = uploaded_path
+        PLAYER_DB_FILE = uploaded_path
+        # Clear cache to reload with new file
+        load_player_database.clear()
+        load_player_info.clear()
+        st.sidebar.success(f"✅ Uploaded: {uploaded_file.name}")
+        st.rerun()
+    else:
+        st.sidebar.error("⚠️ No player database file found!\n\nPlease upload a player database file above, or ensure one of these files exists:\n- Portland Thorns 2025 Long Shortlist.xlsx\n- Portland Thorns 2025 Short Shortlist.xlsx\n- AI Shortlist.xlsx\n- Conference Reports")
+
 # Display loading status in sidebar
 if PLAYER_DB_FILE and PLAYER_DB_FILE.exists():
-    st.sidebar.success(f"✅ Loaded {len(players_list)} players from:\n`{PLAYER_DB_FILE.name}`")
-else:
-    st.sidebar.error("⚠️ No player database file found!\n\nPlease ensure one of these files exists:\n- Portland Thorns 2025 Long Shortlist.xlsx\n- Portland Thorns 2025 Short Shortlist.xlsx\n- AI Shortlist.xlsx\n- Conference Reports")
+    file_source = "uploaded" if UPLOADED_PLAYER_FILE else "local"
+    st.sidebar.success(f"✅ Loaded {len(players_list)} players from:\n`{PLAYER_DB_FILE.name}` ({file_source})")
 
 # Main app
 st.title("⚽ Portland Thorns - Call Log System")
@@ -1710,6 +1734,33 @@ elif page == "View Player Overview":
     st.title("📄 Player Overview PDF Viewer")
     st.markdown("View player overview PDFs generated from the scouting system.")
     
+    # PDF uploader
+    st.markdown("### 📁 Upload Player Overview PDFs")
+    uploaded_pdfs = st.file_uploader(
+        "Upload player overview PDFs",
+        type=['pdf'],
+        accept_multiple_files=True,
+        help="Upload one or more player overview PDF files. They will be saved to the overview directory."
+    )
+    
+    if uploaded_pdfs:
+        # Ensure overview directory exists
+        OVERVIEW_DIR.mkdir(parents=True, exist_ok=True)
+        
+        uploaded_count = 0
+        for uploaded_pdf in uploaded_pdfs:
+            # Save to overview directory (flat structure for uploaded files)
+            pdf_path = OVERVIEW_DIR / uploaded_pdf.name
+            with open(pdf_path, 'wb') as f:
+                f.write(uploaded_pdf.getbuffer())
+            uploaded_count += 1
+        
+        if uploaded_count > 0:
+            st.success(f"✅ Uploaded {uploaded_count} PDF file(s)")
+            st.rerun()
+    
+    st.markdown("---")
+    
     # Find all available PDFs
     pdf_files = []
     if OVERVIEW_DIR.exists():
@@ -1726,6 +1777,14 @@ elif page == "View Player Overview":
                                 'position': position_folder.name,
                                 'type': folder_type
                             })
+        # Also include PDFs directly in OVERVIEW_DIR (uploaded files)
+        for pdf_file in OVERVIEW_DIR.glob('*.pdf'):
+            pdf_files.append({
+                'path': pdf_file,
+                'name': pdf_file.stem,
+                'position': 'Uploaded',
+                'type': 'Direct'
+            })
     
     if pdf_files:
         # Create a searchable dropdown
