@@ -1,0 +1,300 @@
+{
+  "position_profiles": {
+    "Centre Midfielder": {
+      "profile_name": "Defensive-Minded Box-to-Box",
+      "metrics": {
+        "Core": {
+          "Defensive duels per 90 + Defensive duels won, %": {
+            "weight": 0.14285714285714285,
+            "components": {
+              "Defensive duels per 90": 0.8,
+              "Defensive duels won, %": 0.2
+            }
+          },
+          "PAdj Interceptions + PAdj Sliding tackles": {
+            "weight": 0.14285714285714285,
+            "components": {
+              "PAdj Interceptions": 0.8,
+              "PAdj Sliding tackles": 0.2
+            }
+          }
+        },
+        "Specific": {
+          "Progressive passes per 90 + Accurate progressive passes, %": {
+            "weight": 0.14285714285714285,
+            "components": {
+              "Progressive passes per 90": 0.8,
+              "Accurate progressive passes, %": 0.2
+            }
+          },
+          "Short / medium passes per 90 + Accurate short / medium passes, %": {
+            "weight": 0.14285714285714285,
+            "components": {
+              "Short / medium passes per 90": 0.8,
+              "Accurate short / medium passes, %": 0.2
+            }
+          },
+          "Long passes per 90 + Accurate long passes, %": {
+            "weight": 0.14285714285714285,
+            "components": {
+              "Long passes per 90": 0.8,
+              "Accurate long passes, %": 0.2
+            }
+          },
+          "Received passes per 90": 0.14285714285714285,
+          "Dribbles per 90 + Successful dribbles, % + Progressive runs per 90": {
+            "weight": 0.14285714285714285,
+            "components": {
+              "Dribbles per 90": 0.4,
+              "Successful dribbles, %": 0.2,
+              "Progressive runs per 90": 0.4
+            }
+          }
+        }
+      }
+    },
+    "Attacking Midfielder": {
+      "profile_name": "Advanced Playmaker",
+      "metrics": {
+        "Core": {
+          "Goals per 90 + Assists per 90 + Shot assists per 90 + Second assists per 90 + Third assists per 90": {
+            "weight": 0.125,
+            "components": {
+              "Goals per 90": 0.4,
+              "Assists per 90": 0.2,
+              "Shot assists per 90": 0.2,
+              "Second assists per 90": 0.1,
+              "Third assists per 90": 0.1
+            }
+          },
+          "Offensive duels per 90 + Offensive duels won, %": {
+            "weight": 0.125,
+            "components": {
+              "Offensive duels per 90": 0.8,
+              "Offensive duels won, %": 0.2
+            }
+          }
+        },
+        "Specific": {
+          "Smart passes per 90 + Accurate smart passes, % + Through passes per 90 + Accurate through passes, % + Deep completions per 90": {
+            "weight": 0.125,
+            "components": {
+              "Smart passes per 90": 0.25,
+              "Accurate smart passes, %": 0.125,
+              "Through passes per 90": 0.25,
+              "Accurate through passes, %": 0.125,
+              "Deep completions per 90": 0.25
+            }
+          },
+          "Dribbles per 90 + Successful dribbles, %": {
+            "weight": 0.125,
+            "components": {
+              "Dribbles per 90": 0.8,
+              "Successful dribbles, %": 0.2
+            }
+          },
+          "Received passes per 90": 0.125,
+          "Touches in box per 90": 0.125,
+          "Progressive runs per 90": 0.125,
+          "xG per 90 - Goals per 90": 0.125
+        }
+      }
+    },
+    "Winger": {
+      "profile_name": "Touchline Winger (Right-Sided)",
+      "metrics": {
+        "Core": {
+          "Offensive duels per 90 + Offensive duels won, %": {
+            "weight": 0.125,
+            "components": {
+              "Offensive duels per 90": 0.8,
+              "Offensive duels won, %": 0.2
+            }
+          },
+          "Dribbles per 90 + Successful dribbles, %": {
+            "weight": 0.125,
+            "components": {
+              "Dribbles per 90": 0.8,
+              "Successful dribbles, %": 0.2
+            }
+          },
+          "Crosses from right flank per 90 + Accurate crosses from right flank, %": {
+            "weight": 0.125,
+            "components": {
+              "Crosses from right flank per 90": 0.8,
+              "Accurate crosses from right flank, %": 0.2
+            }
+          },
+          "Accelerations per 90": 0.125
+        },
+        "Specific": {
+          "Progressive runs per 90": 0.125,
+          "Received long passes per 90": 0.125,
+          "Received passes per 90": 0.125,
+          "Assists per 90 + Shot assists per 90 + Second assists per 90 + Third assists per 90": {
+            "weight": 0.125,
+            "components": {
+              "Assists per 90": 0.4,
+              "Shot assists per 90": 0.4,
+              "Second assists per 90": 0.1,
+              "Third assists per 90": 0.1
+            }
+          }
+        }
+      }
+    },
+    "Center Back": {
+      "profile_name": "Hybrid Ball-Playing/Winning",
+      "metrics": {
+        "Core": {
+          "Defensive duels per 90 + Defensive duels won, %": {
+            "weight": 0.125,
+            "components": {
+              "Defensive duels per 90": 0.8,
+              "Defensive duels won, %": 0.2
+            }
+          },
+          "PAdj Interceptions + PAdj Sliding tackles": {
+            "weight": 0.125,
+            "components": {
+              "PAdj Interceptions": 0.8,
+              "PAdj Sliding tackles": 0.2
+            }
+          },
+          "Shots blocked per 90": 0.125
+        },
+        "Specific": {
+          "Aerial duels per 90 + Aerial duels won, %": {
+            "weight": 0.125,
+            "components": {
+              "Aerial duels per 90": 0.8,
+              "Aerial duels won, %": 0.2
+            }
+          },
+          "Passes per 90 + Accurate passes, %": {
+            "weight": 0.125,
+            "components": {
+              "Passes per 90": 0.8,
+              "Accurate passes, %": 0.2
+            }
+          },
+          "Short / medium passes per 90 + Accurate short / medium passes, %": {
+            "weight": 0.125,
+            "components": {
+              "Short / medium passes per 90": 0.8,
+              "Accurate short / medium passes, %": 0.2
+            }
+          },
+          "Long passes per 90 + Accurate long passes, %": {
+            "weight": 0.125,
+            "components": {
+              "Long passes per 90": 0.8,
+              "Accurate long passes, %": 0.2
+            }
+          },
+          "Progressive passes per 90 + Accurate progressive passes, %": {
+            "weight": 0.125,
+            "components": {
+              "Progressive passes per 90": 0.8,
+              "Accurate progressive passes, %": 0.2
+            }
+          }
+        }
+      }
+    }
+  },
+  "conferences": {
+    "ACC": {
+      "files": {
+        "Centre Midfielder": "DM Box-To-Box ACC 2025.xlsx",
+        "Attacking Midfielder": "AM Advanced Playmaker ACC 2025.xlsx",
+        "Winger": "W Touchline Winger ACC 2025.xlsx",
+        "Center Back": "CB Hybrid ACC 2025.xlsx"
+      }
+    },
+    "Big Ten": {
+      "files": {
+        "Centre Midfielder": "DM Box-To-Box BIG10 2025.xlsx",
+        "Attacking Midfielder": "AM Advanced Playmaker BIG10 2025.xlsx",
+        "Winger": "W Touchline Winger BIG10 2025.xlsx",
+        "Center Back": "CB Hybrid BIG10 2025.xlsx"
+      }
+    },
+    "Big 12": {
+      "files": {
+        "Centre Midfielder": "DM Box-To-Box BIG12 2025.xlsx",
+        "Attacking Midfielder": "AM Advanced Playmaker BIG12 2025.xlsx",
+        "Winger": "W Touchline Winger BIG12 2025.xlsx",
+        "Center Back": "CB Hybrid BIG12 2025.xlsx"
+      }
+    },
+    "Ivy League": {
+      "files": {
+        "Centre Midfielder": "DM Box-To-Box IVY 2025.xlsx",
+        "Attacking Midfielder": "AM Advanced Playmaker IVY 2025.xlsx",
+        "Winger": "W Touchline Winger IVY 2025.xlsx",
+        "Center Back": "CB Hybrid IVY 2025.xlsx"
+      }
+    },
+    "SEC": {
+      "files": {
+        "Centre Midfielder": "DM Box-To-Box SEC 2025.xlsx",
+        "Attacking Midfielder": "AM Advanced Playmaker SEC 2025.xlsx",
+        "Winger": "W Touchline Winger SEC 2025.xlsx",
+        "Center Back": "CB Hybrid SEC 2025.xlsx"
+      }
+    }
+  },
+  "data_processing": {
+    "normalization": "per_90",
+    "missing_value_strategy": "zero_fill",
+    "outlier_handling": "cap_at_99th_percentile"
+  },
+  "style_fit_metrics": {
+    "Center Back": {
+      "description": "Key metrics for Hybrid CB style fit",
+      "metrics": [
+        "Interceptions",
+        "Passes",
+        "Progressive passes",
+        "Long passes",
+        "Defensive duels",
+        "Aerial duels"
+      ]
+    },
+    "Centre Midfielder": {
+      "description": "Key metrics for DM Box-To-Box style fit",
+      "metrics": [
+        "Interceptions",
+        "Progressive passes",
+        "Defensive duels",
+        "Passes",
+        "Received passes",
+        "Dribbles"
+      ]
+    },
+    "Attacking Midfielder": {
+      "description": "Key metrics for Advanced Playmaker style fit",
+      "metrics": [
+        "Goals",
+        "Assists",
+        "Smart passes",
+        "Through passes",
+        "Deep completions",
+        "Dribbles",
+        "Offensive duels"
+      ]
+    },
+    "Winger": {
+      "description": "Key metrics for Touchline Winger style fit",
+      "metrics": [
+        "Assists",
+        "Crosses",
+        "Dribbles",
+        "Offensive duels",
+        "Progressive runs",
+        "Received long passes"
+      ]
+    }
+  }
+}
