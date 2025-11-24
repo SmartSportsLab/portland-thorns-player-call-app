@@ -1490,8 +1490,15 @@ def get_conferences_from_database():
     conferences = set()
     for player_name, info in player_info_dict.items():
         conf = info.get('conference', '')
-        if conf:
-            conferences.add(conf)
+        if conf and str(conf).strip():
+            # Normalize conference name
+            conf_str = str(conf).strip()
+            conferences.add(conf_str)
+    
+    # If no conferences found in database, provide default list
+    if not conferences:
+        conferences = {'ACC', 'SEC', 'Big Ten', 'Big 12', 'Ivy League'}
+    
     return sorted(list(conferences))
 
 def get_teams_by_conference(conference):
