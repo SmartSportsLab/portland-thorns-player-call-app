@@ -79,6 +79,7 @@ TRANSLATIONS = {
         'search_player': 'Search Player',
         'call_date': 'Call Date',
         'call_type': 'Call Type',
+        'call_number': 'Call Number',
         'duration_minutes': 'Duration (minutes)',
         'participants': 'Participants',
         'list_participants': 'List all participants in the call',
@@ -196,6 +197,7 @@ TRANSLATIONS = {
         'search_player': 'Buscar Jugador',
         'call_date': 'Fecha de la Llamada',
         'call_type': 'Tipo de Llamada',
+        'call_number': 'Número de Llamada',
         'duration_minutes': 'Duración (minutos)',
         'participants': 'Participantes',
         'list_participants': 'Lista todos los participantes en la llamada',
@@ -313,6 +315,7 @@ TRANSLATIONS = {
         'search_player': 'Rechercher un Joueur',
         'call_date': 'Date de l\'Appel',
         'call_type': 'Type d\'Appel',
+        'call_number': 'Numéro d\'Appel',
         'duration_minutes': 'Durée (minutes)',
         'participants': 'Participants',
         'list_participants': 'Liste tous les participants à l\'appel',
@@ -430,6 +433,7 @@ TRANSLATIONS = {
         'search_player': 'Buscar Jogador',
         'call_date': 'Data da Chamada',
         'call_type': 'Tipo de Chamada',
+        'call_number': 'Número da Chamada',
         'duration_minutes': 'Duração (minutos)',
         'participants': 'Participantes',
         'list_participants': 'Liste todos os participantes na chamada',
@@ -547,6 +551,7 @@ TRANSLATIONS = {
         'search_player': 'Spieler Suchen',
         'call_date': 'Anrufdatum',
         'call_type': 'Anruftyp',
+        'call_number': 'Anrufnummer',
         'duration_minutes': 'Dauer (Minuten)',
         'participants': 'Teilnehmer',
         'list_participants': 'Liste aller Teilnehmer am Anruf',
@@ -664,6 +669,7 @@ TRANSLATIONS = {
         'search_player': 'Cerca Giocatore',
         'call_date': 'Data della Chiamata',
         'call_type': 'Tipo di Chiamata',
+        'call_number': 'Numero di Chiamata',
         'duration_minutes': 'Durata (minuti)',
         'participants': 'Partecipanti',
         'list_participants': 'Elenca tutti i partecipanti alla chiamata',
@@ -781,6 +787,7 @@ TRANSLATIONS = {
         'search_player': 'البحث عن لاعب',
         'call_date': 'تاريخ المكالمة',
         'call_type': 'نوع المكالمة',
+        'call_number': 'رقم المكالمة',
         'duration_minutes': 'المدة (بالدقائق)',
         'participants': 'المشاركون',
         'list_participants': 'قائمة جميع المشاركين في المكالمة',
@@ -1564,6 +1571,47 @@ def get_players_by_team(team):
             players.append(player_name)
     return sorted(players)
 
+def get_call_number_for_player(player_name, team=None):
+    """Get the next call number for a player based on existing calls."""
+    if not player_name or not player_name.strip():
+        return 1
+    
+    try:
+        if CALL_LOG_FILE.exists():
+            df = pd.read_csv(CALL_LOG_FILE)
+            if df.empty or 'Player Name' not in df.columns:
+                return 1
+            
+            # Filter by player name (case-insensitive, flexible matching)
+            player_name_clean = str(player_name).strip().lower()
+            df['Player Name'] = df['Player Name'].astype(str).replace('nan', '')
+            matches = df[df['Player Name'].str.lower().str.strip() == player_name_clean].copy()
+            
+            # If team provided, also filter by team
+            if team and len(matches) > 0:
+                team_clean = str(team).strip().lower()
+                matches['Team'] = matches['Team'].astype(str).replace('nan', '')
+                team_matches = (
+                    matches['Team'].str.lower().str.strip() == team_clean
+                ) | (
+                    matches['Team'].str.strip() == ''
+                )
+                matches = matches[team_matches]
+            
+            # Get max call number from existing calls
+            if 'Call Number' in matches.columns:
+                matches['Call Number'] = pd.to_numeric(matches['Call Number'], errors='coerce')
+                max_call_num = matches['Call Number'].max()
+                if pd.notna(max_call_num):
+                    return int(max_call_num) + 1
+            
+            # If no Call Number column, count existing calls
+            return len(matches) + 1
+    except Exception as e:
+        print(f"Error calculating call number: {e}")
+    
+    return 1
+
 # File uploader for player database (always show, but highlight if file exists)
 st.sidebar.markdown("### 📁 Upload Player Database")
 uploaded_file = st.sidebar.file_uploader(
@@ -1859,6 +1907,19 @@ if page == "Log New Call":
     with col1:
         call_date = st.date_input(t('call_date'), value=st.session_state.get('form1_call_date', datetime.now().date()))
         call_type = st.selectbox(t('call_type'), ["Player Call", "Agent Call", "Both"], index=["Player Call", "Agent Call", "Both"].index(st.session_state.get('form1_call_type', "Player Call")) if st.session_state.get('form1_call_type', "Player Call") in ["Player Call", "Agent Call", "Both"] else 0)
+        
+        # Calculate call number for selected player
+        call_number = 1
+        if player_name and player_name.strip():
+            # Get team for call number calculation
+            calc_team = (st.session_state.get('filter_team') or 
+                        st.session_state.get('form1_team') or 
+                        st.session_state.selected_player_team)
+            call_number = get_call_number_for_player(player_name, calc_team)
+        
+        # Allow manual override of call number
+        call_number = st.number_input(t('call_number'), min_value=1, max_value=100, value=call_number, help="Call number for this player (auto-calculated based on existing calls)")
+        
         duration = st.number_input(t('duration_minutes'), min_value=0, max_value=300, value=st.session_state.get('form1_duration', 30))
         
         # Use filter values if manually selected, otherwise use auto-populated values from player selection
@@ -1910,6 +1971,7 @@ if page == "Log New Call":
     # Store values in session state for form submission
     st.session_state.form1_call_date = call_date
     st.session_state.form1_call_type = call_type
+    st.session_state.form1_call_number = call_number
     st.session_state.form1_duration = duration
     st.session_state.form1_team = team
     st.session_state.form1_conference = conference
@@ -2172,6 +2234,7 @@ if page == "Log New Call":
                     'Conference': final_conference,
                     'Position Profile': st.session_state.get('form1_position_profile', ''),
                     'Call Type': st.session_state.get('form1_call_type', ''),
+                    'Call Number': st.session_state.get('form1_call_number', 1),
                     'Duration (min)': st.session_state.get('form1_duration', 0),
                     'Participants': st.session_state.get('form1_participants', ''),
                     'Call Notes': st.session_state.get('form1_call_notes', ''),

@@ -67,9 +67,18 @@ def get_player_call_data(player_name, team=None):
         )
         matches = matches[team_matches]
     
-    # Sort by call date (most recent first)
-    if len(matches) > 0 and 'Call Date' in matches.columns:
-        matches = matches.sort_values('Call Date', ascending=False)
+    # Sort by call number (ascending) or call date (most recent first) if no call number
+    if len(matches) > 0:
+        if 'Call Number' in matches.columns:
+            # Convert to numeric, handling any non-numeric values
+            matches['Call Number'] = pd.to_numeric(matches['Call Number'], errors='coerce')
+            # Sort by Call Number (ascending), then by Call Date for ties
+            if 'Call Date' in matches.columns:
+                matches = matches.sort_values(['Call Number', 'Call Date'], ascending=[True, False])
+            else:
+                matches = matches.sort_values('Call Number', ascending=True)
+        elif 'Call Date' in matches.columns:
+            matches = matches.sort_values('Call Date', ascending=False)
     
     return matches.to_dict('records')
 
@@ -151,12 +160,21 @@ def generate_call_notes_section(call_entries):
     lines.append("## Call Notes & Assessment")
     lines.append("")
     
-    # Process each call entry (most recent first)
-    for idx, call in enumerate(call_entries, 1):
+    # Process each call entry (sorted by call number)
+    for call in call_entries:
         call_date = call.get('Call Date', 'Unknown')
         call_type = call.get('Call Type', 'Unknown')
+        call_number = call.get('Call Number', '')
         
-        lines.append(f"### Call #{idx} - {call_date}")
+        # Use Call Number if available, otherwise use index
+        if call_number and str(call_number).strip() != '' and str(call_number) != 'nan':
+            call_header = f"### Call #{call_number} - {call_date}"
+        else:
+            # Fallback: use index if no call number
+            call_idx = call_entries.index(call) + 1
+            call_header = f"### Call #{call_idx} - {call_date}"
+        
+        lines.append(call_header)
         lines.append("")
         
         # Call details
