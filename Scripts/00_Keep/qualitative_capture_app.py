@@ -1688,19 +1688,21 @@ if 'show_welcome' not in st.session_state:
 # Player Overview PDF Viewer
 OVERVIEW_DIR = BASE_DIR / 'Player Overviews'
 
+# Navigation menu - temporarily showing only essential pages for presentation
+# TODO: Uncomment other pages next week
 page = st.sidebar.selectbox(
     "Navigation", 
     [
         "Log New Call", 
         "View Call History", 
         "Player Summary", 
-        "Player Database", 
-        "Scouting Requests", 
-        "Video Review Tracker",
-        "View Player Overview",
-        "Update Player Overviews",
-        "Export to SAP",
-        "Export Data"
+        # "Player Database", 
+        # "Scouting Requests", 
+        # "Video Review Tracker",
+        # "View Player Overview",
+        # "Update Player Overviews",
+        # "Export to SAP",
+        # "Export Data"
     ]
 )
 
