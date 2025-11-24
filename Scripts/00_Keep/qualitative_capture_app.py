@@ -1507,10 +1507,51 @@ def get_teams_by_conference(conference):
         return []
     teams = set()
     for player_name, info in player_info_dict.items():
-        if info.get('conference', '') == conference:
+        # Try exact match first
+        conf = info.get('conference', '')
+        if conf and str(conf).strip() == str(conference).strip():
             team = info.get('team', '')
-            if team:
-                teams.add(team)
+            if team and str(team).strip():
+                teams.add(str(team).strip())
+    
+    # If no teams found in database, provide default teams for the conference
+    if not teams:
+        conference_upper = str(conference).upper().strip()
+        default_teams = {
+            'ACC': ['Duke', 'North Carolina', 'Virginia', 'Clemson', 'Florida State', 'Virginia Tech', 'Syracuse', 'Louisville', 'Pittsburgh', 'Boston College', 'NC State', 'Wake Forest', 'Miami', 'Notre Dame'],
+            'SEC': ['Alabama', 'Georgia', 'Florida', 'LSU', 'Tennessee', 'Arkansas', 'South Carolina', 'Mississippi', 'Mississippi State', 'Auburn', 'Kentucky', 'Vanderbilt', 'Missouri', 'Texas A&M'],
+            'BIG TEN': ['Michigan', 'Ohio State', 'Penn State', 'Michigan State', 'Wisconsin', 'Iowa', 'Nebraska', 'Minnesota', 'Indiana', 'Purdue', 'Illinois', 'Northwestern', 'Maryland', 'Rutgers', 'USC', 'UCLA'],
+            'BIG 12': ['Texas', 'Oklahoma', 'Kansas', 'Baylor', 'TCU', 'Oklahoma State', 'Texas Tech', 'Iowa State', 'West Virginia', 'Kansas State', 'Houston', 'Cincinnati', 'UCF', 'BYU'],
+            'IVY LEAGUE': ['Harvard', 'Yale', 'Princeton', 'Columbia', 'Penn', 'Brown', 'Dartmouth', 'Cornell'],
+        }
+        
+        # Map conference name variations
+        conference_map = {
+            'BIG TEN': 'BIG TEN',
+            'BIG 10': 'BIG TEN',
+            'B1G': 'BIG TEN',
+            'BIG12': 'BIG 12',
+            'BIG 12': 'BIG 12',
+            'IVY': 'IVY LEAGUE',
+            'IVY LEAGUE': 'IVY LEAGUE',
+            'ACC': 'ACC',
+            'SEC': 'SEC',
+        }
+        
+        mapped_conf = conference_map.get(conference_upper, conference_upper)
+        if mapped_conf in default_teams:
+            teams = set(default_teams[mapped_conf])
+        elif conference_upper == 'ACC':
+            teams = set(default_teams['ACC'])
+        elif conference_upper == 'SEC':
+            teams = set(default_teams['SEC'])
+        elif 'BIG TEN' in conference_upper or 'BIG 10' in conference_upper or 'B1G' in conference_upper:
+            teams = set(default_teams['BIG TEN'])
+        elif 'BIG 12' in conference_upper or 'BIG12' in conference_upper:
+            teams = set(default_teams['BIG 12'])
+        elif 'IVY' in conference_upper:
+            teams = set(default_teams['IVY LEAGUE'])
+    
     return sorted(list(teams))
 
 def get_players_by_team(team):
