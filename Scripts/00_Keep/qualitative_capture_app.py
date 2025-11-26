@@ -1910,6 +1910,7 @@ page = st.sidebar.selectbox(
         "Player Summary",
         "Player Visuals",  # New page for interactive visualizations
         "Video Review Tracker",  # Enhanced video tracking
+        "FAQs",  # Frequently Asked Questions
         "Feedback & Support",  # New feedback form
         # "Player Database", 
         # "Scouting Requests", 
@@ -3064,32 +3065,49 @@ elif page == "Feedback & Support":
                         st.success("✅ Thank you! Your feedback has been sent successfully. We'll review it and get back to you if needed.")
                         st.balloons()
                     elif result is None:
-                        # Email not configured - show instructions
-                        st.warning("📧 Email sending is not currently configured.")
+                        # Email not configured - show instructions and save feedback locally
+                        st.warning("📧 Email sending is not currently configured, but your feedback has been recorded.")
+                        
+                        # Save feedback to local file as backup
+                        feedback_file = DATA_DIR / 'feedback_log.csv'
+                        feedback_entry = {
+                            'Timestamp': datetime.now().strftime('%Y-%m-%d %H:%M:%S'),
+                            'Type': feedback_type,
+                            'Subject': subject,
+                            'Description': description,
+                            'User Email': user_email if user_email else 'Not provided'
+                        }
+                        
+                        try:
+                            if feedback_file.exists():
+                                feedback_df = pd.read_csv(feedback_file)
+                                feedback_df = pd.concat([feedback_df, pd.DataFrame([feedback_entry])], ignore_index=True)
+                            else:
+                                feedback_df = pd.DataFrame([feedback_entry])
+                            feedback_df.to_csv(feedback_file, index=False)
+                            st.success("✅ Your feedback has been saved locally and will be reviewed.")
+                        except Exception as e:
+                            st.error(f"Error saving feedback: {e}")
+                        
                         st.info("""
-                        **To enable email notifications:**
+                        **To enable automatic email notifications:**
                         
-                        1. Set up email credentials in Streamlit secrets (`.streamlit/secrets.toml`):
-                           ```toml
-                           [email]
-                           smtp_server = "smtp.gmail.com"
-                           smtp_port = 587
-                           sender_email = "your-email@gmail.com"
-                           sender_password = "your-app-password"
-                           ```
+                        Email setup is required for automatic delivery. For now, your feedback has been saved locally.
                         
-                        2. For Gmail, you'll need to:
-                           - Enable 2-factor authentication
-                           - Generate an App Password (not your regular password)
-                           - Use that App Password in the config above
+                        **To configure email (optional):**
+                        1. Set up email credentials in Streamlit secrets (`.streamlit/secrets.toml`)
+                        2. See the **EMAIL_SETUP_GUIDE.md** file for detailed instructions
                         
-                        3. For now, you can also contact directly at: **daniellevitt32@gmail.com**
+                        **Direct Contact:**
+                        You can also reach out directly at: **daniellevitt32@gmail.com**
                         """)
+                        
                         st.markdown(f"""
                         **Your Feedback Summary:**
                         - **Type:** {feedback_type}
                         - **Subject:** {subject}
                         - **Description:** {description}
+                        - **Saved:** {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}
                         """)
                     else:
                         st.error("❌ There was an error sending your feedback. Please try again or contact daniellevitt32@gmail.com directly.")
@@ -3102,25 +3120,257 @@ elif page == "Feedback & Support":
     - **Response Time:** We typically respond within 24-48 hours
     """)
     
-    st.markdown("### ❓ Common Questions")
-    with st.expander("How do I upload a player database?"):
+    st.info("💡 For common questions, check out the **FAQs** page in the navigation menu.")
+
+elif page == "FAQs":
+    st.header("❓ Frequently Asked Questions")
+    st.markdown("Find answers to common questions about the Portland Thorns Call Log System.")
+    
+    # Getting Started
+    st.markdown("### 🚀 Getting Started")
+    
+    with st.expander("How do I upload a player database?", expanded=False):
         st.markdown("""
-        Use the file uploader in the sidebar on the main page. Supported formats:
-        - Excel files (.xlsx, .xls)
-        - Files should contain player information with columns like Player, Team, Conference, Position
+        **To upload a player database:**
+        
+        1. Look for the **"Upload Player Database"** section in the left sidebar
+        2. Click **"Browse files"** or drag and drop your Excel file
+        3. Supported formats: `.xlsx` or `.xls` files
+        4. The file will be saved permanently and loaded automatically
+        
+        **File Requirements:**
+        - Should contain player information with columns like:
+          - Player (player name)
+          - Team
+          - Conference
+          - Position or Position Profile
+        - Can be a shortlist file or conference report
+        
+        Once uploaded, you'll see a success message and the player list will be available throughout the app.
         """)
     
-    with st.expander("How do I generate a PDF report?"):
+    with st.expander("How do I log my first call?", expanded=False):
         st.markdown("""
-        After logging a call, click the "Save Call Log" button. A PDF download button will appear
-        automatically. You can also view all call history and download reports from the "View Call History" page.
+        **To log a new call:**
+        
+        1. Go to **"Log New Call"** in the navigation menu
+        2. Select a **Conference** from the dropdown
+        3. Select a **Team** (filtered by conference)
+        4. Search and select a **Player** from the database
+        5. Fill in the call details:
+           - Call Date, Call Type, Duration
+           - Participants, Call Notes
+           - Agent Assessment (if applicable)
+           - Player Assessment (ratings and notes)
+           - Key Talking Points
+           - Next Steps (if follow-up needed)
+        6. Click **"Save Call Log"** at the bottom
+        
+        The call will be saved to your call log and a PDF will be generated automatically.
         """)
     
-    with st.expander("Can I use this on my phone?"):
+    with st.expander("What information is required to log a call?", expanded=False):
         st.markdown("""
-        Yes! The app is mobile-friendly and works on phones and tablets. Cloud storage functionality
-        (coming soon) will allow you to access your data from any device.
+        **Required fields:**
+        - Player Name (can be selected from database or entered manually)
+        - Call Date
+        - Call Type
+        
+        **Optional but recommended:**
+        - Team and Conference (auto-populated if player is in database)
+        - Duration
+        - Participants
+        - Call Notes
+        - All assessment ratings
+        - Agent information
+        
+        You can save a draft at any time using the **"Save Draft"** button in the sidebar.
         """)
+    
+    # Features & Functionality
+    st.markdown("### ⚙️ Features & Functionality")
+    
+    with st.expander("How do I generate a PDF report?", expanded=False):
+        st.markdown("""
+        **PDF reports are generated automatically:**
+        
+        1. After logging a call and clicking **"Save Call Log"**, a PDF download button appears
+        2. The PDF includes:
+           - All call information
+           - Agent assessment (if applicable)
+           - Player assessment ratings
+           - Key talking points
+           - Next steps
+           - All call notes
+        
+        **To view/download past call PDFs:**
+        - Go to **"View Call History"**
+        - Filter by player or date
+        - Download individual call logs or export the full history
+        """)
+    
+    with st.expander("How does the Call Number feature work?", expanded=False):
+        st.markdown("""
+        **Call Numbers track multiple calls with the same player:**
+        
+        - The call number is **auto-calculated** based on existing calls for that player
+        - For example: First call = 1, Second call = 2, etc.
+        - You can manually override the number if needed
+        - When player overview PDFs are generated, all calls are included and sorted by call number
+        
+        This helps track the progression of conversations with each player over time.
+        """)
+    
+    with st.expander("What is the Player Visuals page?", expanded=False):
+        st.markdown("""
+        **Player Visuals** provides interactive charts and visualizations:
+        
+        - **Radar Charts:** Compare player metrics vs Conference Average and Power Five Average
+        - **Scatterplots:** See where players rank on key metrics compared to similar players
+        - **Performance Comparisons:** Visual representation of player strengths and weaknesses
+        
+        This addresses SAP's limitation of text-only data by providing visual insights.
+        
+        **Note:** Full functionality requires player metric data to be loaded from the shortlist file.
+        """)
+    
+    with st.expander("How do I track video reviews?", expanded=False):
+        st.markdown("""
+        **Use the Video Review Tracker:**
+        
+        1. Go to **"Video Review Tracker"** in the navigation
+        2. Click **"Add Review"** tab
+        3. Fill in:
+           - Player name
+           - Video type (Game Film, Highlights, Training, etc.)
+           - Video source and URL (optional)
+           - Games/matches reviewed
+           - Your analysis (observations, strengths, weaknesses)
+           - Overall video score and recommendation
+        4. Click **"Save Review"**
+        
+        All reviews are saved and can be viewed in the **"Review Status"** tab with filters and analytics.
+        """)
+    
+    # Data & Storage
+    st.markdown("### 💾 Data & Storage")
+    
+    with st.expander("Where is my data stored?", expanded=False):
+        st.markdown("""
+        **Local Storage:**
+        - All call logs are saved in CSV format in the `Qualitative_Data/` directory
+        - Player databases are saved when uploaded
+        - Video reviews and scouting requests are also stored locally
+        
+        **Cloud Storage (Coming Soon):**
+        - Cloud sync functionality is being developed
+        - This will allow access from multiple devices (phone, laptop)
+        - Team members will be able to share and access data
+        
+        **Data Backup:**
+        - Regularly download your call logs using the export features
+        - CSV files can be opened in Excel or any spreadsheet application
+        """)
+    
+    with st.expander("Can I export my data?", expanded=False):
+        st.markdown("""
+        **Yes! Multiple export options available:**
+        
+        - **Call Logs:** Download from "View Call History" page
+        - **CSV Format:** Standard format, works with Excel
+        - **PDF Reports:** Individual call summaries
+        - **SAP Export:** SAP-compatible format (if using Export to SAP page)
+        
+        All exports include timestamps and can be filtered before downloading.
+        """)
+    
+    # Technical
+    st.markdown("### 🔧 Technical")
+    
+    with st.expander("Can I use this on my phone or tablet?", expanded=False):
+        st.markdown("""
+        **Yes! The app is mobile-friendly:**
+        
+        - Works on phones, tablets, and laptops
+        - Responsive design adapts to screen size
+        - All features are accessible on mobile devices
+        
+        **Cloud Storage (Coming Soon):**
+        - Will enable seamless access across all your devices
+        - Data will sync automatically
+        """)
+    
+    with st.expander("What languages are supported?", expanded=False):
+        st.markdown("""
+        **Multi-language support available:**
+        
+        - English (default)
+        - Spanish
+        - French
+        - Portuguese
+        - German
+        - Italian
+        - Arabic
+        
+        Use the language selector at the top of the page to switch languages.
+        All UI elements, form labels, and instructions are translated.
+        """)
+    
+    with st.expander("How do I report a bug or issue?", expanded=False):
+        st.markdown("""
+        **Report issues through the Feedback form:**
+        
+        1. Go to **"Feedback & Support"** in the navigation
+        2. Select **"Bug Report"** as the feedback type
+        3. Provide:
+           - Clear subject line describing the issue
+           - Detailed description of what happened
+           - Steps to reproduce (if applicable)
+           - Your email (optional, for follow-up)
+        4. Click **"Send Feedback"**
+        
+        You can also email directly: **daniellevitt32@gmail.com**
+        """)
+    
+    # Calendar & Integration
+    st.markdown("### 📅 Calendar & Integration")
+    
+    with st.expander("How does calendar integration work?", expanded=False):
+        st.markdown("""
+        **Calendar sync for next calls:**
+        
+        1. When logging a call, fill in the **"Next Steps"** section
+        2. Check **"Follow-up needed"** and select a date
+        3. Check **"Add to Google Calendar"** or **"Add to Outlook Calendar"**
+        4. The event will be created automatically in your calendar
+        
+        **Setup Required:**
+        - Calendar integration requires OAuth authentication
+        - See the setup guide for configuring Google Calendar or Outlook
+        - Once configured, events are created automatically with:
+          - Title: "Call with [Player Name]"
+          - Date/Time from your follow-up date
+          - Description with action items
+          - Reminders (1 day before + 30 min before)
+        """)
+    
+    # Contact & Support
+    st.markdown("### 📧 Contact & Support")
+    
+    with st.expander("How can I get help or contact support?", expanded=False):
+        st.markdown("""
+        **Multiple ways to get help:**
+        
+        1. **FAQs Page:** Check this page for common questions
+        2. **Feedback Form:** Use "Feedback & Support" page to submit questions
+        3. **Direct Email:** [daniellevitt32@gmail.com](mailto:daniellevitt32@gmail.com)
+        4. **Response Time:** Typically within 24-48 hours
+        
+        For urgent issues or feature requests, use the feedback form or email directly.
+        """)
+    
+    st.markdown("---")
+    st.info("💡 Still have questions? Visit the **Feedback & Support** page to submit your question or contact us directly.")
 
 elif page == "Export to SAP":
     st.header("📤 Export to SAP")
