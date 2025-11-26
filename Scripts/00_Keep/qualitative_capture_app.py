@@ -35,6 +35,157 @@ st.set_page_config(
     layout="wide"
 )
 
+# ===========================================
+# AUTHENTICATION CONFIGURATION
+# ===========================================
+USERNAME = "MikeNorris"
+PASSWORD = "1234"
+
+# Initialize authentication state
+if "auth" not in st.session_state:
+    st.session_state["auth"] = False
+
+# ===========================================
+# LOGIN PAGE FUNCTION
+# ===========================================
+def login_page():
+    """Display login page with Portland Thorns branding."""
+    st.markdown("""
+        <style>
+        [data-testid="stSidebar"], [data-testid="stToolbar"], header[data-testid="stHeader"] {
+            display: none !important;
+        }
+        [data-testid="stAppViewContainer"] {
+            background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
+            background-size: cover;
+            background-position: center;
+        }
+        div.block-container {
+            display: flex !important;
+            justify-content: center !important;
+            align-items: center !important;
+            height: 100vh !important;
+            padding-top: 0 !important;
+        }
+        .login-container {
+            background: rgba(20, 20, 25, 0.95);
+            border: 2px solid #8B0000;
+            border-radius: 20px;
+            box-shadow: 0 10px 40px rgba(139, 0, 0, 0.5);
+            backdrop-filter: blur(12px);
+            width: 450px;
+            padding: 3rem 3rem;
+            margin: auto;
+            display: flex !important;
+            flex-direction: column;
+            justify-content: center;
+            align-items: stretch;
+        }
+        .login-title {
+            font-size: 2.2rem;
+            font-weight: 900;
+            color: #8B0000;
+            margin-bottom: 0.4rem;
+            text-align: center;
+            text-shadow: 0 0 12px rgba(139, 0, 0, 0.5);
+        }
+        .login-sub {
+            text-align: center;
+            color: #f0f2f5;
+            font-size: 1.1rem;
+            margin-bottom: 2rem;
+        }
+        label { 
+            color: #d7dee8 !important; 
+            font-weight: 600 !important; 
+            font-size: 0.95rem !important; 
+        }
+        input[type="text"], input[type="password"] {
+            background-color: #0f1625 !important;
+            color: #e8eef7 !important;
+            border: 1px solid rgba(139, 0, 0, 0.3) !important;
+            border-radius: 10px !important;
+            height: 48px !important;
+            font-size: 0.95rem !important;
+        }
+        input[type="text"]:focus, input[type="password"]:focus {
+            border-color: #8B0000 !important;
+            box-shadow: 0 0 10px rgba(139, 0, 0, 0.3) !important;
+        }
+        button[kind="primary"] {
+            background-color: #8B0000 !important;
+            border-radius: 10px !important;
+            color: white !important;
+            height: 48px !important;
+            font-weight: 700 !important;
+            font-size: 1rem !important;
+            border: none !important;
+            transition: all 0.3s ease !important;
+        }
+        button[kind="primary"]:hover {
+            background: linear-gradient(90deg, #8B0000, #D10023) !important;
+            transform: translateY(-2px);
+            box-shadow: 0 0 20px rgba(139, 0, 0, 0.4);
+        }
+        @keyframes fadein {
+            from { opacity: 0; transform: translateY(-15px) scale(0.9); }
+            to { opacity: 1; transform: translateY(0) scale(1); }
+        }
+        .login-container {
+            animation: fadein 0.8s ease;
+        }
+        </style>
+    """, unsafe_allow_html=True)
+
+    # Logo and branding
+    logo_path = Path("/Users/daniel/Documents/Smart Sports Lab/Football/Sports Data Campus/Portland Thorns/Branding/portland-thorns-vector-logo-seeklogo/portland-thorns-seeklogo.png")
+    
+    if logo_path.exists():
+        with open(logo_path, "rb") as f:
+            logo_data = f.read()
+            logo_base64 = base64.b64encode(logo_data).decode()
+        
+        st.markdown(f"""
+            <div style="text-align:center; margin-bottom: 1.5rem;">
+                <img src="data:image/png;base64,{logo_base64}" width="180" style="animation: fadein 1s ease;">
+            </div>
+        """, unsafe_allow_html=True)
+    else:
+        st.markdown("""
+            <div style="text-align:center; margin-bottom: 1.5rem;">
+                <h1 style="color: #8B0000; font-size: 2.5rem;">⚽ Portland Thorns</h1>
+            </div>
+        """, unsafe_allow_html=True)
+
+    # Login form
+    placeholder = st.empty()
+    with placeholder.container():
+        st.markdown('<div class="login-title">Call Log System</div>', unsafe_allow_html=True)
+        st.markdown('<div class="login-sub">Player & Agent Call Management Platform 📞</div>', unsafe_allow_html=True)
+
+        user = st.text_input("Username", placeholder="Enter your username", key="login_username")
+        pwd = st.text_input("Password", placeholder="Enter your password", type="password", key="login_password")
+
+        col1, col2, col3 = st.columns([1, 2, 1])
+        with col2:
+            if st.button("Login", use_container_width=True, type="primary"):
+                if user == USERNAME and pwd == PASSWORD:
+                    st.session_state["auth"] = True
+                    st.success("Login successful ✅")
+                    import time
+                    time.sleep(0.5)
+                    st.rerun()
+                else:
+                    st.error("❌ Incorrect username or password")
+
+        st.markdown("---")
+        st.markdown("""
+        <div style="text-align: center; color: #888; font-size: 0.85rem; margin-top: 1rem;">
+            Designed and created by Daniel Levitt<br>
+            <a href="mailto:daniellevitt32@gmail.com" style="color: #8B0000; text-decoration: none;">daniellevitt32@gmail.com</a>
+        </div>
+        """, unsafe_allow_html=True)
+
 # Portland Thorns Branding Colors
 THORNS_DARK_RED = "#8B0000"  # Dark red from color scale
 THORNS_RED = "#D10023"  # Primary red
@@ -1886,7 +2037,14 @@ with col_lang2:
 
 st.markdown("---")
 
-# Main app
+# ===========================================
+# AUTHENTICATION CHECK
+# ===========================================
+if not st.session_state["auth"]:
+    login_page()
+    st.stop()  # Stop execution if not authenticated
+
+# Main app (only shown if authenticated)
 # Display branding header on every page
 display_branding_header()
 
