@@ -1688,17 +1688,17 @@ if 'show_welcome' not in st.session_state:
 # Player Overview PDF Viewer
 OVERVIEW_DIR = BASE_DIR / 'Player Overviews'
 
-# Navigation menu - temporarily showing only essential pages for presentation
-# TODO: Uncomment other pages next week
+# Navigation menu
 page = st.sidebar.selectbox(
     "Navigation", 
     [
         "Log New Call", 
         "View Call History", 
-        "Player Summary", 
+        "Player Summary",
+        "Player Visuals",  # New page for interactive visualizations
+        "Video Review Tracker",  # Enhanced video tracking
         # "Player Database", 
         # "Scouting Requests", 
-        # "Video Review Tracker",
         # "View Player Overview",
         # "Update Player Overviews",
         # "Export to SAP",
@@ -2181,6 +2181,23 @@ if page == "Log New Call":
     action_items = st.text_area(t('action_items'), value=st.session_state.get('action_items', ''), placeholder=t('what_needs_happen'))
     st.session_state.action_items = action_items
     
+    # Calendar Integration
+    if follow_up_needed and follow_up_date:
+        st.markdown("#### 📅 Add to Calendar")
+        calendar_col1, calendar_col2 = st.columns(2)
+        
+        with calendar_col1:
+            add_to_google = st.checkbox("Add to Google Calendar", value=st.session_state.get('add_to_google', False))
+            st.session_state.add_to_google = add_to_google
+        
+        with calendar_col2:
+            add_to_outlook = st.checkbox("Add to Outlook Calendar", value=st.session_state.get('add_to_outlook', False))
+            st.session_state.add_to_outlook = add_to_outlook
+        
+        # Note: Calendar integration will be implemented when credentials are configured
+        if add_to_google or add_to_outlook:
+            st.info("📝 Calendar integration requires authentication. This will be configured in the next update.")
+    
     # Sticky Save Draft button in sidebar (always visible as user scrolls)
     with st.sidebar:
         st.markdown("---")
@@ -2389,6 +2406,110 @@ elif page == "Player Summary":
             st.markdown("### All Calls")
             st.dataframe(player_calls, use_container_width=True)
 
+elif page == "Player Visuals":
+    st.header("📊 Player Visuals")
+    st.markdown("Interactive visualizations for player performance metrics. Addresses SAP's lack of visual data.")
+    
+    if not players_list:
+        st.warning("⚠️ No players loaded. Please upload a player database file in the sidebar.")
+    else:
+        # Player selection
+        selected_player = st.selectbox("Select Player", [""] + sorted(players_list))
+        
+        if selected_player:
+            # Get player info
+            player_info = player_info_dict.get(selected_player, {})
+            player_team = player_info.get('team', 'N/A')
+            player_conference = player_info.get('conference', 'N/A')
+            player_position = player_info.get('position', 'N/A')
+            
+            # Display player info
+            col_info1, col_info2, col_info3 = st.columns(3)
+            with col_info1:
+                st.info(f"**Team**: {player_team}")
+            with col_info2:
+                st.info(f"**Conference**: {player_conference}")
+            with col_info3:
+                st.info(f"**Position**: {player_position}")
+            
+            st.markdown("---")
+            
+            # Try to load player data from shortlist for charts
+            try:
+                # Import chart generation functions
+                import sys
+                from pathlib import Path
+                chart_module_path = Path(__file__).parent / 'generate_player_charts.py'
+                if chart_module_path.exists():
+                    sys.path.insert(0, str(Path(__file__).parent))
+                    from generate_player_charts import generate_performance_radar_charts, generate_scatterplots
+                    from generate_player_overviews import load_player_data_from_shortlist, load_nwsl_data
+                    
+                    # Load player data
+                    if PLAYER_DB_FILE and PLAYER_DB_FILE.exists():
+                        # Load all players data
+                        base_dir = PLAYER_DB_FILE.parent.parent if 'Scripts' in str(PLAYER_DB_FILE) else PLAYER_DB_FILE.parent
+                        all_players_df = None
+                        
+                        # Try to load from shortlist
+                        try:
+                            all_players_data = load_player_data_from_shortlist(PLAYER_DB_FILE, base_dir)
+                            if all_players_data:
+                                all_players_df = pd.DataFrame(all_players_data)
+                        except Exception as e:
+                            st.warning(f"Could not load full player data: {e}")
+                        
+                        # Find selected player in data
+                        if all_players_df is not None and not all_players_df.empty:
+                            player_row = all_players_df[all_players_df['Player'] == selected_player]
+                            
+                            if not player_row.empty:
+                                player_row = player_row.iloc[0]
+                                position_profile = player_row.get('Position Profile', player_position)
+                                
+                                # Load position config (simplified - would need full config in production)
+                                st.markdown("### 📈 Performance Radar Charts")
+                                st.info("📝 Radar charts will be displayed here once player data is fully loaded from the shortlist file.")
+                                
+                                # Placeholder for radar charts
+                                st.markdown("#### Intensity Metrics vs Averages")
+                                st.caption("Player metrics compared to Conference Average and Power Five Average")
+                                
+                                st.markdown("#### Success/Accuracy Metrics vs Averages")
+                                st.caption("Success rates and percentages compared to Conference Average and Power Five Average")
+                                
+                                st.markdown("---")
+                                st.markdown("### 📉 Scatterplots")
+                                st.info("📝 Scatterplots showing player position relative to similar players will be displayed here.")
+                                
+                                # Placeholder for scatterplots
+                                st.caption("Key metric comparisons: Player vs Similar Players")
+                            else:
+                                st.warning(f"Player '{selected_player}' not found in loaded data. Please ensure the shortlist file contains this player.")
+                        else:
+                            st.info("📊 To view visualizations, the app needs to load player metric data from the shortlist file. This feature will be fully functional once the data structure is confirmed.")
+                            
+                            # Show placeholder charts using sample data
+                            st.markdown("### 📈 Sample Visualizations")
+                            st.caption("These are placeholder visualizations. Full charts will appear once player data is loaded.")
+                            
+                            # Sample bar chart
+                            import numpy as np
+                            sample_metrics = ['Defensive Duels/90', 'Pass Accuracy %', 'Goals/90', 'Assists/90']
+                            sample_values = np.random.randint(50, 90, len(sample_metrics))
+                            sample_df = pd.DataFrame({
+                                'Metric': sample_metrics,
+                                'Value': sample_values
+                            })
+                            st.bar_chart(sample_df.set_index('Metric'))
+                    else:
+                        st.warning("Player database file not found. Please upload a shortlist file.")
+            except Exception as e:
+                st.error(f"Error loading visualizations: {e}")
+                import traceback
+                st.code(traceback.format_exc())
+                st.info("📝 Full visualization functionality will be available once the chart generation modules are properly configured.")
+
 elif page == "Player Database":
     st.header("👥 Player Database")
     st.markdown("Browse and search all players in the shortlist database.")
@@ -2556,17 +2677,37 @@ elif page == "Video Review Tracker":
     
     with tab1:
         st.subheader("Add Video Review")
+        st.markdown("Track your analysis of player videos and film. This complements your quantitative scouting data.")
         with st.form("video_review_form"):
             player_name = st.selectbox("Player Name", [""] + players_list[:100])
-            review_date = st.date_input("Review Date", value=datetime.now().date())
-            games_reviewed = st.text_input("Games Reviewed", placeholder="e.g., 'vs Duke, vs UNC'")
-            video_score = st.slider("Video Score (1-10)", 1, 10, 5)
-            status = st.selectbox("Review Status", ["Not Started", "In Progress", "Complete"])
-            quantitative_match = st.selectbox("Quantitative Match", ["Strong Match", "Mostly Match", "Some Discrepancies", "Significant Discrepancies"])
-            key_observations = st.text_area("Key Observations", placeholder="Main takeaways from video review")
-            red_flags_video = st.text_area("Red Flags from Video", placeholder="Any concerns observed")
+            
+            col_vid1, col_vid2 = st.columns(2)
+            with col_vid1:
+                review_date = st.date_input("Review Date", value=datetime.now().date())
+                video_type = st.selectbox("Video Type", ["Game Film", "Highlights", "Training Footage", "Match Replay", "Other"])
+            with col_vid2:
+                video_source = st.text_input("Video Source", placeholder="e.g., 'Hudl', 'YouTube', 'Team Website'")
+                video_url = st.text_input("Video URL (Optional)", placeholder="https://...")
+            
+            games_reviewed = st.text_input("Games/Matches Reviewed", placeholder="e.g., 'vs Duke, vs UNC, vs Stanford'")
+            
+            st.markdown("#### Analysis")
+            col_analysis1, col_analysis2 = st.columns(2)
+            with col_analysis1:
+                video_score = st.slider("Overall Video Score (1-10)", 1, 10, 5, help="Your overall assessment from watching the video")
+                status = st.selectbox("Review Status", ["Not Started", "In Progress", "Complete"])
+            with col_analysis2:
+                quantitative_match = st.selectbox("Quantitative Match", ["Strong Match", "Mostly Match", "Some Discrepancies", "Significant Discrepancies"], help="How well does the video match the player's stats?")
+            
+            st.markdown("#### Observations")
+            key_observations = st.text_area("Key Observations", placeholder="Main takeaways from video review - what stood out?")
+            strengths_video = st.text_area("Strengths Identified", placeholder="What strengths did you observe in the video?")
+            weaknesses_video = st.text_area("Weaknesses Identified", placeholder="What weaknesses or areas for improvement did you notice?")
+            red_flags_video = st.text_area("Red Flags from Video", placeholder="Any concerns observed (injuries, attitude, etc.)")
+            
+            st.markdown("#### Assessment")
             recommendation_video = st.selectbox("Recommendation", ["Strong Yes", "Yes", "Maybe", "No", "Strong No"])
-            notes = st.text_area("Additional Notes")
+            notes = st.text_area("Additional Notes", placeholder="Any other observations or notes about the video review")
             
             submitted = st.form_submit_button("💾 Save Review", use_container_width=True)
             
@@ -2574,11 +2715,16 @@ elif page == "Video Review Tracker":
                 new_review = {
                     'Player Name': player_name,
                     'Review Date': review_date.strftime('%Y-%m-%d'),
+                    'Video Type': video_type,
+                    'Video Source': video_source,
+                    'Video URL': video_url,
                     'Games Reviewed': games_reviewed,
                     'Video Score': video_score,
                     'Status': status,
                     'Quantitative Match': quantitative_match,
                     'Key Observations': key_observations,
+                    'Strengths Identified': strengths_video,
+                    'Weaknesses Identified': weaknesses_video,
                     'Red Flags': red_flags_video,
                     'Recommendation': recommendation_video,
                     'Notes': notes,
