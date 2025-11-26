@@ -11,6 +11,9 @@ from datetime import datetime, date
 import json
 from io import BytesIO
 import base64
+import smtplib
+from email.mime.text import MIMEText
+from email.mime.multipart import MIMEMultipart
 
 # ReportLab for PDF generation (works on Streamlit Cloud)
 PDF_AVAILABLE = False
@@ -1603,6 +1606,81 @@ def generate_call_log_pdf(entry):
         st.error(f"Error generating PDF: {e}")
         return None
 
+def send_feedback_email(feedback_type, subject, description, user_email=None):
+    """
+    Send feedback email to daniellevitt32@gmail.com.
+    
+    Args:
+        feedback_type: Type of feedback (Bug, Question, Suggestion, Other)
+        subject: Subject line
+        description: Detailed description
+        user_email: Optional user email for response
+    
+    Returns:
+        True if sent successfully, False otherwise
+    """
+    recipient_email = "daniellevitt32@gmail.com"
+    
+    # Try to get email credentials from Streamlit secrets
+    try:
+        if 'email' in st.secrets:
+            smtp_server = st.secrets['email'].get('smtp_server', 'smtp.gmail.com')
+            smtp_port = st.secrets['email'].get('smtp_port', 587)
+            sender_email = st.secrets['email'].get('sender_email', '')
+            sender_password = st.secrets['email'].get('sender_password', '')
+        else:
+            # Fallback: try to use environment variables or default Gmail settings
+            smtp_server = 'smtp.gmail.com'
+            smtp_port = 587
+            sender_email = ''
+            sender_password = ''
+    except:
+        smtp_server = 'smtp.gmail.com'
+        smtp_port = 587
+        sender_email = ''
+        sender_password = ''
+    
+    # If no credentials configured, return False (will show instructions)
+    if not sender_email or not sender_password:
+        return None  # None means not configured
+    
+    try:
+        # Create message
+        msg = MIMEMultipart()
+        msg['From'] = sender_email
+        msg['To'] = recipient_email
+        msg['Subject'] = f"[Portland Thorns App] {feedback_type}: {subject}"
+        
+        # Create email body
+        body = f"""
+Feedback Type: {feedback_type}
+Subject: {subject}
+
+Description:
+{description}
+
+---
+"""
+        if user_email:
+            body += f"User Email: {user_email}\n"
+        body += f"Submitted: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}\n"
+        body += f"App: Portland Thorns Call Log System\n"
+        
+        msg.attach(MIMEText(body, 'plain'))
+        
+        # Send email
+        server = smtplib.SMTP(smtp_server, smtp_port)
+        server.starttls()
+        server.login(sender_email, sender_password)
+        text = msg.as_string()
+        server.sendmail(sender_email, recipient_email, text)
+        server.quit()
+        
+        return True
+    except Exception as e:
+        st.error(f"Error sending email: {e}")
+        return False
+
 # Initialize session state
 if 'call_log' not in st.session_state:
     st.session_state.call_log = load_call_log()
@@ -1832,6 +1910,7 @@ page = st.sidebar.selectbox(
         "Player Summary",
         "Player Visuals",  # New page for interactive visualizations
         "Video Review Tracker",  # Enhanced video tracking
+        "Feedback & Support",  # New feedback form
         # "Player Database", 
         # "Scouting Requests", 
         # "View Player Overview",
@@ -2937,6 +3016,111 @@ elif page == "Video Review Tracker":
             st.checkbox("Fits team culture?")
             st.checkbox("Can adapt to NWSL pace?")
             st.checkbox("Potential to grow?")
+
+elif page == "Feedback & Support":
+    st.header("💬 Feedback & Support")
+    st.markdown("Have a question, found a bug, or have a suggestion? We'd love to hear from you!")
+    
+    with st.form("feedback_form"):
+        st.markdown("### Submit Your Feedback")
+        
+        feedback_type = st.selectbox(
+            "Type of Feedback",
+            ["Bug Report", "Question", "Suggestion", "Feature Request", "Other"],
+            help="Select the category that best describes your feedback"
+        )
+        
+        subject = st.text_input(
+            "Subject",
+            placeholder="Brief summary of your feedback",
+            help="A short title describing your issue or question"
+        )
+        
+        description = st.text_area(
+            "Description",
+            placeholder="Please provide as much detail as possible...",
+            height=200,
+            help="Detailed description of your issue, question, or suggestion"
+        )
+        
+        user_email = st.text_input(
+            "Your Email (Optional)",
+            placeholder="your.email@example.com",
+            help="Optional: Provide your email if you'd like a response"
+        )
+        
+        col1, col2 = st.columns([1, 4])
+        with col1:
+            submitted = st.form_submit_button("📧 Send Feedback", use_container_width=True, type="primary")
+        
+        if submitted:
+            if not subject or not description:
+                st.error("⚠️ Please fill in both Subject and Description fields.")
+            else:
+                with st.spinner("Sending your feedback..."):
+                    result = send_feedback_email(feedback_type, subject, description, user_email)
+                    
+                    if result is True:
+                        st.success("✅ Thank you! Your feedback has been sent successfully. We'll review it and get back to you if needed.")
+                        st.balloons()
+                    elif result is None:
+                        # Email not configured - show instructions
+                        st.warning("📧 Email sending is not currently configured.")
+                        st.info("""
+                        **To enable email notifications:**
+                        
+                        1. Set up email credentials in Streamlit secrets (`.streamlit/secrets.toml`):
+                           ```toml
+                           [email]
+                           smtp_server = "smtp.gmail.com"
+                           smtp_port = 587
+                           sender_email = "your-email@gmail.com"
+                           sender_password = "your-app-password"
+                           ```
+                        
+                        2. For Gmail, you'll need to:
+                           - Enable 2-factor authentication
+                           - Generate an App Password (not your regular password)
+                           - Use that App Password in the config above
+                        
+                        3. For now, you can also contact directly at: **daniellevitt32@gmail.com**
+                        """)
+                        st.markdown(f"""
+                        **Your Feedback Summary:**
+                        - **Type:** {feedback_type}
+                        - **Subject:** {subject}
+                        - **Description:** {description}
+                        """)
+                    else:
+                        st.error("❌ There was an error sending your feedback. Please try again or contact daniellevitt32@gmail.com directly.")
+    
+    st.markdown("---")
+    st.markdown("### 📧 Direct Contact")
+    st.markdown("""
+    You can also reach out directly:
+    - **Email:** [daniellevitt32@gmail.com](mailto:daniellevitt32@gmail.com)
+    - **Response Time:** We typically respond within 24-48 hours
+    """)
+    
+    st.markdown("### ❓ Common Questions")
+    with st.expander("How do I upload a player database?"):
+        st.markdown("""
+        Use the file uploader in the sidebar on the main page. Supported formats:
+        - Excel files (.xlsx, .xls)
+        - Files should contain player information with columns like Player, Team, Conference, Position
+        """)
+    
+    with st.expander("How do I generate a PDF report?"):
+        st.markdown("""
+        After logging a call, click the "Save Call Log" button. A PDF download button will appear
+        automatically. You can also view all call history and download reports from the "View Call History" page.
+        """)
+    
+    with st.expander("Can I use this on my phone?"):
+        st.markdown("""
+        Yes! The app is mobile-friendly and works on phones and tablets. Cloud storage functionality
+        (coming soon) will allow you to access your data from any device.
+        """)
 
 elif page == "Export to SAP":
     st.header("📤 Export to SAP")
