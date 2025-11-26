@@ -32,6 +32,138 @@ st.set_page_config(
     layout="wide"
 )
 
+# Portland Thorns Branding Colors
+THORNS_DARK_RED = "#8B0000"  # Dark red from color scale
+THORNS_RED = "#D10023"  # Primary red
+THORNS_WHITE = "#FFFFFF"
+THORNS_BLACK = "#000000"
+
+# Custom CSS for Portland Thorns branding
+st.markdown(f"""
+<style>
+    /* Main branding styles */
+    .main .block-container {{
+        padding-top: 2rem;
+    }}
+    
+    /* Header with logo and designer credit */
+    .branding-header {{
+        background: linear-gradient(135deg, {THORNS_DARK_RED} 0%, {THORNS_RED} 100%);
+        padding: 1rem 2rem;
+        margin: -1rem -2rem 2rem -2rem;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }}
+    
+    .branding-logo {{
+        height: 50px;
+        width: auto;
+    }}
+    
+    .designer-credit {{
+        color: {THORNS_WHITE};
+        font-size: 0.85rem;
+        font-weight: 400;
+        text-align: right;
+    }}
+    
+    /* Primary button styling */
+    .stButton > button {{
+        background-color: {THORNS_DARK_RED};
+        color: {THORNS_WHITE};
+        border: none;
+        border-radius: 6px;
+        font-weight: 500;
+        transition: all 0.3s ease;
+    }}
+    
+    .stButton > button:hover {{
+        background-color: {THORNS_RED};
+        transform: translateY(-1px);
+        box-shadow: 0 4px 8px rgba(139, 0, 0, 0.3);
+    }}
+    
+    /* Sidebar styling */
+    .css-1d391kg {{
+        background-color: #1e1e1e;
+    }}
+    
+    /* Metric cards */
+    [data-testid="stMetricValue"] {{
+        color: {THORNS_DARK_RED};
+    }}
+    
+    /* Headers */
+    h1, h2, h3 {{
+        color: {THORNS_DARK_RED};
+    }}
+    
+    /* Info boxes */
+    .stInfo {{
+        border-left: 4px solid {THORNS_DARK_RED};
+    }}
+    
+    /* Success messages */
+    .stSuccess {{
+        border-left: 4px solid #00CC66;
+    }}
+    
+    /* Selectbox and input focus */
+    .stSelectbox > div > div {{
+        border-color: {THORNS_DARK_RED};
+    }}
+    
+    /* Tabs */
+    .stTabs [data-baseweb="tab-list"] {{
+        gap: 8px;
+    }}
+    
+    .stTabs [data-baseweb="tab"] {{
+        color: {THORNS_DARK_RED};
+        border-bottom: 2px solid transparent;
+    }}
+    
+    .stTabs [aria-selected="true"] {{
+        color: {THORNS_DARK_RED};
+        border-bottom-color: {THORNS_DARK_RED};
+    }}
+</style>
+""", unsafe_allow_html=True)
+
+# Load and display logo + designer credit at top of every page
+def display_branding_header():
+    """Display Portland Thorns logo and designer credit at top of every page."""
+    logo_path = Path("/Users/daniel/Documents/Smart Sports Lab/Football/Sports Data Campus/Portland Thorns/Branding/portland-thorns-vector-logo-seeklogo/portland-thorns-seeklogo.png")
+    
+    if logo_path.exists():
+        # Read logo and convert to base64
+        with open(logo_path, "rb") as f:
+            logo_data = f.read()
+            logo_base64 = base64.b64encode(logo_data).decode()
+        
+        st.markdown(f"""
+        <div class="branding-header">
+            <img src="data:image/png;base64,{logo_base64}" class="branding-logo" alt="Portland Thorns Logo">
+            <div class="designer-credit">
+                Designed and created by Daniel Levitt<br>
+                <a href="mailto:daniellevitt32@gmail.com" style="color: {THORNS_WHITE}; text-decoration: none;">daniellevitt32@gmail.com</a>
+            </div>
+        </div>
+        """, unsafe_allow_html=True)
+    else:
+        # Fallback if logo not found
+        st.markdown(f"""
+        <div class="branding-header">
+            <h2 style="color: {THORNS_WHITE}; margin: 0;">⚽ Portland Thorns</h2>
+            <div class="designer-credit">
+                Designed and created by Daniel Levitt<br>
+                <a href="mailto:daniellevitt32@gmail.com" style="color: {THORNS_WHITE}; text-decoration: none;">daniellevitt32@gmail.com</a>
+            </div>
+        </div>
+        """, unsafe_allow_html=True)
+
 # Language translations
 TRANSLATIONS = {
     'English': {
@@ -1677,6 +1809,9 @@ with col_lang2:
 st.markdown("---")
 
 # Main app
+# Display branding header on every page
+display_branding_header()
+
 st.title(f"⚽ {t('title')}")
 st.markdown("---")
 
