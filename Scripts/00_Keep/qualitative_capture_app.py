@@ -1622,6 +1622,19 @@ def save_form_state_to_history():
         st.session_state.form_history = st.session_state.form_history[-50:]
         st.session_state.form_history_index = len(st.session_state.form_history) - 1
 
+def save_state_if_changed(field_key, old_value, new_value):
+    """Helper function to save form state if a field value changed."""
+    if not st.session_state.get('_undoing', False) and not st.session_state.get('_redoing', False):
+        if new_value != old_value:
+            # Value changed - save the OLD state before updating
+            # Temporarily restore old value, save state, then update
+            current_value = st.session_state.get(field_key, None)
+            st.session_state[field_key] = old_value
+            save_form_state_to_history()
+            st.session_state[field_key] = new_value  # Now update to new value
+            return True
+    return False
+
 def restore_form_state_from_history(index):
     """Restore form state from history at given index."""
     if 'form_history' not in st.session_state or not st.session_state.form_history:
@@ -2612,15 +2625,8 @@ if page == "Log New Call":
     old_red_flags = st.session_state.get('form2_red_flags', '')
     red_flags = st.text_area(t('red_flags'), placeholder=t('any_concerns'), value=old_red_flags, key='red_flags_input')
     
-    # Check if value changed and save previous state if it did
-    if not st.session_state.get('_undoing', False) and not st.session_state.get('_redoing', False):
-        if red_flags != old_red_flags:
-            # Value changed - save the OLD state before updating
-            # Temporarily restore old value, save state, then update
-            temp_red_flags = st.session_state.get('form2_red_flags', '')
-            st.session_state['form2_red_flags'] = old_red_flags
-            save_form_state_to_history()
-            st.session_state['form2_red_flags'] = red_flags  # Now update to new value
+    # Save state if value changed (using helper function)
+    save_state_if_changed('form2_red_flags', old_red_flags, red_flags)
     
     # Store form2 values in session state (this happens on every rerun)
     st.session_state.form2_how_they_carry_themselves = how_they_carry_themselves
