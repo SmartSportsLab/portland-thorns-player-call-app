@@ -2678,6 +2678,8 @@ if page == "Log New Call":
                 
                 # Save to CSV
                 save_call_log(new_entry)
+                # Refresh session state with updated call log
+                st.session_state.call_log = load_call_log()
                 # Clear draft after successful submission
                 clear_draft()
                 st.success("✅ Call log saved successfully!")
@@ -2714,6 +2716,9 @@ if page == "Log New Call":
 elif page == "View Call History":
     st.header("📋 Call History")
     
+    # Refresh call log from file to ensure we have latest data
+    st.session_state.call_log = load_call_log()
+    
     if st.session_state.call_log.empty:
         st.info("No call logs yet. Log your first call!")
     else:
@@ -2744,6 +2749,9 @@ elif page == "View Call History":
 
 elif page == "Player Summary":
     st.header("👤 Player Summary")
+    
+    # Refresh call log from file to ensure we have latest data
+    st.session_state.call_log = load_call_log()
     
     if st.session_state.call_log.empty:
         st.info("No call logs yet.")
