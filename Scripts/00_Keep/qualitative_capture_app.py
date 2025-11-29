@@ -5,6 +5,7 @@ Stores data in CSV format for easy export and sharing.
 """
 
 import streamlit as st
+import streamlit.components.v1 as components
 import pandas as pd
 from pathlib import Path
 from datetime import datetime, date
@@ -41,9 +42,26 @@ st.set_page_config(
 USERNAME = "MikeNorris"
 PASSWORD = "1234"
 
-# Initialize authentication state
+# Initialize authentication state - persist across reruns
+# Use query params as backup for hard refresh (CMD+R)
 if "auth" not in st.session_state:
-    st.session_state["auth"] = False
+    # Check query params first (for hard refresh scenarios)
+    try:
+        qp = st.query_params
+        auth_token = qp.get("auth_token", None)
+        if auth_token == "authenticated":
+            st.session_state["auth"] = True
+        else:
+            st.session_state["auth"] = False
+    except:
+        st.session_state["auth"] = False
+
+# Set query param when authenticated to persist across hard refresh
+if st.session_state.get("auth", False):
+    try:
+        st.query_params["auth_token"] = "authenticated"
+    except:
+        pass
 
 # ===========================================
 # LOGIN PAGE FUNCTION
@@ -171,6 +189,11 @@ def login_page():
             if st.button("Login", use_container_width=True, type="primary"):
                 if user == USERNAME and pwd == PASSWORD:
                     st.session_state["auth"] = True
+                    # Set query param to persist auth across refresh
+                    try:
+                        st.query_params["auth_token"] = "authenticated"
+                    except:
+                        pass
                     st.success("Login successful ✅")
                     import time
                     time.sleep(0.5)
@@ -1497,6 +1520,139 @@ def clear_draft():
     except Exception as e:
         pass
 
+def reset_form():
+    """Reset all form fields without logging out."""
+    # Clear all form-related session state variables
+    form_keys = [
+        'form1_call_date', 'form1_call_type', 'form1_duration', 'form1_team',
+        'form1_conference', 'form1_conference_other', 'form1_position_profile',
+        'form1_participants', 'form1_call_notes', 'form1_agent_name',
+        'form1_agent_selected', 'form1_agent_custom', 'form1_relationship',
+        'form1_relationship_other', 'form1_agent_professionalism',
+        'form1_agent_responsiveness', 'form1_agent_expectations',
+        'form1_agent_transparency', 'form1_agent_negotiation_style',
+        'form1_agent_notes', 'form2_player_notes',
+        'form2_how_they_carry_themselves', 'form2_preparation_level',
+        'form2_preparation_notes', 'form2_how_they_view_themselves',
+        'form2_what_is_important_to_them', 'form2_mindset_towards_growth',
+        'form2_has_big_injuries', 'form2_injury_periods',
+        'form2_personality_traits', 'form2_other_traits',
+        'form2_interest_level', 'form2_timeline', 'form2_timeline_selected',
+        'form2_timeline_custom', 'form2_salary_expectations',
+        'form2_other_opportunities', 'form2_key_talking_points',
+        'form2_red_flags', 'form2_red_flag_severity',
+        'communication', 'maturity', 'coachability', 'leadership',
+        'work_ethic', 'confidence', 'tactical_knowledge', 'team_fit',
+        'overall_rating', 'form2_recommendation', 'form2_summary_notes',
+        'follow_up_needed', 'follow_up_date', 'action_items',
+        'filter_conference', 'filter_team', 'player_search',
+        'selected_player_team', 'selected_player_conference',
+        'selected_player_position'
+    ]
+    
+    for key in form_keys:
+        if key in st.session_state:
+            del st.session_state[key]
+    
+    # Clear draft file
+    clear_draft()
+    
+    # Clear form history for undo
+    if 'form_history' in st.session_state:
+        st.session_state.form_history = []
+    if 'form_history_index' in st.session_state:
+        st.session_state.form_history_index = -1
+
+def save_form_state_to_history():
+    """Save current form state to history for undo functionality."""
+    if 'form_history' not in st.session_state:
+        st.session_state.form_history = []
+    if 'form_history_index' not in st.session_state:
+        st.session_state.form_history_index = -1
+    
+    # Get current form state
+    current_state = {}
+    form_keys = [
+        'form1_call_date', 'form1_call_type', 'form1_duration', 'form1_team',
+        'form1_conference', 'form1_conference_other', 'form1_position_profile',
+        'form1_participants', 'form1_call_notes', 'form1_agent_name',
+        'form1_agent_selected', 'form1_agent_custom', 'form1_relationship',
+        'form1_relationship_other', 'form1_agent_professionalism',
+        'form1_agent_responsiveness', 'form1_agent_expectations',
+        'form1_agent_transparency', 'form1_agent_negotiation_style',
+        'form1_agent_notes', 'form2_player_notes',
+        'form2_how_they_carry_themselves', 'form2_preparation_level',
+        'form2_preparation_notes', 'form2_how_they_view_themselves',
+        'form2_what_is_important_to_them', 'form2_mindset_towards_growth',
+        'form2_has_big_injuries', 'form2_injury_periods',
+        'form2_personality_traits', 'form2_other_traits',
+        'form2_interest_level', 'form2_timeline', 'form2_timeline_selected',
+        'form2_timeline_custom', 'form2_salary_expectations',
+        'form2_other_opportunities', 'form2_key_talking_points',
+        'form2_red_flags', 'form2_red_flag_severity',
+        'communication', 'maturity', 'coachability', 'leadership',
+        'work_ethic', 'confidence', 'tactical_knowledge', 'team_fit',
+        'overall_rating', 'form2_recommendation', 'form2_summary_notes',
+        'follow_up_needed', 'follow_up_date', 'action_items'
+    ]
+    
+    for key in form_keys:
+        if key in st.session_state:
+            current_state[key] = st.session_state[key]
+    
+    # Only save if state has changed
+    if st.session_state.form_history and st.session_state.form_history_index >= 0:
+        last_state = st.session_state.form_history[st.session_state.form_history_index]
+        if last_state == current_state:
+            return  # No change, don't save
+    
+    # Remove any states after current index (when undoing and then making new changes)
+    if st.session_state.form_history_index < len(st.session_state.form_history) - 1:
+        st.session_state.form_history = st.session_state.form_history[:st.session_state.form_history_index + 1]
+    
+    # Add new state to history
+    st.session_state.form_history.append(current_state.copy())
+    st.session_state.form_history_index = len(st.session_state.form_history) - 1
+    
+    # Limit history to last 50 states
+    if len(st.session_state.form_history) > 50:
+        st.session_state.form_history = st.session_state.form_history[-50:]
+        st.session_state.form_history_index = len(st.session_state.form_history) - 1
+
+def restore_form_state_from_history(index):
+    """Restore form state from history at given index."""
+    if 'form_history' not in st.session_state or not st.session_state.form_history:
+        return False
+    
+    if index < 0 or index >= len(st.session_state.form_history):
+        return False
+    
+    state = st.session_state.form_history[index]
+    for key, value in state.items():
+        st.session_state[key] = value
+    
+    st.session_state.form_history_index = index
+    return True
+
+def undo_form():
+    """Undo last form change."""
+    if 'form_history_index' not in st.session_state or st.session_state.form_history_index <= 0:
+        return False
+    
+    new_index = st.session_state.form_history_index - 1
+    return restore_form_state_from_history(new_index)
+
+def redo_form():
+    """Redo last undone form change."""
+    if 'form_history' not in st.session_state or 'form_history_index' not in st.session_state:
+        return False
+    
+    if st.session_state.form_history_index >= len(st.session_state.form_history) - 1:
+        return False
+    
+    new_index = st.session_state.form_history_index + 1
+    return restore_form_state_from_history(new_index)
+
 def escape_text(text):
     """Escape special characters for ReportLab Paragraph."""
     if text is None:
@@ -2458,6 +2614,10 @@ if page == "Log New Call":
     st.session_state.form2_red_flags = red_flags
     st.session_state.form2_red_flag_severity = red_flag_severity
     
+    # Save form state to history for undo functionality (only if not already in undo/redo operation)
+    if not st.session_state.get('_undoing', False) and not st.session_state.get('_redoing', False):
+        save_form_state_to_history()
+    
     # Player Assessment section OUTSIDE form for reactive score updates
     
     col3, col4, col5 = st.columns(3)
@@ -2579,6 +2739,33 @@ if page == "Log New Call":
             if save_draft():
                 st.success("✅ Draft saved!")
         
+        # Form control buttons (Refresh, Undo, Redo)
+        col_refresh, col_undo, col_redo = st.columns(3)
+        
+        with col_refresh:
+            if st.button("🔄 Refresh Form", key="refresh_form_btn", use_container_width=True, help="Clear all form fields and start fresh (does not log you out)"):
+                reset_form()
+                st.success("Form refreshed! All fields cleared.")
+                st.rerun()
+        
+        with col_undo:
+            undo_disabled = 'form_history_index' not in st.session_state or st.session_state.get('form_history_index', -1) <= 0
+            if st.button("↶ Undo (⌘Z)", key="undo_btn", use_container_width=True, disabled=undo_disabled, help="Undo last change (or press CMD+Z)"):
+                if undo_form():
+                    st.success("Undone!")
+                    st.rerun()
+                else:
+                    st.info("Nothing to undo")
+        
+        with col_redo:
+            redo_disabled = 'form_history' not in st.session_state or 'form_history_index' not in st.session_state or st.session_state.get('form_history_index', -1) >= len(st.session_state.get('form_history', [])) - 1
+            if st.button("↷ Redo (⌘⇧Z)", key="redo_btn", use_container_width=True, disabled=redo_disabled, help="Redo last undone change (or press CMD+SHIFT+Z)"):
+                if redo_form():
+                    st.success("Redone!")
+                    st.rerun()
+                else:
+                    st.info("Nothing to redo")
+        
         # Show draft status
         draft_exists = DRAFT_FILE.exists()
         if draft_exists:
@@ -2588,6 +2775,32 @@ if page == "Log New Call":
             if st.button("🗑️ Clear Draft", key="clear_draft_btn", use_container_width=True):
                 clear_draft()
                 st.rerun()
+        
+        # Add keyboard shortcut support via JavaScript
+        st.markdown("""
+        <script>
+        document.addEventListener('keydown', function(e) {
+            // CMD+Z or CTRL+Z for Undo
+            if ((e.metaKey || e.ctrlKey) && e.key === 'z' && !e.shiftKey) {
+                e.preventDefault();
+                // Trigger undo button click
+                const undoBtn = document.querySelector('[data-testid="baseButton-secondary"][aria-label*="Undo"]');
+                if (undoBtn && !undoBtn.disabled) {
+                    undoBtn.click();
+                }
+            }
+            // CMD+SHIFT+Z or CTRL+SHIFT+Z for Redo
+            if ((e.metaKey || e.ctrlKey) && e.key === 'z' && e.shiftKey) {
+                e.preventDefault();
+                // Trigger redo button click
+                const redoBtn = document.querySelector('[data-testid="baseButton-secondary"][aria-label*="Redo"]');
+                if (redoBtn && !redoBtn.disabled) {
+                    redoBtn.click();
+                }
+            }
+        });
+        </script>
+        """, unsafe_allow_html=True)
     
     # Final form for submission only
     with st.form("call_log_form_final"):
