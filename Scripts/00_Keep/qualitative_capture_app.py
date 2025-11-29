@@ -2607,7 +2607,20 @@ if page == "Log New Call":
     
     st.markdown(f"### {t('red_flags_concerns')}")
     red_flag_severity = st.selectbox(t('severity'), ["None", "Low", "Medium", "High"])
-    red_flags = st.text_area(t('red_flags'), placeholder=t('any_concerns'), value=st.session_state.get('form2_red_flags', ''))
+    
+    # Get old value BEFORE rendering the field (for undo to work)
+    old_red_flags = st.session_state.get('form2_red_flags', '')
+    red_flags = st.text_area(t('red_flags'), placeholder=t('any_concerns'), value=old_red_flags, key='red_flags_input')
+    
+    # Check if value changed and save previous state if it did
+    if not st.session_state.get('_undoing', False) and not st.session_state.get('_redoing', False):
+        if red_flags != old_red_flags:
+            # Value changed - save the OLD state before updating
+            # Temporarily restore old value, save state, then update
+            temp_red_flags = st.session_state.get('form2_red_flags', '')
+            st.session_state['form2_red_flags'] = old_red_flags
+            save_form_state_to_history()
+            st.session_state['form2_red_flags'] = red_flags  # Now update to new value
     
     # Store form2 values in session state (this happens on every rerun)
     st.session_state.form2_how_they_carry_themselves = how_they_carry_themselves
