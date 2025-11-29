@@ -1599,10 +1599,13 @@ def save_form_state_to_history():
     for key in form_keys:
         if key in st.session_state:
             current_state[key] = st.session_state[key]
+        else:
+            current_state[key] = None  # Track missing keys too
     
-    # Only save if state has changed
+    # Only save if state has changed (deep comparison)
     if st.session_state.form_history and st.session_state.form_history_index >= 0:
         last_state = st.session_state.form_history[st.session_state.form_history_index]
+        # Deep comparison - check if dictionaries are equal
         if last_state == current_state:
             return  # No change, don't save
     
@@ -2312,6 +2315,18 @@ if page == "Log New Call":
     
     st.header(f"📞 {t('log_new_call')}")
     
+    # Save form state to history BEFORE any fields are rendered/updated
+    # This ensures undo captures the state before changes are made
+    if not st.session_state.get('_undoing', False) and not st.session_state.get('_redoing', False):
+        # Only save if this is a new interaction (not just a rerun with same values)
+        # We'll check for actual changes in save_form_state_to_history()
+        if 'form_history' not in st.session_state or len(st.session_state.get('form_history', [])) == 0:
+            # Initialize with current state if history is empty
+            save_form_state_to_history()
+        else:
+            # Save state before any potential changes
+            save_form_state_to_history()
+    
     # Player selection OUTSIDE form so it updates reactively
     use_custom_player = st.checkbox(t('player_not_in_database'), key="use_custom_player")
     
@@ -2592,7 +2607,7 @@ if page == "Log New Call":
     
     st.markdown(f"### {t('red_flags_concerns')}")
     red_flag_severity = st.selectbox(t('severity'), ["None", "Low", "Medium", "High"])
-    red_flags = st.text_area(t('red_flags'), placeholder=t('any_concerns'))
+    red_flags = st.text_area(t('red_flags'), placeholder=t('any_concerns'), value=st.session_state.get('form2_red_flags', ''))
     
     # Store form2 values in session state (this happens on every rerun)
     st.session_state.form2_how_they_carry_themselves = how_they_carry_themselves
@@ -2613,10 +2628,6 @@ if page == "Log New Call":
     st.session_state.form2_key_talking_points = key_talking_points
     st.session_state.form2_red_flags = red_flags
     st.session_state.form2_red_flag_severity = red_flag_severity
-    
-    # Save form state to history for undo functionality (only if not already in undo/redo operation)
-    if not st.session_state.get('_undoing', False) and not st.session_state.get('_redoing', False):
-        save_form_state_to_history()
     
     # Player Assessment section OUTSIDE form for reactive score updates
     
