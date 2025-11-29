@@ -2777,30 +2777,46 @@ if page == "Log New Call":
                 st.rerun()
         
         # Add keyboard shortcut support via JavaScript
-        st.markdown("""
+        components.html("""
         <script>
-        document.addEventListener('keydown', function(e) {
-            // CMD+Z or CTRL+Z for Undo
-            if ((e.metaKey || e.ctrlKey) && e.key === 'z' && !e.shiftKey) {
-                e.preventDefault();
-                // Trigger undo button click
-                const undoBtn = document.querySelector('[data-testid="baseButton-secondary"][aria-label*="Undo"]');
-                if (undoBtn && !undoBtn.disabled) {
-                    undoBtn.click();
+        (function() {
+            function findButtonByKey(key) {
+                const buttons = document.querySelectorAll('button');
+                for (let btn of buttons) {
+                    const text = btn.textContent || '';
+                    if (key === 'undo' && text.includes('Undo')) {
+                        return btn;
+                    }
+                    if (key === 'redo' && text.includes('Redo')) {
+                        return btn;
+                    }
                 }
+                return null;
             }
-            // CMD+SHIFT+Z or CTRL+SHIFT+Z for Redo
-            if ((e.metaKey || e.ctrlKey) && e.key === 'z' && e.shiftKey) {
-                e.preventDefault();
-                // Trigger redo button click
-                const redoBtn = document.querySelector('[data-testid="baseButton-secondary"][aria-label*="Redo"]');
-                if (redoBtn && !redoBtn.disabled) {
-                    redoBtn.click();
+            
+            document.addEventListener('keydown', function(e) {
+                // CMD+Z or CTRL+Z for Undo
+                if ((e.metaKey || e.ctrlKey) && e.key === 'z' && !e.shiftKey && !e.altKey) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    const undoBtn = findButtonByKey('undo');
+                    if (undoBtn && !undoBtn.disabled) {
+                        undoBtn.click();
+                    }
                 }
-            }
-        });
+                // CMD+SHIFT+Z or CTRL+SHIFT+Z for Redo
+                if ((e.metaKey || e.ctrlKey) && e.key === 'z' && e.shiftKey && !e.altKey) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    const redoBtn = findButtonByKey('redo');
+                    if (redoBtn && !redoBtn.disabled) {
+                        redoBtn.click();
+                    }
+                }
+            }, true);
+        })();
         </script>
-        """, unsafe_allow_html=True)
+        """, height=0)
     
     # Final form for submission only
     with st.form("call_log_form_final"):
