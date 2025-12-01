@@ -1871,19 +1871,22 @@ def authenticate_google_drive():
         # Check for client_secrets.json
         creds_file = Path("client_secrets.json")
         if not creds_file.exists():
-            st.error("""
-            **Google Drive Setup Required**
-            
-            To use Google Drive sync, you need to:
-            1. Go to [Google Cloud Console](https://console.cloud.google.com/)
-            2. Create a new project or select an existing one
-            3. Enable the Google Drive API
-            4. Create OAuth 2.0 credentials (Desktop app)
-            5. Download the credentials as `client_secrets.json`
-            6. Place `client_secrets.json` in the same directory as this app
-            
-            See [PyDrive2 documentation](https://docs.iterative.ai/PyDrive2/) for detailed instructions.
-            """)
+            with st.expander("📋 Google Drive Setup Instructions", expanded=False):
+                st.warning("""
+                **Google Drive Setup Required**
+                
+                To use Google Drive sync, you need to:
+                1. Go to [Google Cloud Console](https://console.cloud.google.com/)
+                2. Create a new project or select an existing one
+                3. Enable the Google Drive API
+                4. Create OAuth 2.0 credentials (Desktop app)
+                5. Download the credentials as `client_secrets.json`
+                6. Place `client_secrets.json` in the same directory as this app
+                
+                See [PyDrive2 documentation](https://docs.iterative.ai/PyDrive2/) for detailed instructions.
+                
+                **Note:** Google Drive sync is optional. You can uncheck the "Save to Google Drive" checkbox to save locally only.
+                """)
             return None
         
         gauth = GoogleAuth()
@@ -1912,12 +1915,12 @@ def authenticate_google_drive():
         drive = GoogleDrive(gauth)
         return drive
     except FileNotFoundError:
-        st.error("`client_secrets.json` file not found. Please set up Google Drive credentials first.")
+        # Don't show error here - it's already handled above with the expander
         return None
     except Exception as e:
-        st.error(f"Error authenticating with Google Drive: {str(e)}")
-        import traceback
-        st.error(traceback.format_exc())
+        # Only show error if it's not a missing credentials file
+        if "client_secrets" not in str(e).lower() and "credentials" not in str(e).lower():
+            st.warning(f"⚠️ Error authenticating with Google Drive: {str(e)}")
         return None
 
 def get_or_create_folder(drive, folder_name="Portland Thorns Call Logs"):
@@ -3496,9 +3499,11 @@ if page == "Phone Calls":
                         if success:
                             st.success(f"✅ {message}")
                         else:
-                            st.warning(f"⚠️ {message}")
+                            st.warning(f"⚠️ Google Drive upload failed: {message}")
                             if "not installed" in message.lower():
                                 st.info("💡 To enable Google Drive sync, install PyDrive2: `pip install PyDrive2`")
+                            elif "Failed to authenticate" in message or "Setup Required" in message:
+                                st.info("💡 Google Drive sync is optional. Uncheck the box to save locally only.")
                 
                 # Store PDF data in session state for download outside form
                 pdf_bytes = generate_call_log_pdf(new_entry)
