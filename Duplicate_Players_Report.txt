@@ -1,0 +1,45 @@
+DUPLICATE PLAYERS REPORT
+================================================================================
+
+Inter-Conference: 3 players with duplicates
+Non-Conference: 5 players with duplicates
+Total: 8 players with duplicates
+
+
+INTER-CONFERENCE DUPLICATES:
+--------------------------------------------------------------------------------
+
+C. Silva (2 entries) - SEC All Positions 2025.xlsx (team: Alabama Crimson Tide)
+  Entry 1: 10 matches, 419 min, 1 goals, 0 assists
+  Entry 2: 4 matches, 188 min, 0 goals, 0 assists
+
+M. Midgley (2 entries) - SEC All Positions 2025.xlsx (team: Tennessee Vols)
+  Entry 1: 10 matches, 847 min, 1 goals, 2 assists
+  Entry 2: 3 matches, 226 min, 1 goals, 1 assists
+
+G. Ceballos (2 entries) - SEC All Positions 2025.xlsx (team: LSU Tigers)
+  Entry 1: 9 matches, 854 min, 1 goals, 1 assists
+  Entry 2: 1 matches, 96 min, 0 goals, 0 assists
+
+NON-CONFERENCE DUPLICATES:
+--------------------------------------------------------------------------------
+
+C. Silva (2 entries) - Alabama Crimson Tide Non Conference All Positions 2025.xlsx
+  Entry 1: 8 matches, 528 min, 0 goals, 1 assists
+  Entry 2: 8 matches, 528 min, 0 goals, 1 assists
+
+N. Bidun (2 entries) - Georgia Bulldogs Non Conference All Positions 2025.xlsx
+  Entry 1: 2 matches, 65 min, 0 goals, 0 assists
+  Entry 2: 1 matches, 47 min, 0 goals, 0 assists
+
+M. Midgley (2 entries) - Tennessee Vols Non Conference All Positions 2025.xlsx
+  Entry 1: 3 matches, 199 min, 0 goals, 0 assists
+  Entry 2: 6 matches, 360 min, 0 goals, 1 assists
+
+J. Travers (2 entries) - Duke Blue Devils Non Conference All Positions 2025.xlsx
+  Entry 1: 4 matches, 208 min, 1 goals, 0 assists
+  Entry 2: 4 matches, 208 min, 1 goals, 0 assists
+
+K. Perdikis (2 entries) - Duke Blue Devils Non Conference All Positions 2025.xlsx
+  Entry 1: 1 matches, 66 min, 0 goals, 0 assists
+  Entry 2: 1 matches, 49 min, 0 goals, 0 assists

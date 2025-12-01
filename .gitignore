@@ -1,0 +1,47 @@
+# Data files
+*.xlsx
+*.xls
+*.csv
+*.zip
+
+# Player Overviews (PDFs)
+Player Overviews/
+*.pdf
+
+# Conference Reports
+Conference Reports/
+ACC:SEC Championship Reports/
+
+# Exports
+Exports/
+
+# Qualitative Data (contains sensitive info)
+Qualitative_Data/
+
+# Python cache
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Scripts we don't need in the app
+Scripts/01_Archive/
+Scripts/02_Remove/
+
+# Other data files
+Team Analysis/
+Scatterplots/
+*.png
+*.jpg
+*.jpeg
