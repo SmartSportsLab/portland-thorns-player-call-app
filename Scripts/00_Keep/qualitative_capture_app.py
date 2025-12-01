@@ -3796,24 +3796,33 @@ if page == "Phone Calls":
                     )
                     
                     # Only apply preset if it changed and is not "None"
+                    # Use a key to track if we've already processed this preset in this run
+                    preset_processing_key = f"preset_processed_{selected_preset}"
                     if selected_preset != "None" and selected_preset != st.session_state.last_applied_preset:
-                        # Apply the selected preset
-                        preset_visibility = st.session_state.column_visibility_presets[selected_preset]
-                        for col in all_available_cols:
-                            # Only apply if column exists in preset, otherwise keep current state
-                            if col in preset_visibility:
-                                st.session_state.column_visibility[col] = preset_visibility[col]
-                            else:
-                                # If column doesn't exist in preset, default to True
-                                st.session_state.column_visibility[col] = True
-                        # Track that we applied this preset
-                        st.session_state.last_applied_preset = selected_preset
-                        # Increment counter to force widget reset
-                        st.session_state.checkbox_key_counter += 1
-                        st.rerun()
+                        # Check if we've already processed this preset in this run
+                        if preset_processing_key not in st.session_state:
+                            # Apply the selected preset
+                            preset_visibility = st.session_state.column_visibility_presets[selected_preset]
+                            for col in all_available_cols:
+                                # Only apply if column exists in preset, otherwise keep current state
+                                if col in preset_visibility:
+                                    st.session_state.column_visibility[col] = preset_visibility[col]
+                                else:
+                                    # If column doesn't exist in preset, default to True
+                                    st.session_state.column_visibility[col] = True
+                            # Track that we applied this preset
+                            st.session_state.last_applied_preset = selected_preset
+                            st.session_state[preset_processing_key] = True
+                            # Increment counter to force widget reset
+                            st.session_state.checkbox_key_counter += 1
+                            st.rerun()
                     elif selected_preset == "None" and st.session_state.last_applied_preset is not None:
                         # Reset tracker when "None" is selected
                         st.session_state.last_applied_preset = None
+                        # Clear all preset processing flags
+                        for key in list(st.session_state.keys()):
+                            if key.startswith("preset_processed_"):
+                                del st.session_state[key]
                 
                 with preset_col2:
                     # Save current selection as preset
