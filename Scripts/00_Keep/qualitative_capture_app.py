@@ -3574,19 +3574,20 @@ if page == "Phone Calls":
         </style>
         """, unsafe_allow_html=True)
         
+        # Get current view mode safely (with default)
+        current_view_mode = st.session_state.get("view_mode", "Summary")
+        
         col1, col2 = st.columns(2)
         with col1:
-            current_view_mode = st.session_state.view_mode
             if st.button("Summary", use_container_width=True, type="primary" if current_view_mode == "Summary" else "secondary"):
                 st.session_state.view_mode = "Summary"
                 st.rerun()
         with col2:
-            current_view_mode = st.session_state.view_mode
             if st.button("Expanded", use_container_width=True, type="primary" if current_view_mode == "Expanded" else "secondary"):
                 st.session_state.view_mode = "Expanded"
                 st.rerun()
         
-        view_mode = st.session_state.view_mode
+        view_mode = st.session_state.get("view_mode", "Summary")
         st.markdown("---")
         
         # ===========================================
