@@ -3553,6 +3553,9 @@ if page == "Phone Calls":
         if "view_mode" not in st.session_state:
             st.session_state.view_mode = "Summary"
         
+        # Get view_mode - always define it before use
+        view_mode = st.session_state.get("view_mode", "Summary")
+        
         if st.session_state.call_log.empty:
             st.info("No call logs yet. Log your first call!")
         else:
@@ -3587,6 +3590,7 @@ if page == "Phone Calls":
                     st.session_state.view_mode = "Expanded"
                     st.rerun()
             
+            # Update view_mode after button clicks
             view_mode = st.session_state.get("view_mode", "Summary")
             st.markdown("---")
             
@@ -3725,52 +3729,52 @@ if page == "Phone Calls":
             # Define summary columns in the specified order
             summary_columns = [
                 'Player Name',
-            'Percentile',
-            'Team',
-            'Conference',
-            'Position Profile',
-            'Call Type',
-            'Call Date',
-            'Assessment Score',
-            'Assessment Grade',
-            'Agent',
-            'Interest Level',
-            'Salary Expectations',
-            'Red Flags',
-            'Recommendation',
-            'Follow-up',
-            'Follow-up Date',
-            'Call No.'
-        ]
-        
-        # ===========================================
-        # IMPROVEMENT 6: Column Visibility Toggle
-        # ===========================================
-        if "column_visibility" not in st.session_state:
-            st.session_state.column_visibility = {}
-        
-        # Initialize checkbox key counter to force widget reset when clearing
-        if "checkbox_key_counter" not in st.session_state:
-            st.session_state.checkbox_key_counter = 0
-        
-        # Initialize column visibility presets - load from file if exists
-        if "column_visibility_presets" not in st.session_state:
-            st.session_state.column_visibility_presets = load_column_presets()
-        
-        # Select columns based on view mode
-        if view_mode == "Summary":
-            # Only include columns that exist in the dataframe
-            available_summary_cols = [col for col in summary_columns if col in filtered_log.columns]
-            filtered_log = filtered_log[available_summary_cols]
-            all_available_cols = available_summary_cols
-        else:
-            # Expanded view - show all columns, but keep percentile after Player Name
-            cols = list(filtered_log.columns)
-            if 'Player Name' in cols and 'Percentile' in cols:
-                player_idx = cols.index('Player Name')
-                cols.insert(player_idx + 1, cols.pop(cols.index('Percentile')))
-            filtered_log = filtered_log[cols]
-            all_available_cols = cols
+                'Percentile',
+                'Team',
+                'Conference',
+                'Position Profile',
+                'Call Type',
+                'Call Date',
+                'Assessment Score',
+                'Assessment Grade',
+                'Agent',
+                'Interest Level',
+                'Salary Expectations',
+                'Red Flags',
+                'Recommendation',
+                'Follow-up',
+                'Follow-up Date',
+                'Call No.'
+            ]
+            
+            # ===========================================
+            # IMPROVEMENT 6: Column Visibility Toggle
+            # ===========================================
+            if "column_visibility" not in st.session_state:
+                st.session_state.column_visibility = {}
+            
+            # Initialize checkbox key counter to force widget reset when clearing
+            if "checkbox_key_counter" not in st.session_state:
+                st.session_state.checkbox_key_counter = 0
+            
+            # Initialize column visibility presets - load from file if exists
+            if "column_visibility_presets" not in st.session_state:
+                st.session_state.column_visibility_presets = load_column_presets()
+            
+            # Select columns based on view mode
+            if view_mode == "Summary":
+                # Only include columns that exist in the dataframe
+                available_summary_cols = [col for col in summary_columns if col in filtered_log.columns]
+                filtered_log = filtered_log[available_summary_cols]
+                all_available_cols = available_summary_cols
+            else:
+                # Expanded view - show all columns, but keep percentile after Player Name
+                cols = list(filtered_log.columns)
+                if 'Player Name' in cols and 'Percentile' in cols:
+                    player_idx = cols.index('Player Name')
+                    cols.insert(player_idx + 1, cols.pop(cols.index('Percentile')))
+                filtered_log = filtered_log[cols]
+                all_available_cols = cols
         
         # Column visibility toggle (only for Expanded view)
         if view_mode == "Expanded":
