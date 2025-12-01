@@ -3555,166 +3555,176 @@ if page == "Phone Calls":
         
         if st.session_state.call_log.empty:
             st.info("No call logs yet. Log your first call!")
-        
-        # Use toggle buttons for better visibility
-        st.markdown("### View Mode")
-        
-        # Add custom CSS for view mode buttons
-        st.markdown("""
-        <style>
-            div[data-testid="stButton"] > button[kind="secondary"] {
-                background-color: #000000 !important;
-                color: #ffffff !important;
-                border: 1px solid #3a3a3a !important;
-            }
-            div[data-testid="stButton"] > button[kind="secondary"]:hover {
-                background-color: #1a1a1a !important;
-                border-color: #8B0000 !important;
-            }
-        </style>
-        """, unsafe_allow_html=True)
-        
-        # Get current view mode safely (with default)
-        current_view_mode = st.session_state.get("view_mode", "Summary")
-        
-        col1, col2 = st.columns(2)
-        with col1:
-            if st.button("Summary", use_container_width=True, type="primary" if current_view_mode == "Summary" else "secondary"):
-                st.session_state.view_mode = "Summary"
-                st.rerun()
-        with col2:
-            if st.button("Expanded", use_container_width=True, type="primary" if current_view_mode == "Expanded" else "secondary"):
-                st.session_state.view_mode = "Expanded"
-                st.rerun()
-        
-        view_mode = st.session_state.get("view_mode", "Summary")
-        st.markdown("---")
-        
-        # ===========================================
-        # IMPROVEMENT 7: Enhanced Date Range Filter
-        # ===========================================
-        # Initialize sorting state before using it
-        if "table_sort_column" not in st.session_state:
-            st.session_state.table_sort_column = None
-        if "table_sort_direction" not in st.session_state:
-            st.session_state.table_sort_direction = "asc"
-        
-        st.markdown("### Filters")
-        col1, col2, col3, col4 = st.columns(4)
-        with col1:
-            filter_player = st.multiselect("Filter by Player", sorted(st.session_state.call_log['Player Name'].unique().tolist()))
-        with col2:
-            filter_recommendation = st.multiselect("Filter by Recommendation", sorted(st.session_state.call_log['Recommendation'].unique().tolist()))
-        with col3:
-            date_preset = st.selectbox("Date Preset", ["All Time", "Last 7 Days", "Last 30 Days", "This Month", "This Year", "Custom Range"])
-        with col4:
-            if date_preset == "Custom Range":
-                date_start = st.date_input("Start Date", value=None, key="date_start")
-                date_end = st.date_input("End Date", value=None, key="date_end")
-            else:
-                date_start = None
-                date_end = None
-        
-        # Calculate player percentiles to add as column (before filtering)
-        def calculate_percentiles_for_table(call_log_df):
-            """Calculate percentiles for all players and return as dictionary."""
-            all_players = call_log_df['Player Name'].unique()
-            player_scores = []
+        else:
+            # Use toggle buttons for better visibility
+            st.markdown("### View Mode")
             
-            for p in all_players:
-                p_calls = call_log_df[call_log_df['Player Name'] == p]
-                avg_score = (
-                    p_calls['Communication'].mean() + p_calls['Maturity'].mean() + 
-                    p_calls['Coachability'].mean() + p_calls['Leadership'].mean() + 
-                    p_calls['Work Ethic'].mean() + p_calls['Confidence'].mean() + 
-                    p_calls['Tactical Knowledge'].mean() + p_calls['Team Fit'].mean() + 
-                    p_calls['Overall Rating'].mean()
-                ) / 9
-                player_scores.append({'player': p, 'score': avg_score})
+            # Add custom CSS for view mode buttons
+            st.markdown("""
+            <style>
+                div[data-testid="stButton"] > button[kind="secondary"] {
+                    background-color: #000000 !important;
+                    color: #ffffff !important;
+                    border: 1px solid #3a3a3a !important;
+                }
+                div[data-testid="stButton"] > button[kind="secondary"]:hover {
+                    background-color: #1a1a1a !important;
+                    border-color: #8B0000 !important;
+                }
+            </style>
+            """, unsafe_allow_html=True)
             
-            scores_df = pd.DataFrame(player_scores)
-            scores_df = scores_df.sort_values('score', ascending=False)
-            scores_df['rank'] = range(1, len(scores_df) + 1)
+            # Get current view mode safely (with default)
+            current_view_mode = st.session_state.get("view_mode", "Summary")
             
-            # Fix percentile calculation: rank 1 (best) should be 100th percentile, rank N (worst) should be lowest
-            # Formula: percentile = ((total - rank) / (total - 1)) * 100
-            total = len(scores_df)
-            if total > 1:
-                scores_df['percentile'] = ((total - scores_df['rank']) / (total - 1) * 100).round(1)
-            else:
-                scores_df['percentile'] = 100.0  # If only one player, they're 100th percentile
+            col1, col2 = st.columns(2)
+            with col1:
+                if st.button("Summary", use_container_width=True, type="primary" if current_view_mode == "Summary" else "secondary"):
+                    st.session_state.view_mode = "Summary"
+                    st.rerun()
+            with col2:
+                if st.button("Expanded", use_container_width=True, type="primary" if current_view_mode == "Expanded" else "secondary"):
+                    st.session_state.view_mode = "Expanded"
+                    st.rerun()
             
-            # Return percentile dictionary
-            return dict(zip(scores_df['player'], scores_df['percentile']))
-        
-        # Get percentiles
-        percentile_dict = calculate_percentiles_for_table(st.session_state.call_log)
-        
-        # Apply filters
-        filtered_log = st.session_state.call_log.copy()
-        
-        # Apply regular filters
-        if filter_player:
-            filtered_log = filtered_log[filtered_log['Player Name'].isin(filter_player)]
-        if filter_recommendation:
-            filtered_log = filtered_log[filtered_log['Recommendation'].isin(filter_recommendation)]
-        
-        # Apply date range filter
-        if date_preset != "All Time":
-            try:
-                filtered_log['Call Date'] = pd.to_datetime(filtered_log['Call Date'], errors='coerce')
-                today = datetime.now().date()
+            view_mode = st.session_state.get("view_mode", "Summary")
+            st.markdown("---")
+            
+            # ===========================================
+            # IMPROVEMENT 7: Enhanced Date Range Filter
+            # ===========================================
+            # Initialize sorting state before using it
+            if "table_sort_column" not in st.session_state:
+                st.session_state.table_sort_column = None
+            if "table_sort_direction" not in st.session_state:
+                st.session_state.table_sort_direction = "asc"
+            
+            st.markdown("### Filters")
+            col1, col2, col3, col4 = st.columns(4)
+            with col1:
+                # Check if 'Player Name' column exists
+                if 'Player Name' in st.session_state.call_log.columns:
+                    filter_player = st.multiselect("Filter by Player", sorted(st.session_state.call_log['Player Name'].unique().tolist()))
+                else:
+                    filter_player = []
+            with col2:
+                # Check if 'Recommendation' column exists
+                if 'Recommendation' in st.session_state.call_log.columns:
+                    filter_recommendation = st.multiselect("Filter by Recommendation", sorted(st.session_state.call_log['Recommendation'].unique().tolist()))
+                else:
+                    filter_recommendation = []
+            with col3:
+                date_preset = st.selectbox("Date Preset", ["All Time", "Last 7 Days", "Last 30 Days", "This Month", "This Year", "Custom Range"])
+            with col4:
+                if date_preset == "Custom Range":
+                    date_start = st.date_input("Start Date", value=None, key="date_start")
+                    date_end = st.date_input("End Date", value=None, key="date_end")
+                else:
+                    date_start = None
+                    date_end = None
+            
+            # Calculate player percentiles to add as column (before filtering)
+            def calculate_percentiles_for_table(call_log_df):
+                """Calculate percentiles for all players and return as dictionary."""
+                if 'Player Name' not in call_log_df.columns or call_log_df.empty:
+                    return {}
+                all_players = call_log_df['Player Name'].unique()
+                player_scores = []
                 
-                if date_preset == "Last 7 Days":
-                    date_start = today - timedelta(days=7)
-                    date_end = today
-                elif date_preset == "Last 30 Days":
-                    date_start = today - timedelta(days=30)
-                    date_end = today
-                elif date_preset == "This Month":
-                    date_start = datetime.now().replace(day=1).date()
-                    date_end = today
-                elif date_preset == "This Year":
-                    date_start = datetime.now().replace(month=1, day=1).date()
-                    date_end = today
-                elif date_preset == "Custom Range":
+                for p in all_players:
+                    p_calls = call_log_df[call_log_df['Player Name'] == p]
+                    avg_score = (
+                        p_calls['Communication'].mean() + p_calls['Maturity'].mean() + 
+                        p_calls['Coachability'].mean() + p_calls['Leadership'].mean() + 
+                        p_calls['Work Ethic'].mean() + p_calls['Confidence'].mean() + 
+                        p_calls['Tactical Knowledge'].mean() + p_calls['Team Fit'].mean() + 
+                        p_calls['Overall Rating'].mean()
+                    ) / 9
+                    player_scores.append({'player': p, 'score': avg_score})
+                
+                scores_df = pd.DataFrame(player_scores)
+                scores_df = scores_df.sort_values('score', ascending=False)
+                scores_df['rank'] = range(1, len(scores_df) + 1)
+                
+                # Fix percentile calculation: rank 1 (best) should be 100th percentile, rank N (worst) should be lowest
+                # Formula: percentile = ((total - rank) / (total - 1)) * 100
+                total = len(scores_df)
+                if total > 1:
+                    scores_df['percentile'] = ((total - scores_df['rank']) / (total - 1) * 100).round(1)
+                else:
+                    scores_df['percentile'] = 100.0  # If only one player, they're 100th percentile
+                
+                # Return percentile dictionary
+                return dict(zip(scores_df['player'], scores_df['percentile']))
+            
+            # Get percentiles
+            percentile_dict = calculate_percentiles_for_table(st.session_state.call_log)
+            
+            # Apply filters
+            filtered_log = st.session_state.call_log.copy()
+            
+            # Apply regular filters
+            if filter_player:
+                filtered_log = filtered_log[filtered_log['Player Name'].isin(filter_player)]
+            if filter_recommendation:
+                filtered_log = filtered_log[filtered_log['Recommendation'].isin(filter_recommendation)]
+            
+            # Apply date range filter
+            if date_preset != "All Time":
+                try:
+                    filtered_log['Call Date'] = pd.to_datetime(filtered_log['Call Date'], errors='coerce')
+                    today = datetime.now().date()
+                    
+                    if date_preset == "Last 7 Days":
+                        date_start = today - timedelta(days=7)
+                        date_end = today
+                    elif date_preset == "Last 30 Days":
+                        date_start = today - timedelta(days=30)
+                        date_end = today
+                    elif date_preset == "This Month":
+                        date_start = datetime.now().replace(day=1).date()
+                        date_end = today
+                    elif date_preset == "This Year":
+                        date_start = datetime.now().replace(month=1, day=1).date()
+                        date_end = today
+                    elif date_preset == "Custom Range":
+                        if date_start and date_end:
+                            date_start = date_start
+                            date_end = date_end
+                        else:
+                            date_start = None
+                            date_end = None
+                    
                     if date_start and date_end:
-                        date_start = date_start
-                        date_end = date_end
-                    else:
-                        date_start = None
-                        date_end = None
-                
-                if date_start and date_end:
-                    filtered_log = filtered_log[
-                        (filtered_log['Call Date'].dt.date >= date_start) & 
-                        (filtered_log['Call Date'].dt.date <= date_end)
-                    ]
-            except Exception as e:
-                pass
-        
-        # Percentile column already added before filtering
-        
-        # Rename columns
-        column_renames = {
-            'Player Percentile': 'Percentile',
-            'Assessment Total Score': 'Assessment Score',
-            'Agent Name': 'Agent',
-            'Follow-up Needed': 'Follow-up',
-            'Call Number': 'Call No.'
-        }
-        filtered_log = filtered_log.rename(columns=column_renames)
-        
-        # Format values
-        if 'Follow-up' in filtered_log.columns:
-            filtered_log['Follow-up'] = filtered_log['Follow-up'].apply(lambda x: 'Yes' if x == True or str(x).lower() == 'true' else 'No')
-        
-        if 'Call No.' in filtered_log.columns:
-            filtered_log['Call No.'] = filtered_log['Call No.'].apply(lambda x: int(float(x)) if pd.notna(x) and str(x) != '' else x)
-        
-        # Define summary columns in the specified order
-        summary_columns = [
-            'Player Name',
+                        filtered_log = filtered_log[
+                            (filtered_log['Call Date'].dt.date >= date_start) & 
+                            (filtered_log['Call Date'].dt.date <= date_end)
+                        ]
+                except Exception as e:
+                    pass
+            
+            # Percentile column already added before filtering
+            
+            # Rename columns
+            column_renames = {
+                'Player Percentile': 'Percentile',
+                'Assessment Total Score': 'Assessment Score',
+                'Agent Name': 'Agent',
+                'Follow-up Needed': 'Follow-up',
+                'Call Number': 'Call No.'
+            }
+            filtered_log = filtered_log.rename(columns=column_renames)
+            
+            # Format values
+            if 'Follow-up' in filtered_log.columns:
+                filtered_log['Follow-up'] = filtered_log['Follow-up'].apply(lambda x: 'Yes' if x == True or str(x).lower() == 'true' else 'No')
+            
+            if 'Call No.' in filtered_log.columns:
+                filtered_log['Call No.'] = filtered_log['Call No.'].apply(lambda x: int(float(x)) if pd.notna(x) and str(x) != '' else x)
+            
+            # Define summary columns in the specified order
+            summary_columns = [
+                'Player Name',
             'Percentile',
             'Team',
             'Conference',
