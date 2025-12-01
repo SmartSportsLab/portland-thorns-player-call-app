@@ -3775,12 +3775,12 @@ if page == "Phone Calls":
                     cols.insert(player_idx + 1, cols.pop(cols.index('Percentile')))
                 filtered_log = filtered_log[cols]
                 all_available_cols = cols
-        
-        # Column visibility toggle (only for Expanded view)
-        if view_mode == "Expanded":
-            with st.expander("👁️ Show/Hide Columns", expanded=False):
-                # Preset management section
-                preset_col1, preset_col2, preset_col3 = st.columns([2, 2, 1])
+            
+            # Column visibility toggle (only for Expanded view)
+            if view_mode == "Expanded":
+                with st.expander("👁️ Show/Hide Columns", expanded=False):
+                    # Preset management section
+                    preset_col1, preset_col2, preset_col3 = st.columns([2, 2, 1])
                 with preset_col1:
                     # Initialize last applied preset tracker
                     if "last_applied_preset" not in st.session_state:
@@ -3906,80 +3906,80 @@ if page == "Phone Calls":
                 visible_cols = [col for col in all_available_cols if st.session_state.column_visibility.get(col, True)]
                 filtered_log = filtered_log[visible_cols]
         
-        # Sort dropdown - adaptive to visible columns (after column visibility is determined)
-        st.markdown("### Sort")
-        sort_col1, sort_col2 = st.columns(2)
-        with sort_col1:
-            # Determine which columns are currently visible for sorting
-            if view_mode == "Summary":
-                visible_for_sort = [col for col in summary_columns if col in filtered_log.columns]
-            else:
-                # For Expanded, use the columns that are actually visible
-                visible_for_sort = list(filtered_log.columns)
-            
-            # Exclude text-heavy columns that don't make sense to sort
-            sortable_columns = [col for col in visible_for_sort if col not in [
-                'Call Notes', 'Preparation Notes', 'How They View Themselves', 
-                'What Is Important To Them', 'Mindset Towards Growth', 'Agent Notes',
-                'Player Notes', 'Key Talking Points', 'Summary Notes', 'Red Flags',
-                'Action Items', 'Other Opportunities', 'Injury Periods', 
-                'Personality Traits', 'Other Traits', 'Agent Expectations',
-                'Agent Negotiation Style', 'How They Carry Themselves'
-            ]]
-            
-            sort_options = ["None"] + sortable_columns
-            
-            # Get current sort column for dropdown default
-            current_sort = st.session_state.table_sort_column if st.session_state.table_sort_column else "None"
-            # Map back if needed
-            reverse_column_map = {
-                'Percentile': 'Player Percentile',
-                'Assessment Score': 'Assessment Total Score',
-                'Agent': 'Agent Name',
-                'Follow-up': 'Follow-up Needed',
-                'Call No.': 'Call Number'
-            }
-            if current_sort in reverse_column_map:
-                current_sort = reverse_column_map[current_sort]
-            if current_sort not in sort_options:
-                current_sort = "None"
-            
-            selected_sort_column = st.selectbox(
-                "Sort by",
-                sort_options,
-                index=sort_options.index(current_sort) if current_sort in sort_options else 0,
-                key="sort_by_dropdown"
-            )
-            
-            # Map selected column to display name for table
-            column_map = {
-                'Player Percentile': 'Percentile',
-                'Assessment Total Score': 'Assessment Score',
-                'Agent Name': 'Agent',
-                'Follow-up Needed': 'Follow-up',
-                'Call Number': 'Call No.'
-            }
-            if selected_sort_column != "None":
-                st.session_state.table_sort_column = column_map.get(selected_sort_column, selected_sort_column)
-            else:
-                st.session_state.table_sort_column = None
-        
-        with sort_col2:
-            # Sort direction dropdown
-            if selected_sort_column != "None":
-                sort_direction = st.selectbox(
-                    "Direction",
-                    ["Ascending", "Descending"],
-                    index=0 if st.session_state.table_sort_direction == "asc" else 1,
-                    key="sort_direction_dropdown"
+            # Sort dropdown - adaptive to visible columns (after column visibility is determined)
+            st.markdown("### Sort")
+            sort_col1, sort_col2 = st.columns(2)
+            with sort_col1:
+                # Determine which columns are currently visible for sorting
+                if view_mode == "Summary":
+                    visible_for_sort = [col for col in summary_columns if col in filtered_log.columns]
+                else:
+                    # For Expanded, use the columns that are actually visible
+                    visible_for_sort = list(filtered_log.columns)
+                
+                # Exclude text-heavy columns that don't make sense to sort
+                sortable_columns = [col for col in visible_for_sort if col not in [
+                    'Call Notes', 'Preparation Notes', 'How They View Themselves', 
+                    'What Is Important To Them', 'Mindset Towards Growth', 'Agent Notes',
+                    'Player Notes', 'Key Talking Points', 'Summary Notes', 'Red Flags',
+                    'Action Items', 'Other Opportunities', 'Injury Periods', 
+                    'Personality Traits', 'Other Traits', 'Agent Expectations',
+                    'Agent Negotiation Style', 'How They Carry Themselves'
+                ]]
+                
+                sort_options = ["None"] + sortable_columns
+                
+                # Get current sort column for dropdown default
+                current_sort = st.session_state.table_sort_column if st.session_state.table_sort_column else "None"
+                # Map back if needed
+                reverse_column_map = {
+                    'Percentile': 'Player Percentile',
+                    'Assessment Score': 'Assessment Total Score',
+                    'Agent': 'Agent Name',
+                    'Follow-up': 'Follow-up Needed',
+                    'Call No.': 'Call Number'
+                }
+                if current_sort in reverse_column_map:
+                    current_sort = reverse_column_map[current_sort]
+                if current_sort not in sort_options:
+                    current_sort = "None"
+                
+                selected_sort_column = st.selectbox(
+                    "Sort by",
+                    sort_options,
+                    index=sort_options.index(current_sort) if current_sort in sort_options else 0,
+                    key="sort_by_dropdown"
                 )
-                st.session_state.table_sort_direction = "asc" if sort_direction == "Ascending" else "desc"
-        
-        # Initialize sorting state
-        if "table_sort_column" not in st.session_state:
-            st.session_state.table_sort_column = None
-        if "table_sort_direction" not in st.session_state:
-            st.session_state.table_sort_direction = "asc"
+                
+                # Map selected column to display name for table
+                column_map = {
+                    'Player Percentile': 'Percentile',
+                    'Assessment Total Score': 'Assessment Score',
+                    'Agent Name': 'Agent',
+                    'Follow-up Needed': 'Follow-up',
+                    'Call Number': 'Call No.'
+                }
+                if selected_sort_column != "None":
+                    st.session_state.table_sort_column = column_map.get(selected_sort_column, selected_sort_column)
+                else:
+                    st.session_state.table_sort_column = None
+            
+            with sort_col2:
+                # Sort direction dropdown
+                if selected_sort_column != "None":
+                    sort_direction = st.selectbox(
+                        "Direction",
+                        ["Ascending", "Descending"],
+                        index=0 if st.session_state.table_sort_direction == "asc" else 1,
+                        key="sort_direction_dropdown"
+                    )
+                    st.session_state.table_sort_direction = "asc" if sort_direction == "Ascending" else "desc"
+            
+            # Initialize sorting state
+            if "table_sort_column" not in st.session_state:
+                st.session_state.table_sort_column = None
+            if "table_sort_direction" not in st.session_state:
+                st.session_state.table_sort_direction = "asc"
         
         # Sorting is now handled in the Filters section (col5)
         
