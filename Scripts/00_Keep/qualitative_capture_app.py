@@ -2972,16 +2972,21 @@ if page == "Phone Calls":
             available_players = players_list
         
         # Search functionality
-        col_search, col_select = st.columns([2, 3])
-        with col_search:
-            player_search = st.text_input(f"{t('search_player')}", key="player_search")
-        with col_select:
-            if player_search:
-                filtered_players = [p for p in available_players if player_search.lower() in p.lower()]
-            else:
-                filtered_players = available_players
-            
-            player_name = st.selectbox(t('player_name'), [""] + filtered_players[:200], key="player_select")  # Increased limit since we're filtering
+        if not players_list:
+            st.warning("⚠️ **No player database loaded.** Please upload a player database file using the sidebar uploader (under 'Upload Player Database') to enable player selection.")
+            st.info("💡 **Tip:** You can still log calls for players not in the database by checking 'Player not in database' below.")
+            player_name = st.text_input(t('player_name'), key="player_select_manual")
+        else:
+            col_search, col_select = st.columns([2, 3])
+            with col_search:
+                player_search = st.text_input(f"{t('search_player')}", key="player_search")
+            with col_select:
+                if player_search:
+                    filtered_players = [p for p in available_players if player_search.lower() in p.lower()]
+                else:
+                    filtered_players = available_players
+                
+                player_name = st.selectbox(t('player_name'), [""] + filtered_players[:200], key="player_select")  # Increased limit since we're filtering
     
         # Auto-populate team, conference, and position when player is selected (reactive)
         if player_name and player_name in player_info_dict:
@@ -3544,13 +3549,12 @@ if page == "Phone Calls":
                 except Exception as e:
                     st.error(f"Error reading file: {e}")
         
+        # Initialize view_mode if not set (must be before buttons)
+        if "view_mode" not in st.session_state:
+            st.session_state.view_mode = "Summary"
+        
         if st.session_state.call_log.empty:
             st.info("No call logs yet. Log your first call!")
-        else:
-            # ===========================================
-            # View mode selector - use session state to persist selection
-            if "view_mode" not in st.session_state:
-                st.session_state.view_mode = "Summary"
         
         # Use toggle buttons for better visibility
         st.markdown("### View Mode")
@@ -3572,11 +3576,13 @@ if page == "Phone Calls":
         
         col1, col2 = st.columns(2)
         with col1:
-            if st.button("Summary", use_container_width=True, type="primary" if st.session_state.view_mode == "Summary" else "secondary"):
+            current_view_mode = st.session_state.view_mode
+            if st.button("Summary", use_container_width=True, type="primary" if current_view_mode == "Summary" else "secondary"):
                 st.session_state.view_mode = "Summary"
                 st.rerun()
         with col2:
-            if st.button("Expanded", use_container_width=True, type="primary" if st.session_state.view_mode == "Expanded" else "secondary"):
+            current_view_mode = st.session_state.view_mode
+            if st.button("Expanded", use_container_width=True, type="primary" if current_view_mode == "Expanded" else "secondary"):
                 st.session_state.view_mode = "Expanded"
                 st.rerun()
         
