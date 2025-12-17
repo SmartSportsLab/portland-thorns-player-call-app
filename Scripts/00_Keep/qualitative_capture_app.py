@@ -1312,11 +1312,18 @@ DRAFT_FILE = DATA_DIR / 'call_log_draft.json'
 PRESETS_FILE = DATA_DIR / 'column_visibility_presets.json'
 
 # Try multiple possible shortlist file names
+# Check both BASE_DIR and parent directory (where the file might be uploaded)
+PARENT_DIR = BASE_DIR.parent if BASE_DIR.name == '00_Keep' else BASE_DIR
 POSSIBLE_SHORTLIST_FILES = [
     BASE_DIR / 'Portland Thorns 2025 Shortlist.xlsx',
     BASE_DIR / 'Portland Thorns 2025 Long Shortlist.xlsx',
     BASE_DIR / 'Portland Thorns 2025 Short Shortlist.xlsx',
     BASE_DIR / 'AI Shortlist.xlsx',
+    # Also check parent directory (Advanced Search folder)
+    PARENT_DIR / 'Portland Thorns 2025 Shortlist.xlsx',
+    PARENT_DIR / 'Portland Thorns 2025 Long Shortlist.xlsx',
+    PARENT_DIR / 'Portland Thorns 2025 Short Shortlist.xlsx',
+    PARENT_DIR / 'AI Shortlist.xlsx',
 ]
 
 # Find the first existing shortlist file
@@ -1340,6 +1347,13 @@ if PLAYER_DB_FILE is None:
     for file_path in POSSIBLE_SHORTLIST_FILES:
         if file_path.exists():
             PLAYER_DB_FILE = file_path
+            break
+
+# Also check parent directory for any Excel files with "Shortlist" in the name
+if PLAYER_DB_FILE is None and PARENT_DIR.exists():
+    for excel_file in PARENT_DIR.glob('*Shortlist*.xlsx'):
+        if excel_file.exists():
+            PLAYER_DB_FILE = excel_file
             break
 
 # If no shortlist file found, try loading from conference reports
