@@ -1,0 +1,46 @@
+{
+  "Center Back": [
+    "Defensive duels per 90",
+    "PAdj Interceptions",
+    "Shots blocked per 90",
+    "Aerial duels per 90",
+    "Passes per 90",
+    "Short / medium passes per 90",
+    "Long passes per 90",
+    "Progressive passes per 90"
+  ],
+  "Centre Midfielder": [
+    "Defensive duels per 90",
+    "PAdj Interceptions",
+    "Progressive passes per 90",
+    "Short / medium passes per 90",
+    "Long passes per 90",
+    "Received passes per 90",
+    "Dribbles per 90",
+    "Progressive runs per 90"
+  ],
+  "Attacking Midfielder": [
+    "Goals per 90",
+    "Assists per 90",
+    "Offensive duels per 90",
+    "Deep completions per 90",
+    "Dribbles per 90",
+    "Received passes per 90",
+    "Touches in box per 90",
+    "Progressive runs per 90"
+  ],
+  "Winger": [
+    "Offensive duels per 90",
+    "Dribbles per 90",
+    "Crosses from right flank per 90",
+    "Accelerations per 90",
+    "Progressive runs per 90",
+    "Received long passes per 90",
+    "Received passes per 90",
+    "Assists per 90"
+  ]
+}
+
+
+
+

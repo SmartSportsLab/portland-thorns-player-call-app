@@ -17,15 +17,7 @@ import smtplib
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 
-# Google Drive integration
-GOOGLE_DRIVE_AVAILABLE = False
-try:
-    from pydrive2.auth import GoogleAuth
-    from pydrive2.drive import GoogleDrive
-    from pydrive2.files import FileNotUploadedError
-    GOOGLE_DRIVE_AVAILABLE = True
-except ImportError:
-    GOOGLE_DRIVE_AVAILABLE = False
+# Google Drive integration removed - not needed
 
 # ReportLab for PDF generation (works on Streamlit Cloud)
 PDF_AVAILABLE = False
@@ -33,7 +25,7 @@ try:
     from reportlab.lib.pagesizes import letter
     from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
     from reportlab.lib.units import inch
-    from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Table, TableStyle, PageBreak
+    from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Table, TableStyle, PageBreak, Image, KeepTogether
     from reportlab.lib import colors
     from reportlab.lib.enums import TA_LEFT, TA_CENTER
     PDF_AVAILABLE = True
@@ -233,6 +225,17 @@ st.markdown(f"""
         padding-top: 2rem;
     }}
     
+    /* Set all non-header text to 20px */
+    body, p, div:not([data-baseweb="tab"]):not([role="tab"]), span, 
+    label:not([data-baseweb="tab"]), .stMarkdown, .stText, 
+    .stSelectbox label, .stTextInput label, .stNumberInput label, .stTextArea label,
+    [data-testid="stMarkdownContainer"] p,
+    [data-testid="stMarkdownContainer"] div:not(h1):not(h2):not(h3):not(h4):not(h5):not(h6):not([data-baseweb="tab"]):not([role="tab"]),
+    .stDataFrame, .stTable, .stInfo, .stWarning, .stError, .stSuccess,
+    .designer-credit {{
+        font-size: 20px !important;
+    }}
+    
     /* Header with logo and designer credit */
     .branding-header {{
         background: linear-gradient(135deg, {THORNS_DARK_RED} 0%, {THORNS_RED} 100%);
@@ -386,13 +389,27 @@ st.markdown(f"""
     }}
     
     .stTabs [data-baseweb="tab"] {{
-        color: {THORNS_DARK_RED};
+        color: white;
         border-bottom: 2px solid transparent;
     }}
     
     .stTabs [aria-selected="true"] {{
-        color: {THORNS_DARK_RED};
-        border-bottom-color: {THORNS_DARK_RED};
+        color: white;
+        border-bottom-color: white;
+    }}
+    
+    /* Altair tooltip styling - left align text */
+    .vega-tooltip {{
+        text-align: left !important;
+    }}
+    .vega-tooltip table {{
+        text-align: left !important;
+    }}
+    .vega-tooltip td {{
+        text-align: left !important;
+    }}
+    .vega-tooltip th {{
+        text-align: left !important;
     }}
 </style>
 """, unsafe_allow_html=True)
@@ -1559,7 +1576,6 @@ def save_draft():
             'form1_agent_responsiveness': st.session_state.get('form1_agent_responsiveness', 5),
             'form1_agent_expectations': st.session_state.get('form1_agent_expectations', 5),
             'form1_agent_transparency': st.session_state.get('form1_agent_transparency', 5),
-            'form1_agent_negotiation_style': st.session_state.get('form1_agent_negotiation_style', 5),
             'form1_agent_notes': st.session_state.get('form1_agent_notes', ''),
             'form2_player_notes': st.session_state.get('form2_player_notes', ''),
             'form2_how_they_carry_themselves': st.session_state.get('form2_how_they_carry_themselves', ''),
@@ -1587,7 +1603,6 @@ def save_draft():
             'maturity': st.session_state.get('maturity', 5),
             'coachability': st.session_state.get('coachability', 5),
             'leadership': st.session_state.get('leadership', 5),
-            'work_ethic': st.session_state.get('work_ethic', 5),
             'confidence': st.session_state.get('confidence', 5),
             'tactical_knowledge': st.session_state.get('tactical_knowledge', 5),
             'team_fit': st.session_state.get('team_fit', 5),
@@ -1659,7 +1674,7 @@ def reset_form():
         'form1_agent_selected', 'form1_agent_custom', 'form1_relationship',
         'form1_relationship_other', 'form1_agent_professionalism',
         'form1_agent_responsiveness', 'form1_agent_expectations',
-        'form1_agent_transparency', 'form1_agent_negotiation_style',
+        'form1_agent_transparency',
         'form1_agent_notes', 'form2_player_notes',
         'form2_how_they_carry_themselves', 'form2_preparation_level',
         'form2_preparation_notes', 'form2_how_they_view_themselves',
@@ -1671,7 +1686,7 @@ def reset_form():
         'form2_other_opportunities', 'form2_key_talking_points',
         'form2_red_flags', 'form2_red_flag_severity',
         'communication', 'maturity', 'coachability', 'leadership',
-        'work_ethic', 'confidence', 'tactical_knowledge', 'team_fit',
+        'confidence', 'tactical_knowledge', 'team_fit',
         'overall_rating', 'form2_recommendation', 'form2_summary_notes',
         'follow_up_needed', 'follow_up_date', 'action_items',
         'filter_conference', 'filter_team', 'player_search',
@@ -1708,7 +1723,7 @@ def save_form_state_to_history():
         'form1_agent_selected', 'form1_agent_custom', 'form1_relationship',
         'form1_relationship_other', 'form1_agent_professionalism',
         'form1_agent_responsiveness', 'form1_agent_expectations',
-        'form1_agent_transparency', 'form1_agent_negotiation_style',
+        'form1_agent_transparency',
         'form1_agent_notes', 'form2_player_notes',
         'form2_how_they_carry_themselves', 'form2_preparation_level',
         'form2_preparation_notes', 'form2_how_they_view_themselves',
@@ -1720,7 +1735,7 @@ def save_form_state_to_history():
         'form2_other_opportunities', 'form2_key_talking_points',
         'form2_red_flags', 'form2_red_flag_severity',
         'communication', 'maturity', 'coachability', 'leadership',
-        'work_ethic', 'confidence', 'tactical_knowledge', 'team_fit',
+        'confidence', 'tactical_knowledge', 'team_fit',
         'overall_rating', 'form2_recommendation', 'form2_summary_notes',
         'follow_up_needed', 'follow_up_date', 'action_items'
     ]
@@ -1862,134 +1877,7 @@ def create_outlook_calendar_link(title, start_date, description="", location="")
     url = "https://outlook.live.com/calendar/0/deeplink/compose?" + "&".join([f"{k}={quote(str(v))}" for k, v in params.items() if v])
     return url
 
-def authenticate_google_drive():
-    """Authenticate with Google Drive API."""
-    if not GOOGLE_DRIVE_AVAILABLE:
-        return None
-    
-    try:
-        # Check for client_secrets.json
-        creds_file = Path("client_secrets.json")
-        if not creds_file.exists():
-            with st.expander("📋 Google Drive Setup Instructions", expanded=False):
-                st.warning("""
-                **Google Drive Setup Required**
-                
-                To use Google Drive sync, you need to:
-                1. Go to [Google Cloud Console](https://console.cloud.google.com/)
-                2. Create a new project or select an existing one
-                3. Enable the Google Drive API
-                4. Create OAuth 2.0 credentials (Desktop app)
-                5. Download the credentials as `client_secrets.json`
-                6. Place `client_secrets.json` in the same directory as this app
-                
-                See [PyDrive2 documentation](https://docs.iterative.ai/PyDrive2/) for detailed instructions.
-                
-                **Note:** Google Drive sync is optional. You can uncheck the "Save to Google Drive" checkbox to save locally only.
-                """)
-            return None
-        
-        gauth = GoogleAuth()
-        # Set settings for authentication
-        gauth.settings['client_config_file'] = str(creds_file)
-        
-        # Try to load saved client credentials
-        creds_path = Path("mycreds.txt")
-        if creds_path.exists():
-            gauth.LoadCredentialsFile(str(creds_path))
-        
-        if gauth.credentials is None:
-            # Authenticate if they're not there
-            st.info("🔐 Please authenticate with Google Drive. A browser window will open.")
-            gauth.LocalWebserverAuth()
-        elif gauth.access_token_expired:
-            # Refresh them if expired
-            gauth.Refresh()
-        else:
-            # Initialize the saved creds
-            gauth.Authorize()
-        
-        # Save the current credentials to a file
-        gauth.SaveCredentialsFile(str(creds_path))
-        
-        drive = GoogleDrive(gauth)
-        return drive
-    except FileNotFoundError:
-        # Don't show error here - it's already handled above with the expander
-        return None
-    except Exception as e:
-        # Only show error if it's not a missing credentials file
-        if "client_secrets" not in str(e).lower() and "credentials" not in str(e).lower():
-            st.warning(f"⚠️ Error authenticating with Google Drive: {str(e)}")
-        return None
-
-def get_or_create_folder(drive, folder_name="Portland Thorns Call Logs"):
-    """Get or create a folder in Google Drive."""
-    if not drive:
-        return None
-    
-    try:
-        # Search for existing folder
-        file_list = drive.ListFile({'q': f"title='{folder_name}' and mimeType='application/vnd.google-apps.folder' and trashed=false"}).GetList()
-        
-        if file_list:
-            return file_list[0]['id']
-        else:
-            # Create new folder
-            folder_metadata = {
-                'title': folder_name,
-                'mimeType': 'application/vnd.google-apps.folder'
-            }
-            folder = drive.CreateFile(folder_metadata)
-            folder.Upload()
-            return folder['id']
-    except Exception as e:
-        st.error(f"Error creating folder in Google Drive: {str(e)}")
-        return None
-
-def upload_to_google_drive(file_path, folder_name="Portland Thorns Call Logs"):
-    """Upload a file to Google Drive."""
-    if not GOOGLE_DRIVE_AVAILABLE:
-        return False, "Google Drive library not installed. Install with: pip install PyDrive2"
-    
-    if not file_path or not Path(file_path).exists():
-        return False, "File does not exist"
-    
-    try:
-        # Authenticate
-        drive = authenticate_google_drive()
-        if not drive:
-            return False, "Failed to authenticate with Google Drive"
-        
-        # Get or create folder
-        folder_id = get_or_create_folder(drive, folder_name)
-        if not folder_id:
-            return False, "Failed to create or find folder in Google Drive"
-        
-        # Check if file already exists (by name)
-        file_name = Path(file_path).name
-        existing_files = drive.ListFile({
-            'q': f"title='{file_name}' and '{folder_id}' in parents and trashed=false"
-        }).GetList()
-        
-        if existing_files:
-            # Update existing file
-            file_drive = existing_files[0]
-            file_drive.SetContentFile(str(file_path))
-            file_drive.Upload()
-            return True, f"Updated {file_name} in Google Drive"
-        else:
-            # Upload new file
-            file_drive = drive.CreateFile({
-                'title': file_name,
-                'parents': [{'id': folder_id}]
-            })
-            file_drive.SetContentFile(str(file_path))
-            file_drive.Upload()
-            return True, f"Uploaded {file_name} to Google Drive"
-            
-    except Exception as e:
-        return False, f"Error uploading to Google Drive: {str(e)}"
+# Google Drive functions removed - not needed
 
 def generate_call_log_pdf(entry):
     """Generate PDF from call log entry using ReportLab."""
@@ -2088,8 +1976,7 @@ def generate_call_log_pdf(entry):
             ['Scores:', f"Prof: {entry.get('Agent Professionalism', 'N/A')}/10 | "
                        f"Resp: {entry.get('Agent Responsiveness', 'N/A')}/10 | "
                        f"Exp: {entry.get('Agent Expectations', 'N/A')}/10 | "
-                       f"Trans: {entry.get('Agent Transparency', 'N/A')}/10 | "
-                       f"Neg: {entry.get('Agent Negotiation Style', 'N/A')}/10"],
+                       f"Trans: {entry.get('Agent Transparency', 'N/A')}/10"],
             ['Notes:', truncate_text(get_value('Agent Notes'), 80)],
         ]
         agent_table = Table(agent_data, colWidths=[1.1*inch, 5.9*inch])
@@ -2121,7 +2008,6 @@ def generate_call_log_pdf(entry):
              'Maturity:', f"{entry.get('Maturity', 'N/A')}/10",
              'Coach:', f"{entry.get('Coachability', 'N/A')}/10"],
             ['Leader:', f"{entry.get('Leadership', 'N/A')}/10",
-             'Work Ethic:', f"{entry.get('Work Ethic', 'N/A')}/10",
              'Conf:', f"{entry.get('Confidence', 'N/A')}/10"],
             ['Tactical:', f"{entry.get('Tactical Knowledge', 'N/A')}/10",
              'Team Fit:', f"{entry.get('Team Fit', 'N/A')}/10",
@@ -2493,7 +2379,6 @@ page = st.sidebar.selectbox(
         "Video Analysis",  # Enhanced video tracking
         "Player Summary",
         "Performance Metrics",  # Power BI-style metrics visualization
-        "To Do List",  # Task management page
         # "Player Database", 
         # "Scouting Requests", 
         # "View Player Overview",
@@ -2511,6 +2396,69 @@ player_info_dict = load_player_info()
 
 # 2. Upload Player Database
 st.sidebar.markdown("### Upload Player Database")
+
+# Display currently loaded file info
+if PLAYER_DB_FILE and PLAYER_DB_FILE.exists():
+    with st.sidebar.expander("📁 Currently Loaded File", expanded=True):
+        file_name = PLAYER_DB_FILE.name
+        file_path = str(PLAYER_DB_FILE)
+        file_size = PLAYER_DB_FILE.stat().st_size
+        file_size_mb = file_size / (1024 * 1024)
+        from datetime import datetime
+        mod_time = datetime.fromtimestamp(PLAYER_DB_FILE.stat().st_mtime)
+        
+        st.markdown(f"**File:** `{file_name}`")
+        st.caption(f"**Path:** `{file_path}`")
+        st.caption(f"**Size:** {file_size_mb:.2f} MB")
+        st.caption(f"**Last Modified:** {mod_time.strftime('%Y-%m-%d %H:%M:%S')}")
+        
+        # Try to load and show basic stats
+        try:
+            @st.cache_data
+            def get_file_stats():
+                if PLAYER_DB_FILE and PLAYER_DB_FILE.exists():
+                    try:
+                        df_dict = pd.read_excel(PLAYER_DB_FILE, sheet_name=None, header=0)
+                        total_players = 0
+                        total_columns = set()
+                        positions = set()
+                        conferences = set()
+                        
+                        for sheet_name, sheet_df in df_dict.items():
+                            if sheet_name.startswith('Sheet') or 'Summary' in sheet_name or 'Notes' in sheet_name:
+                                continue
+                            if 'Player' in sheet_df.columns:
+                                total_players += len(sheet_df)
+                                total_columns.update(sheet_df.columns)
+                                if 'Position Profile' in sheet_df.columns:
+                                    positions.update(sheet_df['Position Profile'].dropna().unique())
+                                if 'Conference' in sheet_df.columns:
+                                    conferences.update(sheet_df['Conference'].dropna().unique())
+                        
+                        return {
+                            'players': total_players,
+                            'columns': len(total_columns),
+                            'positions': sorted(list(positions)),
+                            'conferences': sorted(list(conferences))
+                        }
+                    except:
+                        return None
+                return None
+            
+            stats = get_file_stats()
+            if stats:
+                st.markdown("**📊 File Statistics:**")
+                st.caption(f"• **Players:** {stats['players']}")
+                st.caption(f"• **Columns:** {stats['columns']}")
+                if stats['positions']:
+                    st.caption(f"• **Positions:** {len(stats['positions'])} ({', '.join(stats['positions'][:3])}{'...' if len(stats['positions']) > 3 else ''})")
+                if stats['conferences']:
+                    st.caption(f"• **Conferences:** {', '.join(stats['conferences'])}")
+        except Exception as e:
+            pass
+else:
+    st.sidebar.info("ℹ️ No file currently loaded. Upload a file below.")
+
 uploaded_file = st.sidebar.file_uploader(
     "Upload player database (Excel file)",
     type=['xlsx', 'xls'],
@@ -3077,7 +3025,7 @@ if page == "Phone Calls":
         )
         relationship_other = st.text_input(t('relationship_other'), value=st.session_state.get('form1_relationship_other', ''), placeholder=t('specify_if_other'), disabled=(relationship != "Other"))
     
-        col6, col7, col8, col9, col10 = st.columns(5)
+        col6, col7, col8, col9 = st.columns(4)
         with col6:
             agent_professionalism = st.slider(t('agent_professionalism'), 1, 10, st.session_state.get('form1_agent_professionalism', 5))
         with col7:
@@ -3086,8 +3034,6 @@ if page == "Phone Calls":
             agent_expectations = st.slider(t('reasonable_expectations'), 1, 10, st.session_state.get('form1_agent_expectations', 5))
         with col9:
             agent_transparency = st.slider(t('transparency_honesty'), 1, 10, st.session_state.get('form1_agent_transparency', 5))
-        with col10:
-            agent_negotiation_style = st.slider(t('negotiation_style'), 1, 10, st.session_state.get('form1_agent_negotiation_style', 5), help=t('negotiation_help'))
     
         agent_notes = st.text_area(t('agent_notes'), value=st.session_state.get('form1_agent_notes', ''))
     
@@ -3111,7 +3057,6 @@ if page == "Phone Calls":
         st.session_state.form1_agent_responsiveness = agent_responsiveness
         st.session_state.form1_agent_expectations = agent_expectations
         st.session_state.form1_agent_transparency = agent_transparency
-        st.session_state.form1_agent_negotiation_style = agent_negotiation_style
         st.session_state.form1_agent_notes = agent_notes
     
         # Continue with remaining fields (no form wrapper for reactive updates)
@@ -3218,12 +3163,11 @@ if page == "Phone Calls":
     
         with col3:
             communication = st.slider("Communication Skills (1-10)", 1, 10, st.session_state.get('communication', 5), key="comm_slider")
-            maturity = st.slider("Maturity (1-10)", 1, 10, st.session_state.get('maturity', 5), key="maturity_slider")
+            maturity = st.slider("Maturity/Readiness (1-10)", 1, 10, st.session_state.get('maturity', 5), key="maturity_slider")
             coachability = st.slider("Coachability (1-10)", 1, 10, st.session_state.get('coachability', 5), key="coachability_slider")
         
         with col4:
             leadership = st.slider("Leadership Potential (1-10)", 1, 10, st.session_state.get('leadership', 5), key="leadership_slider")
-            work_ethic = st.slider("Work Ethic (1-10)", 1, 10, st.session_state.get('work_ethic', 5), key="workethic_slider")
             confidence = st.slider("Confidence Level (1-10)", 1, 10, st.session_state.get('confidence', 5), key="confidence_slider")
         
         with col5:
@@ -3236,7 +3180,6 @@ if page == "Phone Calls":
         st.session_state.maturity = maturity
         st.session_state.coachability = coachability
         st.session_state.leadership = leadership
-        st.session_state.work_ethic = work_ethic
         st.session_state.confidence = confidence
         st.session_state.tactical_knowledge = tactical_knowledge
         st.session_state.team_fit = team_fit
@@ -3245,10 +3188,10 @@ if page == "Phone Calls":
         # Calculate total assessment score (reactive - updates immediately as sliders change)
         assessment_total = (
         communication + maturity + coachability + 
-        leadership + work_ethic + confidence + 
+        leadership + confidence + 
         tactical_knowledge + team_fit + overall_rating
         )
-        max_possible = 9 * 10  # 9 metrics * 10 max score
+        max_possible = 8 * 10  # 8 metrics * 10 max score
         assessment_percentage = (assessment_total / max_possible) * 100
     
         # Calculate grade based on assessment percentage (same scale as player metrics)
@@ -3384,14 +3327,6 @@ if page == "Phone Calls":
     
         # Final form for submission only
         with st.form("call_log_form_final"):
-            # Google Drive sync option
-            save_to_drive = st.checkbox(
-                "💾 Save to Google Drive",
-                value=st.session_state.get('save_to_drive', False),
-                help="Upload call log to Google Drive after saving locally"
-            )
-            st.session_state.save_to_drive = save_to_drive
-            
             submitted = st.form_submit_button(f"{t('save_call_log')}", use_container_width=True)
             
             if submitted:
@@ -3439,7 +3374,6 @@ if page == "Phone Calls":
                     'Maturity': st.session_state.get('maturity', 5),
                     'Coachability': st.session_state.get('coachability', 5),
                     'Leadership': st.session_state.get('leadership', 5),
-                    'Work Ethic': st.session_state.get('work_ethic', 5),
                     'Confidence': st.session_state.get('confidence', 5),
                     'Tactical Knowledge': st.session_state.get('tactical_knowledge', 5),
                     'Team Fit': st.session_state.get('team_fit', 5),
@@ -3462,7 +3396,6 @@ if page == "Phone Calls":
                     'Agent Responsiveness': st.session_state.get('form1_agent_responsiveness', 5),
                     'Agent Expectations': st.session_state.get('form1_agent_expectations', 5),
                     'Agent Transparency': st.session_state.get('form1_agent_transparency', 5),
-                    'Agent Negotiation Style': st.session_state.get('form1_agent_negotiation_style', 5),
                     'Agent Notes': st.session_state.get('form1_agent_notes', ''),
                     'Player Notes': st.session_state.get('form2_player_notes', ''),
                     'Interest Level': st.session_state.get('form2_interest_level', ''),
@@ -3491,19 +3424,6 @@ if page == "Phone Calls":
                 if 'pending_call_recording_path' in st.session_state:
                     del st.session_state['pending_call_recording_path']
                 st.success("Call log saved successfully!")
-                
-                # Upload to Google Drive if enabled
-                if save_to_drive:
-                    with st.spinner("Uploading to Google Drive..."):
-                        success, message = upload_to_google_drive(str(CALL_LOG_FILE))
-                        if success:
-                            st.success(f"✅ {message}")
-                        else:
-                            st.warning(f"⚠️ Google Drive upload failed: {message}")
-                            if "not installed" in message.lower():
-                                st.info("💡 To enable Google Drive sync, install PyDrive2: `pip install PyDrive2`")
-                            elif "Failed to authenticate" in message or "Setup Required" in message:
-                                st.info("💡 Google Drive sync is optional. Uncheck the box to save locally only.")
                 
                 # Store PDF data in session state for download outside form
                 pdf_bytes = generate_call_log_pdf(new_entry)
@@ -3645,10 +3565,10 @@ if page == "Phone Calls":
                     avg_score = (
                         p_calls['Communication'].mean() + p_calls['Maturity'].mean() + 
                         p_calls['Coachability'].mean() + p_calls['Leadership'].mean() + 
-                        p_calls['Work Ethic'].mean() + p_calls['Confidence'].mean() + 
+                        p_calls['Confidence'].mean() + 
                         p_calls['Tactical Knowledge'].mean() + p_calls['Team Fit'].mean() + 
                         p_calls['Overall Rating'].mean()
-                    ) / 9
+                    ) / 8
                     player_scores.append({'player': p, 'score': avg_score})
                 
                 scores_df = pd.DataFrame(player_scores)
@@ -3783,30 +3703,27 @@ if page == "Phone Calls":
             
             # Column visibility toggle (only for Expanded view)
             if view_mode == "Expanded":
-                with st.expander("👁️ Show/Hide Columns", expanded=False):
-                    # Preset management section
-                    preset_col1, preset_col2, preset_col3 = st.columns([2, 2, 1])
-                with preset_col1:
-                    # Initialize last applied preset tracker
-                    if "last_applied_preset" not in st.session_state:
-                        st.session_state.last_applied_preset = None
+                with st.expander("📋 Presets", expanded=False):
+                    # Presets section - consolidated
+                    st.markdown("Manage column visibility presets: load, save, or delete")
                     
-                    # Load preset dropdown
+                    # Load/Apply Preset
                     preset_names = ["None"] + list(st.session_state.column_visibility_presets.keys())
-                    selected_preset = st.selectbox(
-                        "Load Preset",
-                        preset_names,
-                        key="preset_selector",
-                        help="Select a saved column visibility preset"
-                    )
+                    load_col1, load_col2 = st.columns([3, 1])
+                    with load_col1:
+                        selected_preset = st.selectbox(
+                            "Load Preset",
+                            preset_names,
+                            key="preset_selector",
+                            help="Select a saved column visibility preset"
+                        )
+                    with load_col2:
+                        st.markdown("<br>", unsafe_allow_html=True)  # Spacing
+                        apply_preset = st.button("Apply", key="apply_preset_btn", use_container_width=True)
                     
-                    # Only apply preset if it changed and is not "None"
-                    # Use a key to track if we've already processed this preset in this run
-                    preset_processing_key = f"preset_processed_{selected_preset}"
-                    if selected_preset != "None" and selected_preset != st.session_state.last_applied_preset:
-                        # Check if we've already processed this preset in this run
-                        if preset_processing_key not in st.session_state:
-                            # Apply the selected preset
+                    # Apply preset when button is clicked
+                    if apply_preset and selected_preset != "None":
+                        if selected_preset in st.session_state.column_visibility_presets:
                             preset_visibility = st.session_state.column_visibility_presets[selected_preset]
                             for col in all_available_cols:
                                 # Only apply if column exists in preset, otherwise keep current state
@@ -3817,104 +3734,130 @@ if page == "Phone Calls":
                                     st.session_state.column_visibility[col] = True
                             # Track that we applied this preset
                             st.session_state.last_applied_preset = selected_preset
-                            st.session_state[preset_processing_key] = True
                             # Increment counter to force widget reset
+                            if "checkbox_key_counter" not in st.session_state:
+                                st.session_state.checkbox_key_counter = 0
                             st.session_state.checkbox_key_counter += 1
-                            st.rerun()
-                    elif selected_preset == "None" and st.session_state.last_applied_preset is not None:
-                        # Reset tracker when "None" is selected
-                        st.session_state.last_applied_preset = None
-                        # Clear all preset processing flags
-                        for key in list(st.session_state.keys()):
-                            if key.startswith("preset_processed_"):
-                                del st.session_state[key]
-                
-                with preset_col2:
-                    # Save current selection as preset
-                    new_preset_name = st.text_input(
-                        "Save as Preset",
-                        key="new_preset_name",
-                        placeholder="Enter preset name...",
-                        help="Save current column selection as a named preset"
-                    )
-                
-                with preset_col3:
-                    st.markdown("<br>", unsafe_allow_html=True)  # Spacing
-                    if st.button("💾 Save", key="save_preset", use_container_width=True):
-                        if new_preset_name and new_preset_name.strip():
-                            # Save current column visibility state
-                            current_visibility = {}
-                            for col in all_available_cols:
-                                current_visibility[col] = st.session_state.column_visibility.get(col, True)
-                            st.session_state.column_visibility_presets[new_preset_name.strip()] = current_visibility
-                            # Save to file for persistence
-                            save_column_presets(st.session_state.column_visibility_presets)
-                            st.success(f"Preset '{new_preset_name.strip()}' saved!")
+                            st.success(f"✅ Applied preset: {selected_preset}")
                             st.rerun()
                         else:
-                            st.warning("Please enter a preset name")
-                
-                # Delete preset option
-                if st.session_state.column_visibility_presets:
-                    delete_col1, delete_col2 = st.columns([3, 1])
-                    with delete_col1:
-                        preset_to_delete = st.selectbox(
-                            "Delete Preset",
-                            ["None"] + list(st.session_state.column_visibility_presets.keys()),
-                            key="delete_preset_selector"
-                        )
-                    with delete_col2:
-                        st.markdown("<br>", unsafe_allow_html=True)  # Spacing
-                        if st.button("🗑️ Delete", key="delete_preset", use_container_width=True):
-                            if preset_to_delete != "None":
-                                del st.session_state.column_visibility_presets[preset_to_delete]
-                                # Save to file after deletion
-                                save_column_presets(st.session_state.column_visibility_presets)
-                                st.success(f"Preset '{preset_to_delete}' deleted!")
-                                st.rerun()
-                
-                st.markdown("---")
-                
-                # Clear all and Select all buttons
-                button_col1, button_col2 = st.columns(2)
-                with button_col1:
-                    if st.button("Clear all", key="clear_all_cols", use_container_width=True):
-                        # Clear all column visibility settings for current columns
-                        for col in all_available_cols:
-                            st.session_state.column_visibility[col] = False
-                        # Increment counter to force new widget keys (this resets widget state)
-                        st.session_state.checkbox_key_counter += 1
-                        st.rerun()
-                with button_col2:
-                    if st.button("Select all", key="select_all_cols", use_container_width=True):
-                        # Select all column visibility settings for current columns
-                        for col in all_available_cols:
-                            st.session_state.column_visibility[col] = True
-                        # Increment counter to force new widget keys (this resets widget state)
-                        st.session_state.checkbox_key_counter += 1
-                        st.rerun()
-                
-                col_vis_cols = st.columns(3)
-                col_idx = 0
-                for col in all_available_cols:
-                    # Initialize to True if not set
-                    if col not in st.session_state.column_visibility:
-                        st.session_state.column_visibility[col] = True
+                            st.error(f"Preset '{selected_preset}' not found")
                     
-                    with col_vis_cols[col_idx % 3]:
-                        # Get the current value from session state
-                        current_value = st.session_state.column_visibility.get(col, True)
-                        # Use counter in key to force widget reset when clearing
-                        checkbox_key = f"col_vis_{col}_{st.session_state.checkbox_key_counter}"
-                        # Use the checkbox value to update session state
-                        checkbox_value = st.checkbox(
-                            col, 
-                            value=current_value,
-                            key=checkbox_key
+                    # Also apply automatically when preset selection changes (for convenience)
+                    if "current_preset_selection" not in st.session_state:
+                        st.session_state.current_preset_selection = "None"
+                    
+                    if selected_preset != st.session_state.current_preset_selection and selected_preset != "None":
+                        if selected_preset in st.session_state.column_visibility_presets:
+                            preset_visibility = st.session_state.column_visibility_presets[selected_preset]
+                            for col in all_available_cols:
+                                if col in preset_visibility:
+                                    st.session_state.column_visibility[col] = preset_visibility[col]
+                                else:
+                                    st.session_state.column_visibility[col] = True
+                            st.session_state.last_applied_preset = selected_preset
+                            if "checkbox_key_counter" not in st.session_state:
+                                st.session_state.checkbox_key_counter = 0
+                            st.session_state.checkbox_key_counter += 1
+                            st.session_state.current_preset_selection = selected_preset
+                            st.rerun()
+                    elif selected_preset == "None" and st.session_state.current_preset_selection != "None":
+                        st.session_state.current_preset_selection = "None"
+                        st.session_state.last_applied_preset = None
+                    
+                    st.markdown("---")
+                    
+                    # Save Preset
+                    save_col1, save_col2 = st.columns([3, 1])
+                    with save_col1:
+                        new_preset_name = st.text_input(
+                            "Save as Preset",
+                            key="new_preset_name",
+                            placeholder="Enter preset name...",
+                            help="Save current column selection as a named preset"
                         )
-                        # Always update session state with checkbox value
-                        st.session_state.column_visibility[col] = checkbox_value
-                    col_idx += 1
+                    with save_col2:
+                        st.markdown("<br>", unsafe_allow_html=True)  # Spacing
+                        if st.button("💾 Save", key="save_preset", use_container_width=True):
+                            if new_preset_name and new_preset_name.strip():
+                                # Save current column visibility state
+                                current_visibility = {}
+                                for col in all_available_cols:
+                                    current_visibility[col] = st.session_state.column_visibility.get(col, True)
+                                st.session_state.column_visibility_presets[new_preset_name.strip()] = current_visibility
+                                # Save to file for persistence
+                                save_column_presets(st.session_state.column_visibility_presets)
+                                st.success(f"✅ Preset '{new_preset_name.strip()}' saved!")
+                                st.rerun()
+                            else:
+                                st.warning("Please enter a preset name")
+                    
+                    # Delete Preset
+                    if st.session_state.column_visibility_presets:
+                        st.markdown("---")
+                        delete_col1, delete_col2 = st.columns([3, 1])
+                        with delete_col1:
+                            preset_to_delete = st.selectbox(
+                                "Delete Preset",
+                                ["None"] + list(st.session_state.column_visibility_presets.keys()),
+                                key="delete_preset_selector"
+                            )
+                        with delete_col2:
+                            st.markdown("<br>", unsafe_allow_html=True)  # Spacing
+                            if st.button("🗑️ Delete", key="delete_preset", use_container_width=True):
+                                if preset_to_delete != "None":
+                                    del st.session_state.column_visibility_presets[preset_to_delete]
+                                    # Save to file after deletion
+                                    save_column_presets(st.session_state.column_visibility_presets)
+                                    st.success(f"✅ Preset '{preset_to_delete}' deleted!")
+                                    st.rerun()
+                    
+                    st.markdown("---")
+                
+                # Column visibility checkboxes in collapsible section
+                with st.expander("👁️ Column Visibility", expanded=False):
+                    st.markdown("Select which columns to show or hide in the table")
+                    
+                    # Clear all and Select all buttons
+                    button_col1, button_col2 = st.columns(2)
+                    with button_col1:
+                        if st.button("Clear all", key="clear_all_cols", use_container_width=True):
+                            # Clear all column visibility settings for current columns
+                            for col in all_available_cols:
+                                st.session_state.column_visibility[col] = False
+                            # Increment counter to force new widget keys (this resets widget state)
+                            st.session_state.checkbox_key_counter += 1
+                            st.rerun()
+                    with button_col2:
+                        if st.button("Select all", key="select_all_cols", use_container_width=True):
+                            # Select all column visibility settings for current columns
+                            for col in all_available_cols:
+                                st.session_state.column_visibility[col] = True
+                            # Increment counter to force new widget keys (this resets widget state)
+                            st.session_state.checkbox_key_counter += 1
+                            st.rerun()
+                    
+                    col_vis_cols = st.columns(3)
+                    col_idx = 0
+                    for col in all_available_cols:
+                        # Initialize to True if not set
+                        if col not in st.session_state.column_visibility:
+                            st.session_state.column_visibility[col] = True
+                        
+                        with col_vis_cols[col_idx % 3]:
+                            # Get the current value from session state
+                            current_value = st.session_state.column_visibility.get(col, True)
+                            # Use counter in key to force widget reset when clearing
+                            checkbox_key = f"col_vis_{col}_{st.session_state.checkbox_key_counter}"
+                            # Use the checkbox value to update session state
+                            checkbox_value = st.checkbox(
+                                col, 
+                                value=current_value,
+                                key=checkbox_key
+                            )
+                            # Always update session state with checkbox value
+                            st.session_state.column_visibility[col] = checkbox_value
+                        col_idx += 1
                 
                 # Filter columns based on visibility
                 visible_cols = [col for col in all_available_cols if st.session_state.column_visibility.get(col, True)]
@@ -3938,7 +3881,7 @@ if page == "Phone Calls":
                     'Player Notes', 'Key Talking Points', 'Summary Notes', 'Red Flags',
                     'Action Items', 'Other Opportunities', 'Injury Periods', 
                     'Personality Traits', 'Other Traits', 'Agent Expectations',
-                    'Agent Negotiation Style', 'How They Carry Themselves'
+                    'How They Carry Themselves'
                 ]]
                 
                 sort_options = ["None"] + sortable_columns
@@ -4060,7 +4003,6 @@ if page == "Phone Calls":
             'Personality Traits',
             'Other Traits',
             'Agent Expectations',
-            'Agent Negotiation Style',
             'How They Carry Themselves'
         ]
         
@@ -4504,7 +4446,6 @@ if page == "Phone Calls":
                                     <li>Maturity</li>
                                     <li>Coachability</li>
                                     <li>Leadership</li>
-                                    <li>Work Ethic</li>
                                     <li>Confidence</li>
                                     <li>Tactical Knowledge</li>
                                     <li>Team Fit</li>
@@ -4772,7 +4713,6 @@ if page == "Phone Calls":
                     avg_maturity = player_calls['Maturity'].mean()
                     avg_coachability = player_calls['Coachability'].mean()
                     avg_leadership = player_calls['Leadership'].mean()
-                    avg_work_ethic = player_calls['Work Ethic'].mean()
                     avg_confidence = player_calls['Confidence'].mean()
                     avg_tactical_knowledge = player_calls['Tactical Knowledge'].mean()
                     avg_team_fit = player_calls['Team Fit'].mean()
@@ -4781,9 +4721,9 @@ if page == "Phone Calls":
                     # Calculate overall average assessment score
                     overall_avg = (
                         avg_communication + avg_maturity + avg_coachability + 
-                        avg_leadership + avg_work_ethic + avg_confidence + 
+                        avg_leadership + avg_confidence + 
                         avg_tactical_knowledge + avg_team_fit + avg_overall_rating
-                    ) / 9
+                    ) / 8
                     
                     # Get latest recommendation
                     latest_recommendation = player_calls.iloc[-1]['Recommendation'] if len(player_calls) > 0 else 'Unknown'
@@ -4803,7 +4743,6 @@ if page == "Phone Calls":
                         'Avg Maturity': round(avg_maturity, 2),
                         'Avg Coachability': round(avg_coachability, 2),
                         'Avg Leadership': round(avg_leadership, 2),
-                        'Avg Work Ethic': round(avg_work_ethic, 2),
                         'Avg Confidence': round(avg_confidence, 2),
                         'Avg Tactical Knowledge': round(avg_tactical_knowledge, 2),
                         'Avg Team Fit': round(avg_team_fit, 2),
@@ -4830,7 +4769,7 @@ if page == "Phone Calls":
                 cols = ['Rank', 'Player Name', 'Team', 'Conference', 'Position', 'Total Calls', 
                        'Overall Average Score', 'Percentile Rank', 'Latest Recommendation', 'Last Call Date',
                        'Avg Communication', 'Avg Maturity', 'Avg Coachability', 'Avg Leadership',
-                       'Avg Work Ethic', 'Avg Confidence', 'Avg Tactical Knowledge', 'Avg Team Fit', 'Avg Overall Rating']
+                       'Avg Confidence', 'Avg Tactical Knowledge', 'Avg Team Fit', 'Avg Overall Rating']
                 rankings_df = rankings_df[cols]
                 
                 return rankings_df
@@ -5137,10 +5076,10 @@ elif page == "Player Summary":
                     avg_score = (
                         p_calls['Communication'].mean() + p_calls['Maturity'].mean() + 
                         p_calls['Coachability'].mean() + p_calls['Leadership'].mean() + 
-                        p_calls['Work Ethic'].mean() + p_calls['Confidence'].mean() + 
+                        p_calls['Confidence'].mean() + 
                         p_calls['Tactical Knowledge'].mean() + p_calls['Team Fit'].mean() + 
                         p_calls['Overall Rating'].mean()
-                    ) / 9
+                    ) / 8
                     player_scores.append({'player': p, 'score': avg_score})
                 
                 scores_df = pd.DataFrame(player_scores)
@@ -5197,7 +5136,7 @@ elif page == "Player Summary":
             if not player_calls.empty:
                 st.markdown("<br>", unsafe_allow_html=True)
                 st.markdown("### Average Ratings")
-                rating_cols = ['Communication', 'Maturity', 'Coachability', 'Leadership', 'Work Ethic', 'Confidence', 'Tactical Knowledge', 'Team Fit']
+                rating_cols = ['Communication', 'Maturity', 'Coachability', 'Leadership', 'Confidence', 'Tactical Knowledge', 'Team Fit']
                 # Filter to only include columns that exist in the dataframe
                 rating_cols = [col for col in rating_cols if col in player_calls.columns]
                 if rating_cols:
@@ -5235,7 +5174,6 @@ elif page == "Player Summary":
             else:
                 st.info("No phone call data available for this player.")
             
-            st.markdown("<br>", unsafe_allow_html=True)
             st.divider()
             st.markdown("<br>", unsafe_allow_html=True)
             
@@ -5243,8 +5181,9 @@ elif page == "Player Summary":
             if not player_calls.empty:
                 st.markdown("### All Calls")
                 
-                # Format date columns before creating table data
                 player_calls_display = player_calls.copy()
+                
+                # Format date columns
                 if 'Call Date' in player_calls_display.columns:
                     try:
                         player_calls_display['Call Date'] = pd.to_datetime(player_calls_display['Call Date'], errors='coerce')
@@ -5259,405 +5198,29 @@ elif page == "Player Summary":
                     except:
                         pass
                 
-                # Define text-heavy columns that should be expandable
-                text_heavy_columns = [
-                    'Call Notes',
-                    'Preparation Notes',
-                    'How They View Themselves',
-                    'What Is Important To Them',
-                    'Mindset Towards Growth',
-                    'Agent Notes',
-                    'Player Notes',
-                    'Key Talking Points',
-                    'Summary Notes',
-                    'Red Flags',
-                    'Action Items',
-                    'Other Opportunities',
-                    'Injury Periods',
-                    'Personality Traits',
-                    'Other Traits',
-                    'Agent Expectations',
-                    'Agent Negotiation Style',
-                    'How They Carry Themselves'
+                # Select key columns to display (similar to video section pattern)
+                key_call_columns = [
+                    'Call Number', 'Player Name', 'Call Date', 'Call Type', 'Agent Name', 
+                    'Team', 'Conference', 'Position Profile', 'Communication', 'Maturity', 
+                    'Coachability', 'Leadership', 'Confidence', 'Tactical Knowledge', 
+                    'Team Fit', 'Overall Rating', 'Assessment Grade', 'Recommendation', 
+                    'Interest Level'
                 ]
+                # Only include columns that exist
+                display_call_columns = [col for col in key_call_columns if col in player_calls_display.columns]
                 
-                # Prepare data for custom HTML table
-                table_data = player_calls_display.to_dict('records')
-                table_columns = list(player_calls_display.columns)
+                if display_call_columns:
+                    st.dataframe(
+                        player_calls_display[display_call_columns].sort_values('Call Date', ascending=False),
+                        use_container_width=True,
+                        hide_index=True
+                    )
                 
-                # Build header row
-                header_cells = []
-                for col in table_columns:
-                    header_cells.append(f'<th>{col}</th>')
-                header_row = ' '.join(header_cells)
+                st.markdown("<br>", unsafe_allow_html=True)
+                st.divider()
+                st.markdown("<br>", unsafe_allow_html=True)
                 
-                # Create HTML/JavaScript component for interactive table
-                html_code = f"""
-            <!DOCTYPE html>
-            <html>
-            <head>
-                <style>
-                    * {{
-                        box-sizing: border-box;
-                    }}
-                    body {{
-                        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Helvetica Neue', Arial, sans-serif;
-                        margin: 0;
-                        padding: 0;
-                        background-color: transparent;
-                        color: #fafafa;
-                        -webkit-font-smoothing: antialiased;
-                        -moz-osx-font-smoothing: grayscale;
-                    }}
-                    .table-wrapper {{
-                        background: #1e1e1e;
-                        border-radius: 12px;
-                        overflow: hidden;
-                        box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
-                        margin-bottom: 0 !important;
-                        padding-bottom: 0 !important;
-                    }}
-                    .table-container {{
-                        overflow-x: auto;
-                        max-height: 500px;
-                        overflow-y: auto;
-                        position: relative;
-                    }}
-                    .table-container::-webkit-scrollbar {{
-                        width: 8px;
-                        height: 8px;
-                    }}
-                    .table-container::-webkit-scrollbar-track {{
-                        background: #1e1e1e;
-                    }}
-                    .table-container::-webkit-scrollbar-thumb {{
-                        background: #3a3a3a;
-                        border-radius: 4px;
-                    }}
-                    .table-container::-webkit-scrollbar-thumb:hover {{
-                        background: #4a4a4a;
-                    }}
-                    table {{
-                        width: 100%;
-                        border-collapse: separate;
-                        border-spacing: 0;
-                        background-color: transparent;
-                        margin: 0;
-                    }}
-                    thead {{
-                        position: sticky;
-                        top: 0;
-                        z-index: 100;
-                    }}
-                    th {{
-                        background: linear-gradient(180deg, #2d2d2d 0%, #1e1e1e 100%);
-                        color: #ffffff;
-                        padding: 8px 12px;
-                        text-align: left;
-                        border-bottom: 2px solid #8B0000;
-                        font-weight: 600;
-                        font-size: 0.75rem;
-                        text-transform: uppercase;
-                        letter-spacing: 0.8px;
-                        white-space: nowrap;
-                        position: relative;
-                        transition: background-color 0.2s ease;
-                    }}
-                    th:hover {{
-                        background: linear-gradient(180deg, #3a3a3a 0%, #2d2d2d 100%);
-                    }}
-                    th::after {{
-                        content: '';
-                        position: absolute;
-                        bottom: 0;
-                        left: 0;
-                        right: 0;
-                        height: 1px;
-                        background: linear-gradient(90deg, transparent, #8B0000, transparent);
-                    }}
-                    td {{
-                        padding: 8px 12px;
-                        border-bottom: 1px solid rgba(58, 58, 58, 0.5);
-                        max-width: 200px;
-                        word-wrap: break-word;
-                        font-size: 0.8125rem;
-                        line-height: 1.4;
-                        transition: all 0.15s cubic-bezier(0.4, 0, 0.2, 1);
-                        color: #e0e0e0;
-                        font-weight: 700 !important;
-                    }}
-                    tbody td {{
-                        font-weight: 700 !important;
-                    }}
-                    tbody tr {{
-                        background-color: #000000;
-                        transition: all 0.15s cubic-bezier(0.4, 0, 0.2, 1);
-                        border-left: 3px solid transparent;
-                    }}
-                    tbody tr:nth-child(even) {{
-                        background-color: #2a2a2a;
-                    }}
-                    tbody tr:hover {{
-                        background-color: rgba(139, 0, 0, 0.3) !important;
-                        border-left-color: #8B0000;
-                        transform: translateX(2px);
-                    }}
-                    tbody tr:last-child td {{
-                        border-bottom: none;
-                    }}
-                    .expandable-cell {{
-                        cursor: pointer;
-                        color: #8B0000;
-                        text-decoration: underline;
-                        text-decoration-color: #8B0000;
-                        text-underline-offset: 2px;
-                        position: relative;
-                        transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-                        font-weight: 600;
-                        font-size: 0.875rem;
-                    }}
-                    .expandable-cell::before {{
-                        content: '▶';
-                        margin-right: 4px;
-                        font-size: 0.75rem;
-                        display: inline-block;
-                        transition: transform 0.2s ease;
-                    }}
-                    .expandable-cell:hover {{
-                        color: #D10023;
-                        background-color: rgba(139, 0, 0, 0.2) !important;
-                        text-decoration-color: #D10023;
-                        transform: translateX(2px);
-                    }}
-                    .expandable-cell:hover::before {{
-                        transform: translateX(2px);
-                    }}
-                    .modal {{
-                        display: none;
-                        position: fixed;
-                        z-index: 1000;
-                        left: 0;
-                        top: 0;
-                        width: 100%;
-                        height: 100%;
-                        background-color: rgba(0,0,0,0.85);
-                        backdrop-filter: blur(4px);
-                        animation: fadeIn 0.2s ease;
-                    }}
-                    @keyframes fadeIn {{
-                        from {{ opacity: 0; }}
-                        to {{ opacity: 1; }}
-                    }}
-                    .modal-content {{
-                        background-color: #1e1e1e;
-                        margin: 5% auto;
-                        padding: 0;
-                        border: none;
-                        border-radius: 12px;
-                        width: 80%;
-                        max-width: 800px;
-                        max-height: 80vh;
-                        overflow: hidden;
-                        color: #fafafa;
-                        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
-                        animation: slideDown 0.3s ease;
-                    }}
-                    @keyframes slideDown {{
-                        from {{
-                            transform: translateY(-20px);
-                            opacity: 0;
-                        }}
-                        to {{
-                            transform: translateY(0);
-                            opacity: 1;
-                        }}
-                    }}
-                    .modal-header {{
-                        display: flex;
-                        justify-content: space-between;
-                        align-items: center;
-                        padding: 20px 24px;
-                        border-bottom: 1px solid #3a3a3a;
-                        background: linear-gradient(180deg, #2a2a2a 0%, #1e1e1e 100%);
-                    }}
-                    .modal-title {{
-                        font-size: 1.25rem;
-                        font-weight: 600;
-                        color: #8B0000;
-                        letter-spacing: 0.3px;
-                    }}
-                    .close {{
-                        color: #aaa;
-                        font-size: 24px;
-                        font-weight: 300;
-                        cursor: pointer;
-                        width: 32px;
-                        height: 32px;
-                        display: flex;
-                        align-items: center;
-                        justify-content: center;
-                        border-radius: 50%;
-                        transition: all 0.2s ease;
-                    }}
-                    .close:hover {{
-                        background-color: #3a3a3a;
-                        color: #fafafa;
-                    }}
-                    .modal-body {{
-                        white-space: pre-wrap;
-                        word-wrap: break-word;
-                        line-height: 1.3;
-                        padding: 24px;
-                        background-color: #1e1e1e;
-                        max-height: calc(80vh - 100px);
-                        overflow-y: auto;
-                    }}
-                    .modal-body::-webkit-scrollbar {{
-                        width: 1px;
-                    }}
-                    .modal-body::-webkit-scrollbar-track {{
-                        background: #1e1e1e;
-                    }}
-                    .modal-body::-webkit-scrollbar-thumb {{
-                        background: #3a3a3a;
-                        border-radius: 1px;
-                    }}
-                    .modal-body::-webkit-scrollbar-thumb:hover {{
-                        background: #4a4a4a;
-                    }}
-                </style>
-            </head>
-            <body>
-                <div class="table-wrapper">
-                    <div class="table-container">
-                        <table id="dataTable">
-                        <thead>
-                            <tr>
-                                {header_row}
-                            </tr>
-                        </thead>
-                        <tbody>
-            """
-            
-            # Add table rows
-            for row_idx, row in enumerate(table_data):
-                html_code += "<tr>"
-                for col in table_columns:
-                        raw_value = row.get(col, '')
-                        
-                        # Convert to string (dates are already formatted above)
-                        if pd.notna(raw_value):
-                            cell_value = str(raw_value)
-                        else:
-                            cell_value = ''
-                        
-                        # Check if this column should be expandable
-                        if col in text_heavy_columns and cell_value and len(str(cell_value).strip()) > 0:
-                            # Escape quotes for JavaScript
-                            escaped_value = str(cell_value).replace('"', '&quot;').replace("'", "&#39;").replace('\n', '\\n')
-                            html_code += f'''
-                            <td class="expandable-cell" 
-                                onclick="showModal('{col}', `{escaped_value}`)"
-                                title="Click to view full text">
-                                Expand
-                            </td>
-                            '''
-                        else:
-                            # Escape HTML
-                            escaped_cell = str(cell_value).replace('<', '&lt;').replace('>', '&gt;')
-                            html_code += f"<td>{escaped_cell}</td>"
-                html_code += "</tr>"
-            
-            html_code += """
-                        </tbody>
-                        </table>
-                    </div>
-                </div>
-                
-                <!-- Modal for expanded text -->
-                <div id="textModal" class="modal">
-                    <div class="modal-content">
-                        <div class="modal-header">
-                            <div class="modal-title" id="modalTitle"></div>
-                            <span class="close" onclick="closeModal()">&times;</span>
-                        </div>
-                        <div class="modal-body" id="modalBody"></div>
-                    </div>
-                </div>
-                
-                <script>
-                    function showModal(columnName, fullText) {{
-                        document.getElementById('modalTitle').textContent = columnName;
-                        document.getElementById('modalBody').textContent = fullText;
-                        document.getElementById('textModal').style.display = 'block';
-                    }}
-                    
-                    function closeModal() {{
-                        document.getElementById('textModal').style.display = 'none';
-                    }}
-                    
-                    // Close modal when clicking outside of it
-                    window.onclick = function(event) {{
-                        const modal = document.getElementById('textModal');
-                        if (event.target == modal) {{
-                            closeModal();
-                        }}
-                    }}
-                    
-                    // Close modal with Escape key
-                    document.addEventListener('keydown', function(event) {{
-                        if (event.key === 'Escape') {{
-                            closeModal();
-                        }}
-                    }});
-                </script>
-            </body>
-            </html>
-            """
-            
-            # Display the custom HTML table with aggressive spacing reduction
-            st.markdown("""
-                <style>
-                    /* Very aggressive negative margins for iframe container */
-                    div[data-testid="stIFrame"] {
-                        margin-bottom: -5rem !important;
-                        padding-bottom: 0 !important;
-                    }
-                    /* Target element-container wrapper */
-                    .element-container:has([data-testid="stIFrame"]) {
-                        margin-bottom: -5rem !important;
-                        padding-bottom: 0 !important;
-                    }
-                    /* Target block container div */
-                    .block-container > div:has([data-testid="stIFrame"]) {
-                        margin-bottom: -5rem !important;
-                        padding-bottom: 0 !important;
-                    }
-                    /* Target divider container with negative margins */
-                    .block-container > div:has(hr) {
-                        margin-top: -4rem !important;
-                        margin-bottom: -3rem !important;
-                        padding: 0 !important;
-                    }
-                    /* Target radar chart section */
-                    .block-container > div:has(hr) + div {
-                        margin-top: -3rem !important;
-                        padding-top: 0 !important;
-                    }
-                    /* Target all divs between iframe and radar chart */
-                    .block-container > div:has([data-testid="stIFrame"]) ~ div {
-                        margin-top: -2rem !important;
-                    }
-                </style>
-            """, unsafe_allow_html=True)
-            components.html(html_code, height=550, scrolling=True)
-            
-            st.markdown("<br>", unsafe_allow_html=True)
-            st.divider()
-            st.markdown("<br>", unsafe_allow_html=True)
-            
-            # Call Review Details
-            if not player_calls.empty:
+                # Show full call details in expanders
                 st.markdown("### Call Review Details")
                 for idx, row in player_calls.iterrows():
                     call_date = row.get('Call Date', 'N/A')
@@ -5682,7 +5245,7 @@ elif page == "Player Summary":
                         
                         # Performance metrics
                         call_metrics = ['Communication', 'Maturity', 'Coachability', 'Leadership', 
-                                      'Work Ethic', 'Confidence', 'Tactical Knowledge', 'Team Fit', 'Overall Rating']
+                                      'Confidence', 'Tactical Knowledge', 'Team Fit', 'Overall Rating']
                         call_metrics_data = {metric: row.get(metric, 'N/A') for metric in call_metrics if metric in row}
                         if call_metrics_data:
                             st.markdown("**Performance Metrics:**")
@@ -5734,7 +5297,7 @@ elif page == "Player Summary":
                 st.markdown("### Performance Comparison Radar Chart")
                 
                 # Define call log metrics
-                call_metrics = ['Communication', 'Maturity', 'Coachability', 'Leadership', 'Work Ethic', 
+                call_metrics = ['Communication', 'Maturity', 'Coachability', 'Leadership', 
                               'Confidence', 'Tactical Knowledge', 'Team Fit', 'Overall Rating']
                 
                 # Filter to only include metrics that exist in both player calls and call log
@@ -5782,13 +5345,13 @@ elif page == "Player Summary":
                     ax.set_yticklabels(['2', '4', '6', '8', '10'], color='#fafafa', fontsize=7)
                     ax.grid(True, color='#4a4a4a', linestyle='--', linewidth=0.5)
                     
-                    # Plot player data
+                    # Plot call log average first (so player line appears on top)
+                    ax.plot(angles, all_players_values, 'o-', linewidth=2, label='Call Log Average', color='white', markersize=6)
+                    ax.fill(angles, all_players_values, alpha=0.15, color='white')
+                    
+                    # Plot player data on top
                     ax.plot(angles, player_values, 'o-', linewidth=2, label=selected_player, color='#8B0000', markersize=6)
                     ax.fill(angles, player_values, alpha=0.25, color='#8B0000')
-                    
-                    # Plot call log average
-                    ax.plot(angles, all_players_values, 'o-', linewidth=2, label='Call Log Average', color='#4a4a4a', markersize=6)
-                    ax.fill(angles, all_players_values, alpha=0.15, color='#4a4a4a')
                     
                     # Set labels - position them at the end of each axis
                     ax.set_xticks(angles[:-1])
@@ -5824,13 +5387,62 @@ elif page == "Player Summary":
                     # Tight layout to reduce padding
                     fig.tight_layout(pad=0.5)
                     
+                    # Save figure to BytesIO for PDF inclusion (with white background for PDF)
+                    call_radar_buffer = BytesIO()
+                    # Create a copy of the figure with white background for PDF
+                    fig_pdf = plt.figure(figsize=(6, 6))
+                    ax_pdf = fig_pdf.add_subplot(111, projection='polar')
+                    ax_pdf.set_facecolor('white')
+                    fig_pdf.patch.set_facecolor('white')
+                    
+                    # Copy all plot elements but with adjusted colors for white background
+                    ax_pdf.set_ylim(0, 12)
+                    ax_pdf.set_yticks([2, 4, 6, 8, 10])
+                    ax_pdf.set_yticklabels(['2', '4', '6', '8', '10'], color='#333333', fontsize=7)
+                    ax_pdf.grid(True, color='#cccccc', linestyle='--', linewidth=0.5)
+                    
+                    # Plot call log average first (so player line appears on top)
+                    ax_pdf.plot(angles, all_players_values, 'o-', linewidth=2, label='Call Log Average', color='#333333', markersize=6)
+                    ax_pdf.fill(angles, all_players_values, alpha=0.15, color='#333333')
+                    
+                    # Plot player data on top
+                    ax_pdf.plot(angles, player_values, 'o-', linewidth=2, label=selected_player, color='#8B0000', markersize=6)
+                    ax_pdf.fill(angles, player_values, alpha=0.25, color='#8B0000')
+                    
+                    ax_pdf.set_xticks(angles[:-1])
+                    ax_pdf.set_xticklabels([''] * len(available_metrics))
+                    
+                    for i, metric in enumerate(available_metrics):
+                        angle_rad = angles[i]
+                        if metric in labels_to_move_inward:
+                            radius_for_label = 11.0
+                        else:
+                            radius_for_label = 11.5
+                        ax_pdf.text(angle_rad, radius_for_label, metric, 
+                                   ha='center', va='center',
+                                   color='#333333', fontsize=9, fontweight='bold')
+                    
+                    ax_pdf.set_title(f'{selected_player} vs Call Log Average', size=11, color='#333333', fontweight='bold', pad=20)
+                    ax_pdf.legend(loc='upper right', bbox_to_anchor=(1.2, 1.1), 
+                                 facecolor='white', edgecolor='#cccccc', 
+                                 labelcolor='#333333', fontsize=8)
+                    fig_pdf.tight_layout(pad=0.5)
+                    
+                    fig_pdf.savefig(call_radar_buffer, format='png', dpi=150, bbox_inches='tight', 
+                                   facecolor='white', edgecolor='none')
+                    call_radar_buffer.seek(0)
+                    st.session_state['call_radar_chart'] = call_radar_buffer.getvalue()
+                    plt.close(fig_pdf)
+                    
                     # Center the chart on the page using columns with minimal spacing
                     with st.container():
                         col1, col2, col3 = st.columns([1, 2, 1])
                         with col2:
                             st.pyplot(fig, use_container_width=False)
+                    plt.close(fig)
             else:
                 st.info("No phone call data available for radar chart.")
+                st.session_state['call_radar_chart'] = None
             
             # ========== VIDEO ANALYSIS SECTION ==========
             st.markdown("<br>", unsafe_allow_html=True)
@@ -6047,13 +5659,13 @@ elif page == "Player Summary":
                     ax.set_yticklabels(['2', '4', '6', '8', '10'], color='#fafafa', fontsize=7)
                     ax.grid(True, color='#4a4a4a', linestyle='--', linewidth=0.5)
                     
-                    # Plot player data
+                    # Plot video analysis average first (so player line appears on top)
+                    ax.plot(angles, all_players_values, 'o-', linewidth=2, label='Video Analysis Average', color='white', markersize=6)
+                    ax.fill(angles, all_players_values, alpha=0.15, color='white')
+                    
+                    # Plot player data on top
                     ax.plot(angles, player_values, 'o-', linewidth=2, label=selected_player, color='#8B0000', markersize=6)
                     ax.fill(angles, player_values, alpha=0.25, color='#8B0000')
-                    
-                    # Plot video analysis average
-                    ax.plot(angles, all_players_values, 'o-', linewidth=2, label='Video Analysis Average', color='#4a4a4a', markersize=6)
-                    ax.fill(angles, all_players_values, alpha=0.15, color='#4a4a4a')
                     
                     # Set labels - position them at the end of each axis
                     ax.set_xticks(angles[:-1])
@@ -6089,13 +5701,62 @@ elif page == "Player Summary":
                     # Tight layout to reduce padding
                     fig.tight_layout(pad=0.5)
                     
+                    # Save figure to BytesIO for PDF inclusion (with white background for PDF)
+                    video_radar_buffer = BytesIO()
+                    # Create a copy of the figure with white background for PDF
+                    fig_pdf = plt.figure(figsize=(6, 6))
+                    ax_pdf = fig_pdf.add_subplot(111, projection='polar')
+                    ax_pdf.set_facecolor('white')
+                    fig_pdf.patch.set_facecolor('white')
+                    
+                    # Copy all plot elements but with adjusted colors for white background
+                    ax_pdf.set_ylim(0, 12)
+                    ax_pdf.set_yticks([2, 4, 6, 8, 10])
+                    ax_pdf.set_yticklabels(['2', '4', '6', '8', '10'], color='#333333', fontsize=7)
+                    ax_pdf.grid(True, color='#cccccc', linestyle='--', linewidth=0.5)
+                    
+                    # Plot video analysis average first (so player line appears on top)
+                    ax_pdf.plot(angles, all_players_values, 'o-', linewidth=2, label='Video Analysis Average', color='#333333', markersize=6)
+                    ax_pdf.fill(angles, all_players_values, alpha=0.15, color='#333333')
+                    
+                    # Plot player data on top
+                    ax_pdf.plot(angles, player_values, 'o-', linewidth=2, label=selected_player, color='#8B0000', markersize=6)
+                    ax_pdf.fill(angles, player_values, alpha=0.25, color='#8B0000')
+                    
+                    ax_pdf.set_xticks(angles[:-1])
+                    ax_pdf.set_xticklabels([''] * len(available_metrics))
+                    
+                    for i, metric in enumerate(available_metrics):
+                        angle_rad = angles[i]
+                        if metric in labels_to_move_inward:
+                            radius_for_label = 11.0
+                        else:
+                            radius_for_label = 11.5
+                        ax_pdf.text(angle_rad, radius_for_label, metric, 
+                                   ha='center', va='center',
+                                   color='#333333', fontsize=9, fontweight='bold')
+                    
+                    ax_pdf.set_title(f'{selected_player} vs Video Analysis Average', size=11, color='#333333', fontweight='bold', pad=20)
+                    ax_pdf.legend(loc='upper right', bbox_to_anchor=(1.2, 1.1), 
+                                 facecolor='white', edgecolor='#cccccc', 
+                                 labelcolor='#333333', fontsize=8)
+                    fig_pdf.tight_layout(pad=0.5)
+                    
+                    fig_pdf.savefig(video_radar_buffer, format='png', dpi=150, bbox_inches='tight', 
+                                   facecolor='white', edgecolor='none')
+                    video_radar_buffer.seek(0)
+                    st.session_state['video_radar_chart'] = video_radar_buffer.getvalue()
+                    plt.close(fig_pdf)
+                    
                     # Center the chart on the page using columns with minimal spacing
                     with st.container():
                         col1, col2, col3 = st.columns([1, 2, 1])
                         with col2:
                             st.pyplot(fig, use_container_width=False)
+                    plt.close(fig)
             else:
                 st.info("No video analysis data available for radar chart.")
+                st.session_state['video_radar_chart'] = None
             
             # ========== SHARED ELEMENTS ==========
             st.markdown("<br>", unsafe_allow_html=True)
@@ -6106,7 +5767,7 @@ elif page == "Player Summary":
             st.markdown("### Download Player Summary")
             
             if PDF_AVAILABLE:
-                def generate_player_summary_pdf(player_name, player_calls_df, player_rank, player_percentile, total_players, player_video_reviews_df=None):
+                def generate_player_summary_pdf(player_name, player_calls_df, player_rank, player_percentile, total_players, player_video_reviews_df=None, call_radar_chart_bytes=None, video_radar_chart_bytes=None):
                     """Generate comprehensive player summary PDF."""
                     try:
                         pdf_buffer = BytesIO()
@@ -6153,25 +5814,80 @@ elif page == "Player Summary":
                                 return default
                             return str(val)
                         
-                        # Title
-                        title = Paragraph(f"Player Summary - {escape_text(player_name)}", title_style)
+                        # Helper function to get position/profile display
+                        def get_position_profile_display():
+                            if len(player_calls_df) == 0:
+                                return 'N/A'
+                            latest = player_calls_df.iloc[-1]
+                            
+                            # Get position profile from call log
+                            position_profile = latest.get('Position Profile', '')
+                            position_profile = str(position_profile).strip() if pd.notna(position_profile) and str(position_profile).strip() else ''
+                            
+                            # Try to get position from call log first
+                            position = latest.get('Position', '')
+                            position = str(position).strip() if pd.notna(position) and str(position).strip() else ''
+                            
+                            # If no position in call log, try to look it up from player database
+                            if not position and PLAYER_DB_FILE and PLAYER_DB_FILE.exists():
+                                try:
+                                    player_info = load_player_info()
+                                    if player_name in player_info:
+                                        player_data = player_info[player_name]
+                                        # Try different possible column names for position
+                                        position = player_data.get('Position', '') or player_data.get('position', '')
+                                        if pd.notna(position):
+                                            position = str(position).strip()
+                                except:
+                                    pass
+                            
+                            # If still no position, try to derive from position profile
+                            if not position and position_profile:
+                                # Map common position profiles to positions
+                                profile_lower = position_profile.lower()
+                                if any(x in profile_lower for x in ['cb', 'center back', 'defender', 'def', 'hybrid']):
+                                    position = 'Defender'
+                                elif any(x in profile_lower for x in ['dm', 'cm', 'am', 'midfielder', 'mid', 'box-to-box', 'playmaker']):
+                                    position = 'Midfielder'
+                                elif any(x in profile_lower for x in ['winger', 'wing', 'fw', 'forward', 'attacker', 'striker']):
+                                    position = 'Forward'
+                                elif any(x in profile_lower for x in ['gk', 'goalkeeper', 'keeper']):
+                                    position = 'Goalkeeper'
+                            
+                            # Combine position and profile
+                            if position and position_profile:
+                                return f"{position} / {position_profile}"
+                            elif position:
+                                return position
+                            elif position_profile:
+                                return position_profile
+                            else:
+                                return 'N/A'
+                        
+                        # Title with player name
+                        title_text = f"Call Log and Video Analysis Summary: {player_name}"
+                        title = Paragraph(title_text, title_style)
                         elements.append(title)
                         elements.append(Spacer(1, 0.1*inch))
                         
-                        # Summary Metrics
-                        elements.append(Paragraph("Summary Metrics", heading_style))
+                        # Phone Calls Section Header
+                        elements.append(Paragraph("Phone Calls", heading_style))
+                        elements.append(Spacer(1, 0.05*inch))
+                        
+                        # Summary Metrics (no heading)
                         avg_rating_str = f"{player_calls_df['Overall Rating'].mean():.1f}/10" if not player_calls_df.empty and 'Overall Rating' in player_calls_df.columns else "N/A"
                         summary_data = [
                             ['Total Calls:', str(len(player_calls_df)),
                              'Overall Rank:', f"#{player_rank} of {total_players}" if player_rank else "N/A"],
                             ['Percentile:', f"{player_percentile:.1f}th" if player_percentile else "N/A",
                              'Avg Overall Rating:', avg_rating_str],
-                            ['Latest Recommendation:', escape_text(get_value('Recommendation')),
+                            ['Recommendation:', escape_text(get_value('Recommendation')),
                              'Team:', escape_text(get_value('Team'))],
                             ['Conference:', escape_text(get_value('Conference')),
-                             'Position:', escape_text(get_value('Position Profile'))],
+                             'Position/Profile:', escape_text(get_position_profile_display())],
                         ]
-                        summary_table = Table(summary_data, colWidths=[1.2*inch, 2.3*inch, 1.2*inch, 2.3*inch])
+                        # Create table with explicit left alignment
+                        summary_table = Table(summary_data, colWidths=[1.2*inch, 2.3*inch, 1.2*inch, 2.3*inch], hAlign='LEFT')
                         summary_table.setStyle(TableStyle([
                             ('FONTNAME', (0, 0), (-1, -1), 'Helvetica'),
                             ('FONTSIZE', (0, 0), (-1, -1), 8),
@@ -6179,18 +5895,19 @@ elif page == "Player Summary":
                             ('FONTNAME', (2, 0), (2, -1), 'Helvetica-Bold'),
                             ('GRID', (0, 0), (-1, -1), 0.5, colors.grey),
                             ('VALIGN', (0, 0), (-1, -1), 'TOP'),
+                            ('ALIGN', (0, 0), (-1, -1), 'LEFT'),
                             ('LEFTPADDING', (0, 0), (-1, -1), 3),
                             ('RIGHTPADDING', (0, 0), (-1, -1), 3),
                             ('TOPPADDING', (0, 0), (-1, -1), 3),
                             ('BOTTOMPADDING', (0, 0), (-1, -1), 3),
                         ]))
-                        elements.append(summary_table)
+                        # Ensure left alignment by wrapping in KeepTogether
+                        elements.append(KeepTogether([summary_table]))
                         elements.append(Spacer(1, 0.15*inch))
                         
-                        # Average Ratings
-                        elements.append(Paragraph("Average Assessment Ratings", heading_style))
+                        # Average Ratings (no heading) - below Summary Metrics
                         rating_cols = ['Communication', 'Maturity', 'Coachability', 'Leadership', 
-                                      'Work Ethic', 'Confidence', 'Tactical Knowledge', 'Team Fit']
+                                      'Confidence', 'Tactical Knowledge', 'Team Fit']
                         rating_cols = [col for col in rating_cols if col in player_calls_df.columns]
                         
                         if rating_cols:
@@ -6206,7 +5923,8 @@ elif page == "Player Summary":
                                 else:
                                     rating_data.append([f"{col1}:", val1, '', ''])
                             
-                            rating_table = Table(rating_data, colWidths=[1.3*inch, 0.7*inch, 1.3*inch, 0.7*inch])
+                            # Create table with explicit left alignment
+                            rating_table = Table(rating_data, colWidths=[1.2*inch, 0.7*inch, 1.2*inch, 0.7*inch], hAlign='LEFT')
                             rating_table.setStyle(TableStyle([
                                 ('FONTNAME', (0, 0), (-1, -1), 'Helvetica'),
                                 ('FONTSIZE', (0, 0), (-1, -1), 8),
@@ -6214,62 +5932,16 @@ elif page == "Player Summary":
                                 ('FONTNAME', (2, 0), (2, -1), 'Helvetica-Bold'),
                                 ('GRID', (0, 0), (-1, -1), 0.5, colors.grey),
                                 ('VALIGN', (0, 0), (-1, -1), 'TOP'),
+                                ('ALIGN', (0, 0), (-1, -1), 'LEFT'),
                                 ('LEFTPADDING', (0, 0), (-1, -1), 3),
                                 ('RIGHTPADDING', (0, 0), (-1, -1), 3),
                                 ('TOPPADDING', (0, 0), (-1, -1), 3),
                                 ('BOTTOMPADDING', (0, 0), (-1, -1), 3),
                             ]))
-                            elements.append(rating_table)
+                            elements.append(KeepTogether([rating_table]))
                             elements.append(Spacer(1, 0.15*inch))
                         
-                        # Assessment Grade Distribution
-                        if 'Assessment Grade' in player_calls_df.columns:
-                            elements.append(Paragraph("Assessment Grade Distribution", heading_style))
-                            grade_counts = player_calls_df['Assessment Grade'].value_counts().sort_index()
-                            grade_data = []
-                            for grade, count in grade_counts.items():
-                                grade_data.append([f"Grade {grade}:", f"{count} call(s)"])
-                            
-                            grade_table = Table(grade_data, colWidths=[1.2*inch, 1.8*inch])
-                            grade_table.setStyle(TableStyle([
-                                ('FONTNAME', (0, 0), (-1, -1), 'Helvetica'),
-                                ('FONTSIZE', (0, 0), (-1, -1), 8),
-                                ('FONTNAME', (0, 0), (0, -1), 'Helvetica-Bold'),
-                                ('GRID', (0, 0), (-1, -1), 0.5, colors.grey),
-                                ('VALIGN', (0, 0), (-1, -1), 'TOP'),
-                                ('LEFTPADDING', (0, 0), (-1, -1), 3),
-                                ('RIGHTPADDING', (0, 0), (-1, -1), 3),
-                                ('TOPPADDING', (0, 0), (-1, -1), 3),
-                                ('BOTTOMPADDING', (0, 0), (-1, -1), 3),
-                            ]))
-                            elements.append(grade_table)
-                            elements.append(Spacer(1, 0.15*inch))
-                        
-                        # Key Information from Latest Call
-                        elements.append(Paragraph("Key Information (Latest Call)", heading_style))
-                        key_info = [
-                            ['Agent:', escape_text(get_value('Agent Name'))],
-                            ['Interest Level:', escape_text(get_value('Interest Level'))],
-                            ['Salary Expectations:', escape_text(truncate_text(get_value('Salary Expectations'), 60))],
-                            ['Red Flags:', escape_text(truncate_text(get_value('Red Flags'), 80))],
-                        ]
-                        key_table = Table(key_info, colWidths=[1.2*inch, 5.8*inch])
-                        key_table.setStyle(TableStyle([
-                            ('FONTNAME', (0, 0), (-1, -1), 'Helvetica'),
-                            ('FONTSIZE', (0, 0), (-1, -1), 8),
-                            ('FONTNAME', (0, 0), (0, -1), 'Helvetica-Bold'),
-                            ('GRID', (0, 0), (-1, -1), 0.5, colors.grey),
-                            ('VALIGN', (0, 0), (-1, -1), 'TOP'),
-                            ('LEFTPADDING', (0, 0), (-1, -1), 3),
-                            ('RIGHTPADDING', (0, 0), (-1, -1), 3),
-                            ('TOPPADDING', (0, 0), (-1, -1), 3),
-                            ('BOTTOMPADDING', (0, 0), (-1, -1), 3),
-                        ]))
-                        elements.append(key_table)
-                        elements.append(Spacer(1, 0.15*inch))
-                        
-                        # Call History Summary
-                        elements.append(Paragraph("Call History", heading_style))
+                        # Call History Summary (no heading)
                         call_history_data = [['Call Date', 'Call Type', 'Assessment Grade', 'Recommendation']]
                         for _, call in player_calls_df.iterrows():
                             call_date = str(call.get('Call Date', 'N/A'))[:10] if pd.notna(call.get('Call Date')) else 'N/A'
@@ -6278,7 +5950,7 @@ elif page == "Player Summary":
                             rec = escape_text(str(call.get('Recommendation', 'N/A')))
                             call_history_data.append([call_date, call_type, grade, rec])
                         
-                        call_history_table = Table(call_history_data, colWidths=[1.5*inch, 1.5*inch, 1.5*inch, 2.5*inch])
+                        call_history_table = Table(call_history_data, colWidths=[1.5*inch, 1.5*inch, 1.5*inch, 2.5*inch], hAlign='LEFT')
                         call_history_table.setStyle(TableStyle([
                             ('FONTNAME', (0, 0), (-1, -1), 'Helvetica'),
                             ('FONTSIZE', (0, 0), (-1, -1), 7),
@@ -6286,17 +5958,31 @@ elif page == "Player Summary":
                             ('BACKGROUND', (0, 0), (-1, 0), colors.HexColor('#E0E0E0')),
                             ('GRID', (0, 0), (-1, -1), 0.5, colors.grey),
                             ('VALIGN', (0, 0), (-1, -1), 'TOP'),
+                            ('ALIGN', (0, 0), (-1, -1), 'LEFT'),
                             ('LEFTPADDING', (0, 0), (-1, -1), 3),
                             ('RIGHTPADDING', (0, 0), (-1, -1), 3),
                             ('TOPPADDING', (0, 0), (-1, -1), 3),
                             ('BOTTOMPADDING', (0, 0), (-1, -1), 3),
                         ]))
-                        elements.append(call_history_table)
+                        elements.append(KeepTogether([call_history_table]))
                         elements.append(Spacer(1, 0.15*inch))
                         
-                        # Video Reviews Section
+                        # Add Phone Call Radar Chart on Page 1 (after all phone call content)
+                        if call_radar_chart_bytes:
+                            # Create Image from bytes (no heading to save space, 0.5 times bigger than 2.5 inches = 3.75 inches)
+                            call_radar_img = Image(BytesIO(call_radar_chart_bytes), width=3.75*inch, height=3.75*inch)
+                            elements.append(call_radar_img)
+                            elements.append(Spacer(1, 0.15*inch))
+                        
+                        # Page break before video section
+                        elements.append(PageBreak())
+                        
+                        # Video Analysis Section Header
+                        elements.append(Paragraph("Video Analysis", heading_style))
+                        elements.append(Spacer(1, 0.05*inch))
+                        
+                        # Video Reviews Section (no heading)
                         if player_video_reviews_df is not None and not player_video_reviews_df.empty:
-                            elements.append(Paragraph("Video Reviews", heading_style))
                             
                             # Video Reviews Summary
                             video_summary_data = [
@@ -6305,7 +5991,7 @@ elif page == "Player Summary":
                                 ['Avg Video Rating:', f"{player_video_reviews_df['Overall Video Rating'].mean():.1f}/10" if 'Overall Video Rating' in player_video_reviews_df.columns else "N/A",
                                  'Latest Recommendation:', escape_text(str(player_video_reviews_df.iloc[-1].get('Recommendation', 'N/A'))) if 'Recommendation' in player_video_reviews_df.columns else "N/A"],
                             ]
-                            video_summary_table = Table(video_summary_data, colWidths=[1.2*inch, 2.3*inch, 1.2*inch, 2.3*inch])
+                            video_summary_table = Table(video_summary_data, colWidths=[1.2*inch, 2.3*inch, 1.2*inch, 2.3*inch], hAlign='LEFT')
                             video_summary_table.setStyle(TableStyle([
                                 ('FONTNAME', (0, 0), (-1, -1), 'Helvetica'),
                                 ('FONTSIZE', (0, 0), (-1, -1), 8),
@@ -6313,12 +5999,13 @@ elif page == "Player Summary":
                                 ('FONTNAME', (2, 0), (2, -1), 'Helvetica-Bold'),
                                 ('GRID', (0, 0), (-1, -1), 0.5, colors.grey),
                                 ('VALIGN', (0, 0), (-1, -1), 'TOP'),
+                                ('ALIGN', (0, 0), (-1, -1), 'LEFT'),
                                 ('LEFTPADDING', (0, 0), (-1, -1), 3),
                                 ('RIGHTPADDING', (0, 0), (-1, -1), 3),
                                 ('TOPPADDING', (0, 0), (-1, -1), 3),
                                 ('BOTTOMPADDING', (0, 0), (-1, -1), 3),
                             ]))
-                            elements.append(video_summary_table)
+                            elements.append(KeepTogether([video_summary_table]))
                             elements.append(Spacer(1, 0.15*inch))
                             
                             # Video Reviews History
@@ -6331,7 +6018,7 @@ elif page == "Player Summary":
                                 rec = escape_text(str(review.get('Recommendation', 'N/A')))
                                 video_history_data.append([review_date, video_type, video_score, grade, rec])
                             
-                            video_history_table = Table(video_history_data, colWidths=[1.2*inch, 1.2*inch, 1.0*inch, 0.8*inch, 1.8*inch])
+                            video_history_table = Table(video_history_data, colWidths=[1.2*inch, 1.2*inch, 1.0*inch, 0.8*inch, 1.8*inch], hAlign='LEFT')
                             video_history_table.setStyle(TableStyle([
                                 ('FONTNAME', (0, 0), (-1, -1), 'Helvetica'),
                                 ('FONTSIZE', (0, 0), (-1, -1), 7),
@@ -6339,18 +6026,18 @@ elif page == "Player Summary":
                                 ('BACKGROUND', (0, 0), (-1, 0), colors.HexColor('#E0E0E0')),
                                 ('GRID', (0, 0), (-1, -1), 0.5, colors.grey),
                                 ('VALIGN', (0, 0), (-1, -1), 'TOP'),
+                                ('ALIGN', (0, 0), (-1, -1), 'LEFT'),
                                 ('LEFTPADDING', (0, 0), (-1, -1), 3),
                                 ('RIGHTPADDING', (0, 0), (-1, -1), 3),
                                 ('TOPPADDING', (0, 0), (-1, -1), 3),
                                 ('BOTTOMPADDING', (0, 0), (-1, -1), 3),
                             ]))
-                            elements.append(video_history_table)
+                            elements.append(KeepTogether([video_history_table]))
                             elements.append(Spacer(1, 0.15*inch))
                             
-                            # Latest Video Review Details
+                            # Latest Video Review Details (no heading)
                             if len(player_video_reviews_df) > 0:
                                 latest_review = player_video_reviews_df.iloc[-1]
-                                elements.append(Paragraph("Latest Video Review Details", heading_style))
                                 
                                 video_details = []
                                 if pd.notna(latest_review.get('Key Observations')):
@@ -6363,20 +6050,28 @@ elif page == "Player Summary":
                                     video_details.append(['Red Flags:', escape_text(truncate_text(str(latest_review.get('Red Flags', '')), 100))])
                                 
                                 if video_details:
-                                    video_details_table = Table(video_details, colWidths=[1.2*inch, 5.8*inch])
+                                    video_details_table = Table(video_details, colWidths=[1.2*inch, 5.8*inch], hAlign='LEFT')
                                     video_details_table.setStyle(TableStyle([
                                         ('FONTNAME', (0, 0), (-1, -1), 'Helvetica'),
                                         ('FONTSIZE', (0, 0), (-1, -1), 8),
                                         ('FONTNAME', (0, 0), (0, -1), 'Helvetica-Bold'),
                                         ('GRID', (0, 0), (-1, -1), 0.5, colors.grey),
                                         ('VALIGN', (0, 0), (-1, -1), 'TOP'),
+                                        ('ALIGN', (0, 0), (-1, -1), 'LEFT'),
                                         ('LEFTPADDING', (0, 0), (-1, -1), 3),
                                         ('RIGHTPADDING', (0, 0), (-1, -1), 3),
                                         ('TOPPADDING', (0, 0), (-1, -1), 3),
                                         ('BOTTOMPADDING', (0, 0), (-1, -1), 3),
                                     ]))
-                                    elements.append(video_details_table)
+                                    elements.append(KeepTogether([video_details_table]))
                                     elements.append(Spacer(1, 0.15*inch))
+                        
+                        # Add Video Radar Chart on Page 2 (after all video content, no heading to save space)
+                        if video_radar_chart_bytes:
+                            # Create Image from bytes (0.5 times bigger than 2.5 inches = 3.75 inches)
+                            video_radar_img = Image(BytesIO(video_radar_chart_bytes), width=3.75*inch, height=3.75*inch)
+                            elements.append(video_radar_img)
+                            elements.append(Spacer(1, 0.15*inch))
                         
                         # Build PDF
                         doc.build(elements)
@@ -6387,13 +6082,19 @@ elif page == "Player Summary":
                         return None
                 
                 if st.button("Download Player Summary PDF", use_container_width=True):
+                    # Get radar chart images from session state
+                    call_radar_bytes = st.session_state.get('call_radar_chart')
+                    video_radar_bytes = st.session_state.get('video_radar_chart')
+                    
                     pdf_bytes = generate_player_summary_pdf(
                         selected_player, 
                         player_calls, 
                         player_rank, 
                         player_percentile, 
                         total_players,
-                        player_video_reviews
+                        player_video_reviews,
+                        call_radar_chart_bytes=call_radar_bytes,
+                        video_radar_chart_bytes=video_radar_bytes
                     )
                     if pdf_bytes:
                         pdf_filename = f"player_summary_{selected_player.replace(' ', '_')}_{datetime.now().strftime('%Y%m%d')}.pdf"
@@ -6404,879 +6105,117 @@ elif page == "Player Summary":
                             mime="application/pdf",
                             use_container_width=True
                         )
-            # All Calls Table
-            if not player_calls.empty:
-                st.markdown("### All Calls")
-            
-            # Format date columns before creating table data
-            player_calls_display = player_calls.copy()
-            if 'Call Date' in player_calls_display.columns:
-                try:
-                    player_calls_display['Call Date'] = pd.to_datetime(player_calls_display['Call Date'], errors='coerce')
-                    player_calls_display['Call Date'] = player_calls_display['Call Date'].dt.strftime('%Y-%m-%d')
-                except:
-                    pass
-            
-            if 'Follow-up Date' in player_calls_display.columns:
-                try:
-                    player_calls_display['Follow-up Date'] = pd.to_datetime(player_calls_display['Follow-up Date'], errors='coerce')
-                    player_calls_display['Follow-up Date'] = player_calls_display['Follow-up Date'].dt.strftime('%Y-%m-%d')
-                except:
-                    pass
-            
-            # Define text-heavy columns that should be expandable
-            text_heavy_columns = [
-                'Call Notes',
-                'Preparation Notes',
-                'How They View Themselves',
-                'What Is Important To Them',
-                'Mindset Towards Growth',
-                'Agent Notes',
-                'Player Notes',
-                'Key Talking Points',
-                'Summary Notes',
-                'Red Flags',
-                'Action Items',
-                'Other Opportunities',
-                'Injury Periods',
-                'Personality Traits',
-                'Other Traits',
-                'Agent Expectations',
-                'Agent Negotiation Style',
-                'How They Carry Themselves'
-            ]
-            
-            # Prepare data for custom HTML table
-            table_data = player_calls_display.to_dict('records')
-            table_columns = list(player_calls_display.columns)
-            
-            # Build header row
-            header_cells = []
-            for col in table_columns:
-                header_cells.append(f'<th>{col}</th>')
-            header_row = ' '.join(header_cells)
-            
-            # Create HTML/JavaScript component for interactive table
-            html_code = f"""
-            <!DOCTYPE html>
-            <html>
-            <head>
-                <style>
-                    * {{
-                        box-sizing: border-box;
-                    }}
-                    body {{
-                        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Helvetica Neue', Arial, sans-serif;
-                        margin: 0;
-                        padding: 0;
-                        background-color: transparent;
-                        color: #fafafa;
-                        -webkit-font-smoothing: antialiased;
-                        -moz-osx-font-smoothing: grayscale;
-                    }}
-                    .table-wrapper {{
-                        background: #1e1e1e;
-                        border-radius: 12px;
-                        overflow: hidden;
-                        box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
-                        margin-bottom: 0 !important;
-                        padding-bottom: 0 !important;
-                    }}
-                    .table-container {{
-                        overflow-x: auto;
-                        max-height: 500px;
-                        overflow-y: auto;
-                        position: relative;
-                    }}
-                    .table-container::-webkit-scrollbar {{
-                        width: 8px;
-                        height: 8px;
-                    }}
-                    .table-container::-webkit-scrollbar-track {{
-                        background: #1e1e1e;
-                    }}
-                    .table-container::-webkit-scrollbar-thumb {{
-                        background: #3a3a3a;
-                        border-radius: 4px;
-                    }}
-                    .table-container::-webkit-scrollbar-thumb:hover {{
-                        background: #4a4a4a;
-                    }}
-                    table {{
-                        width: 100%;
-                        border-collapse: separate;
-                        border-spacing: 0;
-                        background-color: transparent;
-                        margin: 0;
-                    }}
-                    thead {{
-                        position: sticky;
-                        top: 0;
-                        z-index: 100;
-                    }}
-                    th {{
-                        background: linear-gradient(180deg, #2d2d2d 0%, #1e1e1e 100%);
-                        color: #ffffff;
-                        padding: 8px 12px;
-                        text-align: left;
-                        border-bottom: 2px solid #8B0000;
-                        font-weight: 600;
-                        font-size: 0.75rem;
-                        text-transform: uppercase;
-                        letter-spacing: 0.8px;
-                        white-space: nowrap;
-                        position: relative;
-                        transition: background-color 0.2s ease;
-                    }}
-                    th:hover {{
-                        background: linear-gradient(180deg, #3a3a3a 0%, #2d2d2d 100%);
-                    }}
-                    th::after {{
-                        content: '';
-                        position: absolute;
-                        bottom: 0;
-                        left: 0;
-                        right: 0;
-                        height: 1px;
-                        background: linear-gradient(90deg, transparent, #8B0000, transparent);
-                    }}
-                    td {{
-                        padding: 8px 12px;
-                        border-bottom: 1px solid rgba(58, 58, 58, 0.5);
-                        max-width: 200px;
-                        word-wrap: break-word;
-                        font-size: 0.8125rem;
-                        line-height: 1.4;
-                        transition: all 0.15s cubic-bezier(0.4, 0, 0.2, 1);
-                        color: #e0e0e0;
-                        font-weight: 700 !important;
-                    }}
-                    tbody td {{
-                        font-weight: 700 !important;
-                    }}
-                    tbody tr {{
-                        background-color: #000000;
-                        transition: all 0.15s cubic-bezier(0.4, 0, 0.2, 1);
-                        border-left: 3px solid transparent;
-                    }}
-                    tbody tr:nth-child(even) {{
-                        background-color: #2a2a2a;
-                    }}
-                    tbody tr:hover {{
-                        background-color: rgba(139, 0, 0, 0.3) !important;
-                        border-left-color: #8B0000;
-                        transform: translateX(2px);
-                    }}
-                    tbody tr:last-child td {{
-                        border-bottom: none;
-                    }}
-                    .expandable-cell {{
-                        cursor: pointer;
-                        color: #8B0000;
-                        text-decoration: underline;
-                        text-decoration-color: #8B0000;
-                        text-underline-offset: 2px;
-                        position: relative;
-                        transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-                        font-weight: 600;
-                        font-size: 0.875rem;
-                    }}
-                    .expandable-cell::before {{
-                        content: '▶';
-                        margin-right: 4px;
-                        font-size: 0.75rem;
-                        display: inline-block;
-                        transition: transform 0.2s ease;
-                    }}
-                    .expandable-cell:hover {{
-                        color: #D10023;
-                        background-color: rgba(139, 0, 0, 0.2) !important;
-                        text-decoration-color: #D10023;
-                        transform: translateX(2px);
-                    }}
-                    .expandable-cell:hover::before {{
-                        transform: translateX(2px);
-                    }}
-                    .modal {{
-                        display: none;
-                        position: fixed;
-                        z-index: 1000;
-                        left: 0;
-                        top: 0;
-                        width: 100%;
-                        height: 100%;
-                        background-color: rgba(0,0,0,0.85);
-                        backdrop-filter: blur(4px);
-                        animation: fadeIn 0.2s ease;
-                    }}
-                    @keyframes fadeIn {{
-                        from {{ opacity: 0; }}
-                        to {{ opacity: 1; }}
-                    }}
-                    .modal-content {{
-                        background-color: #1e1e1e;
-                        margin: 5% auto;
-                        padding: 0;
-                        border: none;
-                        border-radius: 12px;
-                        width: 80%;
-                        max-width: 800px;
-                        max-height: 80vh;
-                        overflow: hidden;
-                        color: #fafafa;
-                        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
-                        animation: slideDown 0.3s ease;
-                    }}
-                    @keyframes slideDown {{
-                        from {{
-                            transform: translateY(-20px);
-                            opacity: 0;
-                        }}
-                        to {{
-                            transform: translateY(0);
-                            opacity: 1;
-                        }}
-                    }}
-                    .modal-header {{
-                        display: flex;
-                        justify-content: space-between;
-                        align-items: center;
-                        padding: 20px 24px;
-                        border-bottom: 1px solid #3a3a3a;
-                        background: linear-gradient(180deg, #2a2a2a 0%, #1e1e1e 100%);
-                    }}
-                    .modal-title {{
-                        font-size: 1.25rem;
-                        font-weight: 600;
-                        color: #8B0000;
-                        letter-spacing: 0.3px;
-                    }}
-                    .close {{
-                        color: #aaa;
-                        font-size: 24px;
-                        font-weight: 300;
-                        cursor: pointer;
-                        width: 32px;
-                        height: 32px;
-                        display: flex;
-                        align-items: center;
-                        justify-content: center;
-                        border-radius: 50%;
-                        transition: all 0.2s ease;
-                    }}
-                    .close:hover {{
-                        background-color: #3a3a3a;
-                        color: #fafafa;
-                    }}
-                    .modal-body {{
-                        white-space: pre-wrap;
-                        word-wrap: break-word;
-                        line-height: 1.3;
-                        padding: 24px;
-                        background-color: #1e1e1e;
-                        max-height: calc(80vh - 100px);
-                        overflow-y: auto;
-                    }}
-                    .modal-body::-webkit-scrollbar {{
-                        width: 1px;
-                    }}
-                    .modal-body::-webkit-scrollbar-track {{
-                        background: #1e1e1e;
-                    }}
-                    .modal-body::-webkit-scrollbar-thumb {{
-                        background: #3a3a3a;
-                        border-radius: 1px;
-                    }}
-                    .modal-body::-webkit-scrollbar-thumb:hover {{
-                        background: #4a4a4a;
-                    }}
-                </style>
-            </head>
-            <body>
-                <div class="table-wrapper">
-                    <div class="table-container">
-                        <table id="dataTable">
-                        <thead>
-                            <tr>
-                                {header_row}
-                            </tr>
-                        </thead>
-                        <tbody>
-            """
-            
-            # Add table rows
-            for row_idx, row in enumerate(table_data):
-                html_code += "<tr>"
-                for col in table_columns:
-                        raw_value = row.get(col, '')
-                        
-                        # Convert to string (dates are already formatted above)
-                        if pd.notna(raw_value):
-                            cell_value = str(raw_value)
-                        else:
-                            cell_value = ''
-                        
-                        # Check if this column should be expandable
-                        if col in text_heavy_columns and cell_value and len(str(cell_value).strip()) > 0:
-                            # Escape quotes for JavaScript
-                            escaped_value = str(cell_value).replace('"', '&quot;').replace("'", "&#39;").replace('\n', '\\n')
-                            html_code += f'''
-                            <td class="expandable-cell" 
-                                onclick="showModal('{col}', `{escaped_value}`)"
-                                title="Click to view full text">
-                                Expand
-                            </td>
-                            '''
-                        else:
-                            # Escape HTML
-                            escaped_cell = str(cell_value).replace('<', '&lt;').replace('>', '&gt;')
-                            html_code += f"<td>{escaped_cell}</td>"
-                html_code += "</tr>"
-            
-            html_code += """
-                        </tbody>
-                        </table>
-                    </div>
-                </div>
-                
-                <!-- Modal for expanded text -->
-                <div id="textModal" class="modal">
-                    <div class="modal-content">
-                        <div class="modal-header">
-                            <div class="modal-title" id="modalTitle"></div>
-                            <span class="close" onclick="closeModal()">&times;</span>
-                        </div>
-                        <div class="modal-body" id="modalBody"></div>
-                    </div>
-                </div>
-                
-                <script>
-                    function showModal(columnName, fullText) {{
-                        document.getElementById('modalTitle').textContent = columnName;
-                        document.getElementById('modalBody').textContent = fullText;
-                        document.getElementById('textModal').style.display = 'block';
-                    }}
-                    
-                    function closeModal() {{
-                        document.getElementById('textModal').style.display = 'none';
-                    }}
-                    
-                    // Close modal when clicking outside of it
-                    window.onclick = function(event) {{
-                        const modal = document.getElementById('textModal');
-                        if (event.target == modal) {{
-                            closeModal();
-                        }}
-                    }}
-                    
-                    // Close modal with Escape key
-                    document.addEventListener('keydown', function(event) {{
-                        if (event.key === 'Escape') {{
-                            closeModal();
-                        }}
-                    }});
-                </script>
-            </body>
-            </html>
-            """
-            
-            # Display the custom HTML table with aggressive spacing reduction
-            st.markdown("""
-            <style>
-                    /* Very aggressive negative margins for iframe container */
-                    div[data-testid="stIFrame"] {
-                        margin-bottom: -5rem !important;
-                        padding-bottom: 0 !important;
-                    }
-                    /* Target element-container wrapper */
-                    .element-container:has([data-testid="stIFrame"]) {
-                        margin-bottom: -5rem !important;
-                        padding-bottom: 0 !important;
-                    }
-                    /* Target block container div */
-                    .block-container > div:has([data-testid="stIFrame"]) {
-                        margin-bottom: -5rem !important;
-                        padding-bottom: 0 !important;
-                    }
-                    /* Target divider container with negative margins */
-                    .block-container > div:has(hr) {
-                        margin-top: -4rem !important;
-                        margin-bottom: -3rem !important;
-                        padding: 0 !important;
-                    }
-                    /* Target radar chart section */
-                    .block-container > div:has(hr) + div {
-                        margin-top: -3rem !important;
-                        padding-top: 0 !important;
-                    }
-                    /* Target all divs between iframe and radar chart */
-                    .block-container > div:has([data-testid="stIFrame"]) ~ div {
-                        margin-top: -2rem !important;
-                    }
-                </style>
-            """, unsafe_allow_html=True)
-            components.html(html_code, height=550, scrolling=True)
-            
-            st.markdown("<br>", unsafe_allow_html=True)
-            st.divider()
-            st.markdown("<br>", unsafe_allow_html=True)
-            
-            # Call Review Details
-            if not player_calls.empty:
-                st.markdown("### Call Review Details")
-                for idx, row in player_calls.iterrows():
-                    call_date = row.get('Call Date', 'N/A')
-                    call_number = row.get('Call Number', 'N/A')
-                    call_type = row.get('Call Type', 'N/A')
-                    with st.expander(f"Call #{call_number} - {call_date} ({call_type})"):
-                        col_c1, col_c2 = st.columns(2)
-                    with col_c1:
-                        if 'Overall Rating' in row:
-                            st.metric("Overall Rating", f"{row.get('Overall Rating', 'N/A')}/10")
-                        if 'Assessment Grade' in row:
-                            st.metric("Grade", row.get('Assessment Grade', 'N/A'))
-                        if 'Recommendation' in row:
-                            st.metric("Recommendation", row.get('Recommendation', 'N/A'))
-                    with col_c2:
-                        if 'Call Type' in row:
-                            st.metric("Call Type", row.get('Call Type', 'N/A'))
-                        if 'Agent Name' in row:
-                            st.metric("Agent", row.get('Agent Name', 'N/A'))
-                        if 'Interest Level' in row:
-                            st.metric("Interest Level", row.get('Interest Level', 'N/A'))
-                    
-                    # Performance metrics
-                    call_metrics = ['Communication', 'Maturity', 'Coachability', 'Leadership', 
-                                  'Work Ethic', 'Confidence', 'Tactical Knowledge', 'Team Fit', 'Overall Rating']
-                    call_metrics_data = {metric: row.get(metric, 'N/A') for metric in call_metrics if metric in row}
-                    if call_metrics_data:
-                        st.markdown("**Performance Metrics:**")
-                        call_metrics_df = pd.DataFrame([call_metrics_data])
-                        st.dataframe(call_metrics_df.T, use_container_width=True, hide_index=False)
-                    
-                    # Call details
-                    if row.get('Call Notes'):
-                        st.markdown("**Call Notes:**")
-                        st.info(row.get('Call Notes', ''))
-                    if row.get('Preparation Notes'):
-                        st.markdown("**Preparation Notes:**")
-                        st.text(row.get('Preparation Notes', ''))
-                    if row.get('Summary Notes'):
-                        st.markdown("**Summary Notes:**")
-                        st.text(row.get('Summary Notes', ''))
-                    if row.get('Red Flags'):
-                        st.markdown("**Red Flags:**")
-                        st.error(row.get('Red Flags', ''))
-                    if row.get('Action Items'):
-                        st.markdown("**Action Items:**")
-                        st.warning(row.get('Action Items', ''))
-                    
-                    # Display call recording if available
-                    if 'Call Recording' in row and pd.notna(row.get('Call Recording')) and row.get('Call Recording'):
-                        recording_path = row.get('Call Recording', '')
-                        if recording_path and Path(recording_path).exists():
-                            st.markdown("**Call Recording:**")
-                            try:
-                                recording_file = Path(recording_path)
-                                file_ext = recording_file.suffix.lower()
-                                with open(recording_file, 'rb') as f:
-                                    recording_bytes = f.read()
-                                if file_ext in ['.mp3', '.wav', '.m4a']:
-                                    st.audio(recording_bytes)
-                                elif file_ext in ['.mp4', '.mov', '.avi']:
-                                    st.video(recording_bytes)
-                                else:
-                                    st.info(f"Recording file: {recording_file.name}")
-                            except Exception as e:
-                                st.error(f"Error loading recording: {e}")
-            
-            st.markdown("<br>", unsafe_allow_html=True)
-            st.divider()
-            st.markdown("<br>", unsafe_allow_html=True)
-            
-            # Radar Chart - Player's Call Metrics vs Call Log Average
-            if not player_calls.empty:
-                st.markdown("### Performance Comparison Radar Chart")
-                
-                # Define call log metrics
-                call_metrics = ['Communication', 'Maturity', 'Coachability', 'Leadership', 'Work Ethic', 
-                              'Confidence', 'Tactical Knowledge', 'Team Fit', 'Overall Rating']
-                
-                # Filter to only include metrics that exist in both player calls and call log
-                available_call_metrics = [col for col in call_metrics if col in player_calls.columns]
-                call_log_available_metrics = [col for col in call_metrics if col in st.session_state.call_log.columns] if not st.session_state.call_log.empty else []
-                
-                # Find intersection
-                available_metrics = [m for m in available_call_metrics if m in call_log_available_metrics]
-                
-                if available_metrics and len(st.session_state.call_log) > 0:
-                    # Calculate player's average for each metric
-                    player_avg = player_calls[available_metrics].mean()
-                    
-                    # Calculate average across all players for each metric (from call log)
-                    all_players_avg = st.session_state.call_log[available_metrics].mean()
-                    
-                    # Create radar chart using matplotlib
-                    import matplotlib.pyplot as plt
-                    import matplotlib
-                    import numpy as np
-                    matplotlib.use('Agg')  # Use non-interactive backend
-                    
-                    # Number of metrics
-                    N = len(available_metrics)
-                    
-                    # Compute angle for each metric (radar chart is circular)
-                    angles = [n / float(N) * 2 * np.pi for n in range(N)]
-                    angles += angles[:1]  # Complete the circle
-                    
-                    # Prepare data
-                    player_values = [player_avg[metric] for metric in available_metrics]
-                    player_values += player_values[:1]  # Complete the circle
-                    
-                    all_players_values = [all_players_avg[metric] for metric in available_metrics]
-                    all_players_values += all_players_values[:1]  # Complete the circle
-                    
-                    # Create figure - slightly larger to accommodate labels outside
-                    fig, ax = plt.subplots(figsize=(6, 6), subplot_kw=dict(projection='polar'))
-                    fig.patch.set_facecolor('#1e1e1e')
-                    ax.set_facecolor('#1e1e1e')
-                    
-                    # Set y-axis (ratings from 0 to 10) - extend beyond 10 to make room for labels
-                    ax.set_ylim(0, 12)
-                    ax.set_yticks([2, 4, 6, 8, 10])
-                    ax.set_yticklabels(['2', '4', '6', '8', '10'], color='#fafafa', fontsize=7)
-                    ax.grid(True, color='#4a4a4a', linestyle='--', linewidth=0.5)
-                    
-                    # Plot player data
-                    ax.plot(angles, player_values, 'o-', linewidth=2, label=selected_player, color='#8B0000', markersize=6)
-                    ax.fill(angles, player_values, alpha=0.25, color='#8B0000')
-                    
-                    # Plot call log average
-                    ax.plot(angles, all_players_values, 'o-', linewidth=2, label='Call Log Average', color='#4a4a4a', markersize=6)
-                    ax.fill(angles, all_players_values, alpha=0.15, color='#4a4a4a')
-                    
-                    # Set labels - position them at the end of each axis
-                    ax.set_xticks(angles[:-1])
-                    # First, set empty labels to avoid duplicates
-                    ax.set_xticklabels([''] * len(available_metrics))
-                    
-                    # Now manually place all labels at the end of their axes
-                    labels_to_move_inward = ['Team Fit', 'Tactical Knowledge', 'Leadership', 'Coachability', 'Maturity']
-                    
-                    for i, metric in enumerate(available_metrics):
-                        angle_rad = angles[i]
-                        # Position most labels at radius 11.5 (at the end of the axis)
-                        # Position specific labels slightly inward at radius 11.0
-                        if metric in labels_to_move_inward:
-                            radius_for_label = 11.0
-                        else:
-                            radius_for_label = 11.5
-                        
-                        # Place label at the end of the axis using polar coordinates
-                        ax.text(angle_rad, radius_for_label, metric, 
-                               ha='center', va='center',
-                               color='#fafafa', fontsize=9, fontweight='bold')
-                    
-                    # Add title - dynamic based on selected player
-                    ax.set_title(f'{selected_player} vs Call Log Average', size=11, color='#fafafa', fontweight='bold', pad=20)
-                    
-                    # Add legend
-                    legend = ax.legend(loc='upper right', bbox_to_anchor=(1.2, 1.1), 
-                                      facecolor='#2a2a2a', edgecolor='#4a4a4a', 
-                                      labelcolor='#fafafa', fontsize=8)
-                    legend.get_frame().set_alpha(0.9)
-                    
-                    # Tight layout to reduce padding
-                    fig.tight_layout(pad=0.5)
-                    
-                    # Center the chart on the page using columns with minimal spacing
-                    with st.container():
-                        col1, col2, col3 = st.columns([1, 2, 1])
-                        with col2:
-                            st.pyplot(fig, use_container_width=False)
-            else:
-                st.info("No phone call data available for radar chart.")
-            
-            # ========== VIDEO ANALYSIS SECTION ==========
-            st.markdown("<br>", unsafe_allow_html=True)
-            st.divider()
-            st.markdown("<br>", unsafe_allow_html=True)
-            st.markdown("## 🎥 Video Analysis")
-            
-            # Video Analysis Summary Metrics
-            video_col1, video_col2, video_col3, video_col4 = st.columns(4)
-            with video_col1:
-                st.metric("Total Reviews", len(player_video_reviews))
-            with video_col2:
-                if not player_video_reviews.empty and 'Video Score' in player_video_reviews.columns:
-                    avg_video_score = player_video_reviews['Video Score'].mean()
-                    st.metric("Avg Video Score", f"{avg_video_score:.1f}/10")
-                else:
-                    st.metric("Avg Video Score", "N/A")
-            with video_col3:
-                if not player_video_reviews.empty and 'Overall Video Rating' in player_video_reviews.columns:
-                    avg_video_rating = player_video_reviews['Overall Video Rating'].mean()
-                    st.metric("Avg Video Rating", f"{avg_video_rating:.1f}/10")
-                else:
-                    st.metric("Avg Video Rating", "N/A")
-            with video_col4:
-                if not player_video_reviews.empty and 'Recommendation' in player_video_reviews.columns:
-                    latest_video_rec = player_video_reviews.iloc[-1]['Recommendation'] if len(player_video_reviews) > 0 else "N/A"
-                    st.metric("Latest Recommendation", latest_video_rec)
-                else:
-                    st.metric("Latest Recommendation", "N/A")
-            
-            if not player_video_reviews.empty:
-                st.markdown("<br>", unsafe_allow_html=True)
-                st.markdown("### Average Ratings")
-                video_rating_cols = ['Technical Ability', 'Tactical Awareness', 'Decision Making', 'Physical Attributes', 
-                                   'Work Rate', 'Communication', 'Leadership', 'Composure', 'Overall Video Rating']
-                # Filter to only include columns that exist in the dataframe
-                video_rating_cols = [col for col in video_rating_cols if col in player_video_reviews.columns]
-                if video_rating_cols:
-                    avg_video_ratings = player_video_reviews[video_rating_cols].mean()
-                    # Create bar chart with Portland Red color (#8B0000) using Altair
-                    import altair as alt
-                    
-                    video_chart_data = pd.DataFrame({
-                        'Metric': avg_video_ratings.index,
-                        'Average Rating': avg_video_ratings.values
-                    })
-                    
-                    video_chart = alt.Chart(video_chart_data).mark_bar(
-                        color='#8B0000',  # Portland Red
-                        cornerRadiusTopLeft=4,
-                        cornerRadiusTopRight=4
-                    ).encode(
-                        x=alt.X('Metric', axis=alt.Axis(labelAngle=0, labelColor='white', title=None)),
-                        y=alt.Y('Average Rating', axis=alt.Axis(labelColor='white', titleColor='white'), scale=alt.Scale(domain=[0, 10], padding=0.15)),
-                        tooltip=['Metric', 'Average Rating']
-                    ).properties(
-                        width=600,
-                        height=450,
-                        padding={'top': 50, 'bottom': 40, 'left': 40, 'right': 40}
-                    ).configure(
-                        background='#1e1e1e',
-                        view=alt.ViewConfig(stroke=None)
-                    ).configure_axis(
-                        gridColor='#4a4a4a',  # More subtle gray instead of white
-                        domainColor='#8B0000',
-                        gridOpacity=0.4
-                    )
-                    
-                    st.altair_chart(video_chart, use_container_width=True)
-            else:
-                st.info("No video analysis data available for this player.")
-            
-            st.markdown("<br>", unsafe_allow_html=True)
-            st.divider()
-            st.markdown("<br>", unsafe_allow_html=True)
-            
-            # All Video Reviews Table
-            if not player_video_reviews.empty:
-                st.markdown("### All Video Reviews")
-                
-                video_reviews_display = player_video_reviews.copy()
-                
-                # Format date columns
-                if 'Review Date' in video_reviews_display.columns:
-                    try:
-                        video_reviews_display['Review Date'] = pd.to_datetime(video_reviews_display['Review Date'], errors='coerce')
-                        video_reviews_display['Review Date'] = video_reviews_display['Review Date'].dt.strftime('%Y-%m-%d')
-                    except:
-                        pass
-                
-                # Select key columns to display
-                key_video_columns = [
-                    'Review Date', 'Video Type', 'Video Source', 'Video Score', 
-                    'Overall Video Rating', 'Video Grade', 'Status', 'Recommendation'
-                ]
-                # Only include columns that exist
-                display_video_columns = [col for col in key_video_columns if col in video_reviews_display.columns]
-                
-                if display_video_columns:
-                    st.dataframe(
-                        video_reviews_display[display_video_columns].sort_values('Review Date', ascending=False),
-                        use_container_width=True,
-                        hide_index=True
-                    )
-                
-                st.markdown("<br>", unsafe_allow_html=True)
-                st.divider()
-                st.markdown("<br>", unsafe_allow_html=True)
-                
-                # Show full video review details in expanders
-                st.markdown("### Video Review Details")
-                for idx, row in player_video_reviews.iterrows():
-                    review_date = row.get('Review Date', 'N/A')
-                    video_type = row.get('Video Type', 'N/A')
-                    with st.expander(f"Review: {review_date} - {video_type}"):
-                        col_v1, col_v2 = st.columns(2)
-                        with col_v1:
-                            if 'Video Score' in row:
-                                st.metric("Video Score", f"{row.get('Video Score', 'N/A')}/10")
-                            if 'Overall Video Rating' in row:
-                                st.metric("Overall Rating", f"{row.get('Overall Video Rating', 'N/A')}/10")
-                            if 'Video Grade' in row:
-                                st.metric("Grade", row.get('Video Grade', 'N/A'))
-                        with col_v2:
-                            if 'Status' in row:
-                                st.metric("Status", row.get('Status', 'N/A'))
-                            if 'Recommendation' in row:
-                                st.metric("Recommendation", row.get('Recommendation', 'N/A'))
-                            if 'Quantitative Match' in row:
-                                st.metric("Quantitative Match", row.get('Quantitative Match', 'N/A'))
-                        
-                        # Performance metrics
-                        if any(col in row for col in ['Technical Ability', 'Tactical Awareness', 'Decision Making']):
-                            st.markdown("**Performance Metrics:**")
-                            perf_metrics = ['Technical Ability', 'Tactical Awareness', 'Decision Making', 
-                                          'Physical Attributes', 'Work Rate', 'Communication', 
-                                          'Leadership', 'Composure', 'Overall Video Rating']
-                            perf_data = {metric: row.get(metric, 'N/A') for metric in perf_metrics if metric in row}
-                            if perf_data:
-                                perf_df = pd.DataFrame([perf_data])
-                                st.dataframe(perf_df.T, use_container_width=True, hide_index=False)
-                        
-                        # Observations
-                        if row.get('Key Observations'):
-                            st.markdown("**Key Observations:**")
-                            st.info(row.get('Key Observations', ''))
-                        if row.get('Strengths Identified'):
-                            st.markdown("**Strengths:**")
-                            st.success(row.get('Strengths Identified', ''))
-                        if row.get('Weaknesses Identified'):
-                            st.markdown("**Weaknesses:**")
-                            st.warning(row.get('Weaknesses Identified', ''))
-                        if row.get('Red Flags'):
-                            st.markdown("**Red Flags:**")
-                            st.error(row.get('Red Flags', ''))
-                        if row.get('Additional Notes'):
-                            st.markdown("**Additional Notes:**")
-                            st.text(row.get('Additional Notes', ''))
-            
-            st.markdown("<br>", unsafe_allow_html=True)
-            st.divider()
-            st.markdown("<br>", unsafe_allow_html=True)
-            
-            # Radar Chart - Player's Video Metrics vs Video Analysis Average
-            if not player_video_reviews.empty:
-                st.markdown("### Performance Comparison Radar Chart")
-                
-                # Define video review metrics
-                video_metrics = ['Technical Ability', 'Tactical Awareness', 'Decision Making', 'Physical Attributes', 
-                               'Work Rate', 'Communication', 'Leadership', 'Composure', 'Overall Video Rating']
-                
-                # Filter to only include metrics that exist in both player reviews and all video reviews
-                available_video_metrics = [col for col in video_metrics if col in player_video_reviews.columns]
-                all_video_reviews_available_metrics = [col for col in video_metrics if col in st.session_state.video_reviews.columns] if not st.session_state.video_reviews.empty else []
-                
-                # Find intersection
-                available_metrics = [m for m in available_video_metrics if m in all_video_reviews_available_metrics]
-                
-                if available_metrics and len(st.session_state.video_reviews) > 0:
-                    # Calculate player's average for each metric
-                    player_video_avg = player_video_reviews[available_metrics].mean()
-                    
-                    # Calculate average across all players for each metric (from all video reviews)
-                    all_players_video_avg = st.session_state.video_reviews[available_metrics].mean()
-                    
-                    # Create radar chart using matplotlib
-                    import matplotlib.pyplot as plt
-                    import matplotlib
-                    import numpy as np
-                    matplotlib.use('Agg')  # Use non-interactive backend
-                    
-                    # Number of metrics
-                    N = len(available_metrics)
-                    
-                    # Compute angle for each metric (radar chart is circular)
-                    angles = [n / float(N) * 2 * np.pi for n in range(N)]
-                    angles += angles[:1]  # Complete the circle
-                    
-                    # Prepare data
-                    player_values = [player_video_avg[metric] for metric in available_metrics]
-                    player_values += player_values[:1]  # Complete the circle
-                    
-                    all_players_values = [all_players_video_avg[metric] for metric in available_metrics]
-                    all_players_values += all_players_values[:1]  # Complete the circle
-                    
-                    # Create figure - slightly larger to accommodate labels outside
-                    fig, ax = plt.subplots(figsize=(6, 6), subplot_kw=dict(projection='polar'))
-                    fig.patch.set_facecolor('#1e1e1e')
-                    ax.set_facecolor('#1e1e1e')
-                    
-                    # Set y-axis (ratings from 0 to 10) - extend beyond 10 to make room for labels
-                    ax.set_ylim(0, 12)
-                    ax.set_yticks([2, 4, 6, 8, 10])
-                    ax.set_yticklabels(['2', '4', '6', '8', '10'], color='#fafafa', fontsize=7)
-                    ax.grid(True, color='#4a4a4a', linestyle='--', linewidth=0.5)
-                    
-                    # Plot player data
-                    ax.plot(angles, player_values, 'o-', linewidth=2, label=selected_player, color='#8B0000', markersize=6)
-                    ax.fill(angles, player_values, alpha=0.25, color='#8B0000')
-                    
-                    # Plot video analysis average
-                    ax.plot(angles, all_players_values, 'o-', linewidth=2, label='Video Analysis Average', color='#4a4a4a', markersize=6)
-                    ax.fill(angles, all_players_values, alpha=0.15, color='#4a4a4a')
-                    
-                    # Set labels - position them at the end of each axis
-                    ax.set_xticks(angles[:-1])
-                    # First, set empty labels to avoid duplicates
-                    ax.set_xticklabels([''] * len(available_metrics))
-                    
-                    # Now manually place all labels at the end of their axes
-                    labels_to_move_inward = ['Overall Video Rating', 'Tactical Awareness', 'Physical Attributes', 'Decision Making']
-                    
-                    for i, metric in enumerate(available_metrics):
-                        angle_rad = angles[i]
-                        # Position most labels at radius 11.5 (at the end of the axis)
-                        # Position specific labels slightly inward at radius 11.0
-                        if metric in labels_to_move_inward:
-                            radius_for_label = 11.0
-                        else:
-                            radius_for_label = 11.5
-                        
-                        # Place label at the end of the axis using polar coordinates
-                        ax.text(angle_rad, radius_for_label, metric, 
-                               ha='center', va='center',
-                               color='#fafafa', fontsize=9, fontweight='bold')
-                    
-                    # Add title - dynamic based on selected player
-                    ax.set_title(f'{selected_player} vs Video Analysis Average', size=11, color='#fafafa', fontweight='bold', pad=20)
-                    
-                    # Add legend
-                    legend = ax.legend(loc='upper right', bbox_to_anchor=(1.2, 1.1), 
-                                      facecolor='#2a2a2a', edgecolor='#4a4a4a', 
-                                      labelcolor='#fafafa', fontsize=8)
-                    legend.get_frame().set_alpha(0.9)
-                    
-                    # Tight layout to reduce padding
-                    fig.tight_layout(pad=0.5)
-                    
-                    # Center the chart on the page using columns with minimal spacing
-                    with st.container():
-                        col1, col2, col3 = st.columns([1, 2, 1])
-                        with col2:
-                            st.pyplot(fig, use_container_width=False)
-            else:
-                st.info("No video analysis data available for radar chart.")
-            
-            # ========== SHARED ELEMENTS ==========
-            st.markdown("<br>", unsafe_allow_html=True)
-            st.divider()
-            st.markdown("<br>", unsafe_allow_html=True)
+
             
 elif page == "Performance Metrics":
     st.header("Performance Metrics")
     st.markdown("Comprehensive performance analysis and visualization from the long shortlist database.")
     
-    # Load position-specific metrics from JSON config
+    # Display loaded file info at the top
+    if PLAYER_DB_FILE and PLAYER_DB_FILE.exists():
+        with st.expander("📁 Currently Loaded Database File", expanded=False):
+            col1, col2 = st.columns(2)
+            with col1:
+                st.markdown(f"**File Name:** `{PLAYER_DB_FILE.name}`")
+                st.markdown(f"**File Path:** `{PLAYER_DB_FILE}`")
+                file_size = PLAYER_DB_FILE.stat().st_size / (1024 * 1024)
+                st.markdown(f"**File Size:** {file_size:.2f} MB")
+            with col2:
+                from datetime import datetime
+                mod_time = datetime.fromtimestamp(PLAYER_DB_FILE.stat().st_mtime)
+                st.markdown(f"**Last Modified:** {mod_time.strftime('%Y-%m-%d %H:%M:%S')}")
+                
+                # Show if file is in uploaded directory vs local
+                if DATA_DIR in PLAYER_DB_FILE.parents:
+                    st.markdown("**Location:** 📤 Uploaded file (saved in app)")
+                else:
+                    st.markdown("**Location:** 💾 Local file")
+            
+            # Try to show basic stats
+            try:
+                @st.cache_data
+                def get_performance_metrics_stats():
+                    if PLAYER_DB_FILE and PLAYER_DB_FILE.exists():
+                        try:
+                            df_dict = pd.read_excel(PLAYER_DB_FILE, sheet_name=None, header=0)
+                            total_players = 0
+                            total_columns = set()
+                            positions = {}
+                            conferences = {}
+                            
+                            for sheet_name, sheet_df in df_dict.items():
+                                if sheet_name.startswith('Sheet') or 'Summary' in sheet_name or 'Notes' in sheet_name:
+                                    continue
+                                if 'Player' in sheet_df.columns:
+                                    total_players += len(sheet_df)
+                                    total_columns.update(sheet_df.columns)
+                                    if 'Position Profile' in sheet_df.columns:
+                                        pos_counts = sheet_df['Position Profile'].value_counts()
+                                        for pos, count in pos_counts.items():
+                                            positions[pos] = positions.get(pos, 0) + count
+                                    if 'Conference' in sheet_df.columns:
+                                        conf_counts = sheet_df['Conference'].value_counts()
+                                        for conf, count in conf_counts.items():
+                                            conferences[conf] = conferences.get(conf, 0) + count
+                            
+                            return {
+                                'players': total_players,
+                                'columns': len(total_columns),
+                                'positions': positions,
+                                'conferences': conferences
+                            }
+                        except:
+                            return None
+                    return None
+                
+                stats = get_performance_metrics_stats()
+                if stats:
+                    st.markdown("**📊 Database Statistics:**")
+                    col1, col2, col3 = st.columns(3)
+                    with col1:
+                        st.metric("Total Players", stats['players'])
+                    with col2:
+                        st.metric("Total Columns", stats['columns'])
+                    with col3:
+                        st.metric("Positions", len(stats['positions']))
+                    
+                    if stats['positions']:
+                        st.markdown("**Position Breakdown:**")
+                        pos_df = pd.DataFrame(list(stats['positions'].items()), columns=['Position', 'Count'])
+                        pos_df = pos_df.sort_values('Count', ascending=False)
+                        st.dataframe(pos_df, use_container_width=True, hide_index=True)
+                    
+                    if stats['conferences']:
+                        st.markdown("**Conference Breakdown:**")
+                        conf_df = pd.DataFrame(list(stats['conferences'].items()), columns=['Conference', 'Count'])
+                        conf_df = conf_df.sort_values('Count', ascending=False)
+                        st.dataframe(conf_df, use_container_width=True, hide_index=True)
+            except Exception as e:
+                pass
+    else:
+        st.warning("⚠️ No database file loaded. Please upload a file using the sidebar uploader.")
+    
+    # Load position-specific metrics from JSON config for radar chart
+    @st.cache_data(ttl=0)  # No cache - always reload to pick up changes
+    def load_radar_chart_metrics():
+        """Load position-specific metrics for radar chart from simple JSON file."""
+        import json
+        config_path = Path(__file__).parent / "radar_chart_metrics_short.json"
+        try:
+            if config_path.exists():
+                with open(config_path, 'r') as f:
+                    config = json.load(f)
+                return config
+        except Exception as e:
+            st.warning(f"Could not load radar chart metrics config: {e}")
+        return {}
+    
+    # Load position-specific metrics from JSON config (legacy - for other uses)
     @st.cache_data
     def load_position_metrics_config():
         """Load position-specific metrics from JSON config file."""
         import json
-        config_path = Path(__file__).parent / "position_metrics_config.json"
+        config_path = Path(__file__).parent / "position_metrics_config_accuracy_80_20.json"
         try:
             if config_path.exists():
                 with open(config_path, 'r') as f:
@@ -7286,68 +6225,165 @@ elif page == "Performance Metrics":
             st.warning(f"Could not load position metrics config: {e}")
         return {}
     
-    def get_metrics_for_position(position_profile, config, available_columns):
-        """Get position-specific metrics from config, matching available columns."""
-        if not config or 'position_profiles' not in config:
+    def get_metrics_for_radar_chart(position_profile, radar_config, available_columns):
+        """Get position-specific metrics for radar chart from simple JSON config."""
+        if not radar_config:
             return []
         
         # Map position profile names to JSON keys
         position_map = {
-            'DM Box-To-Box': 'Centre Midfielder',
-            'AM Advanced Playmaker': 'Attacking Midfielder',
-            'Right Touchline Winger': 'Winger',
+            # Center Back profiles -> "Center Back" in JSON
             'Hybrid CB': 'Center Back',
             'Hybrid Ball-Playing/Winning': 'Center Back',
-            'Touchline Winger (Right-Sided)': 'Winger',
+            'CB': 'Center Back',
+            'Center Back': 'Center Back',
+            
+            # Centre Midfielder profiles -> "Centre Midfielder" in JSON
+            'DM Box-To-Box': 'Centre Midfielder',
             'Defensive-Minded Box-to-Box': 'Centre Midfielder',
-            'Advanced Playmaker': 'Attacking Midfielder'
+            'Centre Midfielder': 'Centre Midfielder',
+            'CM': 'Centre Midfielder',
+            
+            # Attacking Midfielder profiles -> "Attacking Midfielder" in JSON
+            'AM Advanced Playmaker': 'Attacking Midfielder',
+            'Advanced Playmaker': 'Attacking Midfielder',
+            'Attacking Midfielder': 'Attacking Midfielder',
+            'AM': 'Attacking Midfielder',
+            
+            # Winger profiles -> "Winger" in JSON
+            'Right Touchline Winger': 'Winger',
+            'Touchline Winger (Right-Sided)': 'Winger',
+            'Winger': 'Winger',
+            'RW': 'Winger',
+            'LW': 'Winger'
         }
         
         # Find matching position in config
         config_key = position_map.get(position_profile, position_profile)
-        if config_key not in config['position_profiles']:
+        if config_key not in radar_config:
             # Try direct match
             config_key = position_profile
         
-        if config_key not in config['position_profiles']:
+        if config_key not in radar_config:
             return []
         
-        position_config = config['position_profiles'][config_key]
-        metrics_list = []
+        # Get the list of metrics for this position
+        metrics_list = radar_config[config_key]
         
-        # Extract all metric names from Core and Specific sections
-        for section in ['Core', 'Specific']:
-            if section in position_config.get('metrics', {}):
-                section_metrics = position_config['metrics'][section]
-                for metric_key, metric_value in section_metrics.items():
-                    if isinstance(metric_value, dict) and 'components' in metric_value:
-                        # Composite metric - add all components
-                        for component in metric_value['components'].keys():
-                            metrics_list.append(component)
-                    elif isinstance(metric_value, (int, float)):
-                        # Simple metric
-                        metrics_list.append(metric_key)
-        
-        # Match metrics to available columns (fuzzy matching)
+        # Match metrics to available columns
         matched_metrics = []
-        for metric in metrics_list:
-            # Try exact match first
-            if metric in available_columns:
-                matched_metrics.append(metric)
-            else:
-                # Try fuzzy matching
-                for col in available_columns:
-                    # Check if metric name is contained in column name or vice versa
-                    metric_lower = metric.lower()
-                    col_lower = str(col).lower()
-                    if metric_lower in col_lower or col_lower in metric_lower:
-                        if col not in matched_metrics:
-                            matched_metrics.append(col)
-                            break
         
-        return matched_metrics[:8]  # Limit to 8 metrics for radar chart
+        def find_best_column_match(metric_name, available_cols):
+            """Find the best matching column for a metric name."""
+            metric_lower = str(metric_name).lower().strip()
+            
+            # Normalize metric name: handle common variations
+            # Remove commas, normalize "per 90", handle % variations
+            metric_normalized = metric_lower.replace(',', '').replace('%', '%').replace('percent', '%')
+            metric_normalized = metric_normalized.replace('per 90', 'per90').replace(' per 90', ' per90')
+            metric_normalized = metric_normalized.replace('padj ', 'padj').replace('p adj ', 'padj').replace('p.adj ', 'padj')
+            metric_normalized = ' '.join(metric_normalized.split())
+            
+            # Handle singular/plural variations for common words
+            def normalize_singular_plural(text):
+                """Normalize singular/plural forms."""
+                # Common plural -> singular mappings
+                plural_to_singular = {
+                    'goals': 'goal',
+                    'assists': 'assist',
+                    'passes': 'pass',
+                    'dribbles': 'dribble',
+                    'duels': 'duel',
+                    'touches': 'touch',
+                    'runs': 'run',
+                    'completions': 'completion',
+                    'interceptions': 'interception',
+                    'tackles': 'tackle'
+                }
+                words = text.split()
+                normalized_words = []
+                for word in words:
+                    if word in plural_to_singular:
+                        normalized_words.append(plural_to_singular[word])
+                    elif word.rstrip('s') in plural_to_singular.values():
+                        # Already singular
+                        normalized_words.append(word.rstrip('s'))
+                    else:
+                        normalized_words.append(word)
+                return ' '.join(normalized_words)
+            
+            metric_core_normalized = normalize_singular_plural(metric_normalized.replace(' per90', '').replace(' %', '').replace('padj', '').strip())
+            
+            # Try exact match (case-insensitive)
+            for col in available_cols:
+                if str(col).lower().strip() == metric_lower:
+                    return col
+            
+            # Try normalized match
+            for col in available_cols:
+                col_normalized = str(col).lower().strip()
+                col_normalized = col_normalized.replace(',', '').replace('%', '%').replace('percent', '%')
+                col_normalized = col_normalized.replace('per 90', 'per90').replace(' per 90', ' per90')
+                col_normalized = col_normalized.replace('padj ', 'padj').replace('p adj ', 'padj').replace('p.adj ', 'padj')
+                col_normalized = ' '.join(col_normalized.split())
+                if metric_normalized == col_normalized:
+                    return col
+            
+            # Try substring match (metric name in column or vice versa)
+            # But be more careful - check if the core metric name matches
+            metric_core = metric_normalized.replace(' per90', '').replace(' %', '').replace('padj', '').strip()
+            for col in available_cols:
+                col_lower = str(col).lower()
+                col_core = col_lower.replace(' per 90', '').replace(' per90', '').replace(' %', '').replace('percent', '').replace('padj', '').strip()
+                col_core_normalized = normalize_singular_plural(col_core)
+                
+                # Check if core metric matches (with singular/plural normalization)
+                if metric_core_normalized == col_core_normalized:
+                    return col
+                
+                # Check if metric is contained in column or column is contained in metric
+                if metric_lower in col_lower or col_lower in metric_lower:
+                    return col
+            
+            # Try word-based matching with lower threshold
+            metric_words = [w for w in metric_normalized.split() if len(w) >= 2]  # Lowered from 3 to 2
+            best_match = None
+            best_score = 0
+            
+            for col in available_cols:
+                col_lower = str(col).lower()
+                col_normalized_col = col_lower.replace('per 90', 'per90').replace(' per 90', ' per90')
+                col_words = [w for w in col_normalized_col.split() if len(w) >= 2]  # Lowered from 3 to 2
+                
+                if len(metric_words) > 0 and len(col_words) > 0:
+                    matching_words = sum(1 for word in metric_words if word in col_words)
+                    if matching_words > 0:
+                        score = matching_words / max(len(metric_words), len(col_words))
+                        if score > best_score and score >= 0.4:  # Lowered threshold from 0.5 to 0.4
+                            best_score = score
+                            best_match = col
+            
+            return best_match
+        
+        # Match each metric from JSON
+        for metric_name in metrics_list:
+            matched_col = find_best_column_match(metric_name, available_columns)
+            
+            if matched_col and matched_col not in matched_metrics:
+                matched_metrics.append(matched_col)
+        
+        # Return all matched metrics (no artificial limit - show all that match)
+        return matched_metrics
     
-    # Load position metrics config
+    def get_metrics_for_position(position_profile, config, available_columns):
+        """Get position-specific metrics from config, matching available columns (legacy function)."""
+        # This function is kept for backward compatibility but not used for radar chart
+        return []
+    
+    # Load radar chart metrics config (simple format)
+    radar_chart_config = load_radar_chart_metrics()
+    
+    # Load position metrics config (legacy - for other uses)
     position_config = load_position_metrics_config()
     
     # Load full player data from shortlist (reusing existing PLAYER_DB_FILE)
@@ -7356,38 +6392,55 @@ elif page == "Performance Metrics":
         """Load complete player data with all metrics from shortlist Excel file."""
         try:
             if PLAYER_DB_FILE and PLAYER_DB_FILE.exists():
-                # Try different header rows (same approach as existing load functions)
-                for header_row in [2, 1, 0]:
+                # Try different header rows, but prefer header=0 for single-sheet files
+                # For multi-sheet files, try header=0 first, then fall back to others
+                df_dict = None
+                for header_row in [0, 1, 2]:
                     try:
-                        df_dict = pd.read_excel(PLAYER_DB_FILE, sheet_name=None, header=header_row)
-                        all_data = []
-                        
-                        for sheet_name, sheet_df in df_dict.items():
-                            # Skip non-data sheets (same logic as existing functions)
-                            if sheet_name.startswith('Sheet') or 'Summary' in sheet_name or 'Notes' in sheet_name:
-                                continue
-                            
-                            # Check if this sheet has player data (same check as existing functions)
-                            if 'Player' in sheet_df.columns:
-                                # Add position profile column
-                                sheet_df['Position Profile'] = sheet_name
-                                all_data.append(sheet_df)
-                        
-                        if all_data:
-                            combined_df = pd.concat(all_data, ignore_index=True)
-                            
-                            # Handle duplicate column names by renaming them
-                            if combined_df.columns.duplicated().any():
-                                cols = pd.Series(combined_df.columns)
-                                for dup in cols[cols.duplicated()].unique():
-                                    dup_indices = cols[cols == dup].index.values.tolist()
-                                    cols[dup_indices] = [dup if i == 0 else f"{dup}_{i}" 
-                                                         for i in range(len(dup_indices))]
-                                combined_df.columns = cols
-                            
-                            return combined_df
-                    except Exception as e:
+                        test_df_dict = pd.read_excel(PLAYER_DB_FILE, sheet_name=None, header=header_row)
+                        # Check if first sheet has 'Player' column (proper header)
+                        first_sheet = list(test_df_dict.values())[0] if test_df_dict else None
+                        if first_sheet is not None and 'Player' in first_sheet.columns:
+                            df_dict = test_df_dict
+                            break
+                    except:
                         continue
+                
+                if df_dict is None:
+                    # Fallback: try header=0 anyway
+                    try:
+                        df_dict = pd.read_excel(PLAYER_DB_FILE, sheet_name=None, header=0)
+                    except:
+                        pass
+                
+                if df_dict:
+                    all_data = []
+                    
+                    for sheet_name, sheet_df in df_dict.items():
+                        # Skip non-data sheets (same logic as existing functions)
+                        if sheet_name.startswith('Sheet') or 'Summary' in sheet_name or 'Notes' in sheet_name:
+                            continue
+                        
+                        # Check if this sheet has player data (same check as existing functions)
+                        if 'Player' in sheet_df.columns:
+                            # For single-sheet files, Position Profile might already be in the data
+                            if 'Position Profile' not in sheet_df.columns:
+                                sheet_df['Position Profile'] = sheet_name
+                            all_data.append(sheet_df)
+                    
+                    if all_data:
+                        combined_df = pd.concat(all_data, ignore_index=True)
+                        
+                        # Handle duplicate column names by renaming them
+                        if combined_df.columns.duplicated().any():
+                            cols = pd.Series(combined_df.columns)
+                            for dup in cols[cols.duplicated()].unique():
+                                dup_indices = cols[cols == dup].index.values.tolist()
+                                cols[dup_indices] = [dup if i == 0 else f"{dup}_{i}" 
+                                                     for i in range(len(dup_indices))]
+                            combined_df.columns = cols
+                        
+                        return combined_df
         except Exception as e:
             st.error(f"Error loading shortlist data: {e}")
         
@@ -7525,10 +6578,10 @@ elif page == "Performance Metrics":
                     
                     # Get position-specific metrics if a position is selected
                     position_metrics = []
-                    if page_selected_position != 'All' and position_config:
-                        position_metrics = get_metrics_for_position(page_selected_position, position_config, numeric_cols)
+                    if page_selected_position != 'All' and radar_chart_config:
+                        position_metrics = get_metrics_for_radar_chart(page_selected_position, radar_chart_config, numeric_cols)
                     
-                    # Display table with styling - reorder to show position metrics first
+                    # Display table with styling
                     display_cols = [player_col]
                     if team_col:
                         display_cols.append(team_col)
@@ -7554,26 +6607,26 @@ elif page == "Performance Metrics":
                     if rank_cols:
                         display_cols.append(rank_cols[0])
                     
-                    # Add position-specific metrics FIRST (if available)
-                    if position_metrics:
+                    # If position is selected, ONLY show position-specific metrics
+                    if page_selected_position != 'All' and position_metrics:
                         # Filter to only include metrics that exist in the dataframe
                         position_metrics = [m for m in position_metrics if m in page_filtered_df.columns and m not in display_cols]
                         display_cols.extend(position_metrics)
-                    
-                    # Add other key metrics (show all numeric columns, but limit display if too many)
-                    # Filter out non-metric columns and already-added metrics
-                    metric_cols = [c for c in numeric_cols if c not in display_cols and 'Unnamed' not in str(c)]
-                    
-                    # Show up to 15 additional metrics to avoid overwhelming the table
-                    if len(metric_cols) > 15:
-                        # Prioritize columns with 'PAdj' or common metric names
-                        priority_metrics = [c for c in metric_cols if 'PAdj' in str(c) or any(term in str(c) for term in ['per 90', 'won (%)', 'accurate'])]
-                        other_metrics = [c for c in metric_cols if c not in priority_metrics]
-                        display_metrics = priority_metrics[:10] + other_metrics[:5]
                     else:
-                        display_metrics = metric_cols
-                    
-                    display_cols.extend(display_metrics)
+                        # If no position selected, show all metrics (limit to avoid overwhelming)
+                        # Filter out non-metric columns and already-added metrics
+                        metric_cols = [c for c in numeric_cols if c not in display_cols and 'Unnamed' not in str(c)]
+                        
+                        # Show up to 15 additional metrics to avoid overwhelming the table
+                        if len(metric_cols) > 15:
+                            # Prioritize columns with 'PAdj' or common metric names
+                            priority_metrics = [c for c in metric_cols if 'PAdj' in str(c) or any(term in str(c) for term in ['per 90', 'won (%)', 'accurate'])]
+                            other_metrics = [c for c in metric_cols if c not in priority_metrics]
+                            display_metrics = priority_metrics[:10] + other_metrics[:5]
+                        else:
+                            display_metrics = metric_cols
+                        
+                        display_cols.extend(display_metrics)
                     
                     # Only include columns that actually exist
                     display_cols = [c for c in display_cols if c in page_filtered_df.columns]
@@ -7645,21 +6698,193 @@ elif page == "Performance Metrics":
                     player_position = player_data.get('Position Profile', '')
                     numeric_cols = shortlist_df.select_dtypes(include=[np.number]).columns.tolist()
                     
-                    if player_position and position_config:
-                        # Get position-specific metrics
-                        top_metrics = get_metrics_for_position(player_position, position_config, numeric_cols)
-                        # If no position-specific metrics found, fall back to first 8 numeric columns
-                        if not top_metrics:
-                            top_metrics = numeric_cols[:8]
+                    if player_position and radar_chart_config:
+                        # Get position-specific metrics from radar chart JSON config
+                        top_metrics = get_metrics_for_radar_chart(player_position, radar_chart_config, numeric_cols)
+                        
+                        # Debug: Show what metrics were found
+                        if len(top_metrics) == 0:
+                            st.warning(f"No position-specific metrics matched for {player_position}. Check radar_chart_metrics_short.json to ensure metric names match your dataframe column names.")
+                        
+                        # Ensure we only use metrics that exist in the dataframe and have valid values
+                        valid_metrics = []
+                        unmatched_metrics = []
+                        for metric in top_metrics:
+                            if metric in shortlist_df.columns:
+                                # Check if the metric has valid numeric data for this player
+                                player_val = player_data.get(metric)
+                                
+                                # Also check if the column has any valid data at all in the dataframe
+                                col_data = shortlist_df[metric].dropna()
+                                has_data_in_df = len(col_data) > 0
+                                
+                                if pd.notna(player_val) and isinstance(player_val, (int, float)):
+                                    valid_metrics.append(metric)
+                                else:
+                                    # Provide more detailed error message
+                                    if pd.isna(player_val):
+                                        reason = f"player value is NaN/None"
+                                    elif not isinstance(player_val, (int, float)):
+                                        reason = f"player value is not numeric (type: {type(player_val).__name__}, value: {player_val})"
+                                    else:
+                                        reason = "unknown issue"
+                                    
+                                    if not has_data_in_df:
+                                        reason += " (column has no valid data in entire dataset)"
+                                    
+                                    unmatched_metrics.append(f"{metric} ({reason})")
+                            else:
+                                unmatched_metrics.append(f"{metric} (column not found in dataframe)")
+                        
+                        # Show debug info if metrics are missing or to help diagnose issues
+                        # Always show if we have fewer than 8 metrics (expected from short JSON)
+                        if unmatched_metrics or len(valid_metrics) < len(top_metrics) or len(valid_metrics) < 8:
+                            with st.expander("🔍 Debug: Metric Matching", expanded=True):  # Expanded by default to help diagnose
+                                st.write(f"**Expected metrics from JSON:** 8 (for {player_position})")
+                                st.write(f"**Matched metrics from JSON:** {len(top_metrics)}")
+                                st.write(f"**Valid metrics for chart:** {len(valid_metrics)}")
+                                
+                                if len(top_metrics) > 0:
+                                    st.write("**All metrics from JSON:**")
+                                    for tm in top_metrics:
+                                        status = "✅" if tm in valid_metrics else "❌"
+                                        st.caption(f"{status} {tm}")
+                                
+                                if unmatched_metrics:
+                                    st.write("**Unmatched metrics (not found in data or no valid values):**")
+                                    for um in unmatched_metrics:
+                                        st.caption(f"⚠️ {um}")
+                                    
+                                    # Show actual player values for unmatched metrics to help debug
+                                    st.write("**Actual player values for unmatched metrics:**")
+                                    for metric in top_metrics:
+                                        if metric not in valid_metrics and metric in shortlist_df.columns:
+                                            player_val = player_data.get(metric)
+                                            # Also check if column has data for other players
+                                            col_data = shortlist_df[metric].dropna()
+                                            has_other_data = len(col_data) > 0
+                                            data_info = f" (column has {len(col_data)} valid values for other players)" if has_other_data else " (column has no valid data for any player)"
+                                            st.caption(f"  - **{metric}**: `{player_val}` (type: {type(player_val).__name__}){data_info}")
+                                    
+                                    # Show sample values from dataframe for debugging
+                                    sample_cols = [m for m in top_metrics if m in shortlist_df.columns and m not in valid_metrics]
+                                    if sample_cols:
+                                        st.write("**Sample values from dataframe (first 5 rows with data):**")
+                                        sample_df = shortlist_df[sample_cols].head(5)
+                                        st.dataframe(sample_df, use_container_width=True)
+                                
+                                if len(valid_metrics) > 0:
+                                    st.write("**Metrics being used in chart:**")
+                                    st.caption(", ".join(valid_metrics))
+                                
+                                # Show available columns that might match
+                                if len(valid_metrics) < 8:
+                                    st.write("**💡 Tip:** Check if column names in your data match the JSON metric names exactly.")
+                        
+                        # If we have valid position-specific metrics, use them (limit to 15 for radar chart)
+                        if valid_metrics:
+                            top_metrics = valid_metrics[:15]  # Increased from 8 to 15 to show more metrics
+                        else:
+                            # If no position-specific metrics found, show a message
+                            st.warning(f"No valid position-specific metrics found for {player_position}.")
+                            st.info("💡 Tip: The metric names in radar_chart_metrics_short.json may not match your dataframe column names exactly. Check the debug section above for details.")
+                            top_metrics = []
                     else:
-                        # Fall back to first 8 metrics
-                        top_metrics = numeric_cols[:8] if len(numeric_cols) > 0 else []
+                        # If no position config or position, show a message
+                        if not player_position:
+                            st.warning("Player position not available.")
+                        else:
+                            st.warning("Position metrics configuration not loaded.")
+                        top_metrics = []
                     
                     if len(top_metrics) > 0:
-                        player_values = [player_data.get(m, 0) for m in top_metrics]
-                        avg_values = [shortlist_df[m].mean() for m in top_metrics]
+                        # Get player values and average values, ensuring they're numeric
+                        player_values = []
+                        avg_values = []
+                        valid_metrics = []
+                        metric_mins = []
+                        metric_maxs = []
                         
-                        # Create radar chart (smaller, centered)
+                        # Filter dataframe to same position profile for position-specific min/max
+                        position_filtered_df = shortlist_df.copy()
+                        if player_position and 'Position Profile' in shortlist_df.columns:
+                            position_filtered_df = shortlist_df[shortlist_df['Position Profile'] == player_position]
+                        
+                        for m in top_metrics:
+                            player_val = player_data.get(m, 0)
+                            
+                            # Calculate average for this position profile if available, otherwise overall average
+                            if player_position and 'Position Profile' in shortlist_df.columns and len(position_filtered_df) > 0:
+                                avg_val = position_filtered_df[m].mean() if m in position_filtered_df.columns else 0
+                            else:
+                                avg_val = shortlist_df[m].mean() if m in shortlist_df.columns else 0
+                            
+                            # Only include metrics with valid numeric values
+                            if pd.notna(player_val) and pd.notna(avg_val):
+                                if isinstance(player_val, (int, float)) and isinstance(avg_val, (int, float)):
+                                    # Use position-specific data for min/max if available
+                                    if player_position and 'Position Profile' in shortlist_df.columns and len(position_filtered_df) > 0:
+                                        metric_data = position_filtered_df[m].dropna()
+                                    else:
+                                        metric_data = shortlist_df[m].dropna()
+                                    
+                                    if len(metric_data) > 0:
+                                        metric_min = metric_data.quantile(0.01)  # 1st percentile (wider range)
+                                        metric_max = metric_data.quantile(0.99)  # 99th percentile (wider range)
+                                        
+                                        # If percentiles are too close or same, fall back to min/max
+                                        if metric_max <= metric_min or (metric_max - metric_min) < 0.01:
+                                            metric_min = metric_data.min()
+                                            metric_max = metric_data.max()
+                                        
+                                        # Round to whole numbers for cleaner display
+                                        metric_min = np.floor(metric_min)
+                                        metric_max = np.ceil(metric_max)
+                                        
+                                        # Ensure we have a valid range
+                                        if metric_max == metric_min:
+                                            metric_max = metric_min + 1
+                                        
+                                        # Don't clamp - allow values to extend beyond percentile range
+                                        # This will make the chart fill out more
+                                        player_values.append(float(player_val))
+                                        avg_values.append(float(avg_val))
+                                        metric_mins.append(float(metric_min))
+                                        metric_maxs.append(float(metric_max))
+                                        valid_metrics.append(m)
+                        
+                        # Update top_metrics to only include valid ones
+                        top_metrics = valid_metrics
+                        
+                        if len(top_metrics) == 0:
+                            st.warning("No valid position-specific metrics found for this player.")
+                            st.stop()
+                        
+                        # Normalize each metric to 0-100 scale based on percentile range
+                        # Allow values to extend beyond 0-100 if they're outside the percentile range
+                        normalized_player_values = []
+                        normalized_avg_values = []
+                        
+                        for i in range(len(player_values)):
+                            # Normalize to 0-100 scale using percentile-based range
+                            # Values can go negative or above 100 if outside the 1st-99th percentile range
+                            player_normalized = ((player_values[i] - metric_mins[i]) / (metric_maxs[i] - metric_mins[i])) * 100
+                            avg_normalized = ((avg_values[i] - metric_mins[i]) / (metric_maxs[i] - metric_mins[i])) * 100
+                            
+                            # Clamp to reasonable bounds (-20 to 120) to allow some extension beyond scale
+                            # This helps the chart fill out more while still being readable
+                            player_normalized = max(-20, min(120, player_normalized))
+                            avg_normalized = max(-20, min(120, avg_normalized))
+                            
+                            normalized_player_values.append(player_normalized)
+                            normalized_avg_values.append(avg_normalized)
+                        
+                        # Adjust y-axis limits to accommodate extended values
+                        all_normalized = normalized_player_values + normalized_avg_values
+                        y_min = min(0, min(all_normalized) - 10) if all_normalized else 0
+                        y_max = max(100, max(all_normalized) + 10) if all_normalized else 100
+                        
+                        # Create radar chart with individual scales for each metric
                         import matplotlib.pyplot as plt
                         import matplotlib
                         matplotlib.use('Agg')
@@ -7669,25 +6894,145 @@ elif page == "Performance Metrics":
                         angles = [n / float(N) * 2 * np.pi for n in range(N)]
                         angles += angles[:1]
                         
-                        player_values += player_values[:1]
-                        avg_values += avg_values[:1]
+                        # Format numbers appropriately
+                        def format_value(val):
+                            if abs(val) >= 100:
+                                return f'{val:.0f}'
+                            elif abs(val) >= 10:
+                                return f'{val:.1f}'
+                            elif abs(val) >= 1:
+                                return f'{val:.2f}'
+                            else:
+                                return f'{val:.3f}'
                         
-                        # Smaller figure size (half of original)
-                        fig, ax = plt.subplots(figsize=(4, 4), subplot_kw=dict(projection='polar'))
+                        # Create cleaner label names
+                        def clean_label(metric_name):
+                            """Clean metric name for display while keeping it readable."""
+                            label = str(metric_name)
+                            label = label.replace('PAdj ', '').replace(' per 90', '').replace('Per 90', '')
+                            return label
+                        
+                        # Calculate normalized positions for plotting (still need normalized for matplotlib)
+                        normalized_player_values += normalized_player_values[:1]
+                        normalized_avg_values += normalized_avg_values[:1]
+                        
+                        # Create figure with polar projection
+                        fig, ax = plt.subplots(figsize=(6, 6), subplot_kw=dict(projection='polar'))
                         fig.patch.set_facecolor('#1e1e1e')
                         ax.set_facecolor('#1e1e1e')
                         
-                        ax.plot(angles, player_values, 'o-', linewidth=2, label=selected_player_profile, color='#8B0000', markersize=4)
-                        ax.fill(angles, player_values, alpha=0.25, color='#8B0000')
-                        ax.plot(angles, avg_values, 'o-', linewidth=2, label='Average', color='#4a4a4a', markersize=4)
-                        ax.fill(angles, avg_values, alpha=0.15, color='#4a4a4a')
+                        # Plot the data (using normalized values for positioning)
+                        # Plot average first (so player line appears on top)
+                        ax.plot(angles, normalized_avg_values, 'o-', linewidth=2, label='Average', color='white', markersize=4)
+                        ax.fill(angles, normalized_avg_values, alpha=0.15, color='white')
                         
+                        # Plot player data on top
+                        ax.plot(angles, normalized_player_values, 'o-', linewidth=2, label=selected_player_profile, color='#8B0000', markersize=4)
+                        ax.fill(angles, normalized_player_values, alpha=0.25, color='#8B0000')
+                        
+                        # Set up axes
                         ax.set_xticks(angles[:-1])
-                        ax.set_xticklabels([m.replace('PAdj ', '').replace(' per 90', '')[:12] for m in top_metrics], 
-                                          color='#fafafa', fontsize=7)
+                        ax.set_xticklabels([''] * len(top_metrics))
+                        
+                        # For each metric, create individual scale along its radial axis
+                        # We'll use a normalized range (0-100) for plotting, but display actual values
+                        max_radius = 100  # Maximum radius for normalized scale
+                        
+                        # Calculate scale ticks for each metric and display them
+                        for i, metric in enumerate(top_metrics):
+                            angle_rad = angles[i]
+                            label = clean_label(metric)
+                            
+                            # Get actual value range for this metric
+                            actual_min = metric_mins[i]
+                            actual_max = metric_maxs[i]
+                            actual_player_val = player_values[i]
+                            actual_avg_val = avg_values[i]
+                            
+                            # Calculate normalized positions for this metric's range
+                            def normalize_to_100(val, min_val, max_val):
+                                """Normalize a value to 0-100 scale based on metric's range."""
+                                if max_val == min_val:
+                                    return 50  # Middle if no range
+                                return ((val - min_val) / (max_val - min_val)) * 100
+                            
+                            # Create 5-6 tick marks for this metric's scale (using whole numbers)
+                            num_ticks = 5
+                            actual_ticks = np.linspace(actual_min, actual_max, num_ticks)
+                            
+                            # Round tick values to whole numbers for cleaner display
+                            actual_ticks = np.round(actual_ticks).astype(int)
+                            
+                            # Normalize these ticks to 0-100 for positioning
+                            normalized_ticks = [normalize_to_100(tick, actual_min, actual_max) for tick in actual_ticks]
+                            
+                            # Display scale values along the radial axis (as whole numbers)
+                            for tick_idx, (actual_tick, norm_tick) in enumerate(zip(actual_ticks, normalized_ticks)):
+                                # Position text along the radial line
+                                # Use a radius slightly less than the normalized tick position
+                                text_radius = norm_tick * 0.95  # Slightly inside to avoid overlap
+                                
+                                # Format as whole number
+                                tick_label = f'{int(actual_tick)}'
+                                
+                                # Position the label along the radial axis (bigger font)
+                                ax.text(angle_rad, text_radius, tick_label,
+                                       ha='center', va='center',
+                                       color='#888888', fontsize=9,
+                                       rotation=0, fontweight='bold')  # Text will be rotated by angle
+                            
+                            # Position metric name at the end of the axis (outside the scale)
+                            ax.text(angle_rad, max_radius * 1.15, label,
+                                   ha='center', va='center',
+                                   color='#fafafa', fontsize=8, fontweight='bold',
+                                   rotation=0)
+                            
+                            # Average value annotation removed per user request
+                        
                         ax.tick_params(axis='x', pad=20, labelsize=7)
                         
-                        ax.set_ylim(0, max(max(player_values), max(avg_values)) * 1.2)
+                        # Set y-axis limits (0-100 for normalized scale)
+                        ax.set_ylim(0, max_radius * 1.2)  # Extra space for labels
+                        
+                        # Remove default y-axis labels (we're showing individual scales)
+                        ax.set_yticks([])
+                        ax.set_yticklabels([])
+                        
+                        # Add more visible grid lines (both radial and concentric circles)
+                        # Set grid to be more visible with better contrast
+                        # This creates both radial lines and concentric circles
+                        ax.grid(True, color='#6a6a6a', linestyle='-', linewidth=1.0, alpha=0.9)
+                        
+                        # Explicitly set radial grid (concentric circles) to be more visible
+                        # These are the circular rings at different radii - called "concentric circles"
+                        # Exclude the outermost circle to avoid the black boundary ring
+                        num_circles = 5  # Number of concentric circles
+                        circle_radii = np.linspace(max_radius / num_circles, max_radius * 0.95, num_circles)  # Stop before max_radius
+                        # Set the grid circles (concentric circles) - returns (lines, labels) tuple
+                        grid_result = ax.set_rgrids(circle_radii, labels=[], angle=0)
+                        # grid_result is a tuple: (lines, labels), so get the lines
+                        if grid_result and len(grid_result) > 0:
+                            grid_lines = grid_result[0]  # Get the lines from the tuple
+                            # Now set the properties on the grid lines themselves
+                            for line in grid_lines:
+                                line.set_color('#6a6a6a')
+                                line.set_linestyle('-')
+                                line.set_linewidth(1.0)
+                                line.set_alpha(0.9)
+                        
+                        # Hide the outer spine (the black boundary ring)
+                        ax.spines['polar'].set_visible(False)
+                        
+                        # Explicitly enable radial lines (x-axis lines from center to each metric)
+                        # Draw radial lines manually to ensure they're visible
+                        for angle in angles[:-1]:  # Exclude the duplicate last angle
+                            ax.plot([angle, angle], [0, max_radius], 
+                                   color='#6a6a6a', linestyle='-', linewidth=1.0, alpha=0.9, zorder=0)
+                        
+                        # Add note explaining the scales
+                        fig.text(0.5, 0.02, 'Each metric has its own scale shown in brackets. Values shown are actual metrics, not normalized.', 
+                                ha='center', va='bottom', fontsize=7, color='#888888', style='italic')
+                        
                         ax.set_title(f'{selected_player_profile} Profile', size=11, color='#fafafa', fontweight='bold', pad=15)
                         
                         ax.legend(loc='upper right', bbox_to_anchor=(1.3, 1.1), 
@@ -7712,10 +7057,12 @@ elif page == "Performance Metrics":
                 comp_filter_col1, comp_filter_col2, comp_filter_col3 = st.columns(3)
                 with comp_filter_col1:
                     if 'Position Profile' in shortlist_df.columns:
-                        comp_positions = ['All'] + sorted(shortlist_df['Position Profile'].dropna().unique().tolist())
-                        comp_selected_position = st.selectbox("Filter by Position Profile", comp_positions, key="comp_pos_filter")
+                        comp_positions = sorted(shortlist_df['Position Profile'].dropna().unique().tolist())
+                        comp_selected_position = st.selectbox("Position Profile (Required)", comp_positions, key="comp_pos_filter")
                     else:
-                        comp_selected_position = 'All'
+                        st.warning("Position Profile column not found in data.")
+                        comp_selected_position = None
+                        st.stop()
                 
                 with comp_filter_col2:
                     if conf_col:
@@ -7738,7 +7085,7 @@ elif page == "Performance Metrics":
                 
                 # Apply filters to player list
                 comp_filtered_df = shortlist_df.copy()
-                if comp_selected_position != 'All' and 'Position Profile' in comp_filtered_df.columns:
+                if comp_selected_position and 'Position Profile' in comp_filtered_df.columns:
                     comp_filtered_df = comp_filtered_df[comp_filtered_df['Position Profile'] == comp_selected_position]
                 if comp_selected_conference != 'All' and conf_col:
                     comp_filtered_df = comp_filtered_df[comp_filtered_df[conf_col] == comp_selected_conference]
@@ -7748,10 +7095,9 @@ elif page == "Performance Metrics":
                 # Only show players from the filtered dataset
                 player_list = sorted(comp_filtered_df[player_col].dropna().unique().tolist())
                 
-                # If position profile is selected, ensure only players from that position are shown
-                if comp_selected_position != 'All':
-                    # This is already handled by the filter above, but we'll make it explicit
-                    pass
+                if len(player_list) == 0:
+                    st.warning(f"No players found for position profile: {comp_selected_position}")
+                    st.stop()
                 
                 st.markdown("### Select Players")
                 col1, col2 = st.columns(2)
@@ -7764,24 +7110,122 @@ elif page == "Performance Metrics":
                     p1_data = shortlist_df[shortlist_df[player_col] == player1].iloc[0]
                     p2_data = shortlist_df[shortlist_df[player_col] == player2].iloc[0]
                     
-                    # Get position for metrics (use player1's position, or player2's if different)
-                    p1_position = p1_data.get('Position Profile', '')
-                    p2_position = p2_data.get('Position Profile', '')
-                    comparison_position = p1_position if p1_position else p2_position
+                    # Use the selected position profile from dropdown for metrics
+                    comparison_position = comp_selected_position
                     
                     # Comparison radar chart
                     numeric_cols = shortlist_df.select_dtypes(include=[np.number]).columns.tolist()
                     if len(numeric_cols) > 0:
-                        # Get position-specific metrics
-                        if comparison_position and position_config:
-                            top_metrics = get_metrics_for_position(comparison_position, position_config, numeric_cols)
+                        # Get position-specific metrics based on selected position profile
+                        if comparison_position and radar_chart_config:
+                            top_metrics = get_metrics_for_radar_chart(comparison_position, radar_chart_config, numeric_cols)
                             if not top_metrics:
-                                top_metrics = numeric_cols[:8]
+                                # Fallback: try to get metrics from the metric ranges CSV
+                                metric_ranges_path = BASE_DIR / 'metric_ranges_by_profile.csv'
+                                if metric_ranges_path.exists():
+                                    try:
+                                        ranges_df = pd.read_csv(metric_ranges_path)
+                                        metric_rows = ranges_df[ranges_df['Position Profile'] == comparison_position]
+                                        if len(metric_rows) > 0:
+                                            top_metrics = metric_rows['Metric'].unique().tolist()
+                                            # Filter to only include metrics that exist in numeric_cols
+                                            top_metrics = [m for m in top_metrics if m in numeric_cols]
+                                    except:
+                                        pass
+                                if not top_metrics:
+                                    top_metrics = numeric_cols[:8]
                         else:
                             top_metrics = numeric_cols[:8]
                         
-                        p1_values = [p1_data.get(m, 0) for m in top_metrics]
-                        p2_values = [p2_data.get(m, 0) for m in top_metrics]
+                        # Get values, handling missing columns
+                        p1_values = []
+                        p2_values = []
+                        valid_metrics = []
+                        
+                        for metric in top_metrics:
+                            p1_val = p1_data.get(metric, None)
+                            p2_val = p2_data.get(metric, None)
+                            
+                            # Check if value exists and is not NaN
+                            if pd.notna(p1_val) or pd.notna(p2_val):
+                                p1_values.append(float(p1_val) if pd.notna(p1_val) else 0)
+                                p2_values.append(float(p2_val) if pd.notna(p2_val) else 0)
+                                valid_metrics.append(metric)
+                        
+                        # Update top_metrics to only include valid ones
+                        top_metrics = valid_metrics
+                        
+                        if len(top_metrics) == 0:
+                            st.warning(f"No valid metrics found for position profile: {comparison_position}. Please check your data.")
+                            st.stop()
+                        
+                        # Load metric ranges for normalization
+                        metric_ranges_path = BASE_DIR / 'metric_ranges_by_profile.csv'
+                        metric_mins = []
+                        metric_maxs = []
+                        
+                        if metric_ranges_path.exists() and comparison_position:
+                            try:
+                                ranges_df = pd.read_csv(metric_ranges_path)
+                                for metric in top_metrics:
+                                    # Try to find matching metric in ranges
+                                    metric_rows = ranges_df[
+                                        (ranges_df['Position Profile'] == comparison_position) & 
+                                        (ranges_df['Metric'] == metric)
+                                    ]
+                                    if len(metric_rows) > 0 and pd.notna(metric_rows.iloc[0]['Min Value']):
+                                        metric_mins.append(float(metric_rows.iloc[0]['Min Value']))
+                                        metric_maxs.append(float(metric_rows.iloc[0]['Max Value']))
+                                    else:
+                                        # Fallback: use min/max from actual data
+                                        all_values = shortlist_df[metric].dropna()
+                                        if len(all_values) > 0:
+                                            metric_mins.append(float(all_values.min()))
+                                            metric_maxs.append(float(all_values.max()))
+                                        else:
+                                            metric_mins.append(0)
+                                            metric_maxs.append(100)
+                            except:
+                                # Fallback: use min/max from actual data
+                                for metric in top_metrics:
+                                    all_values = shortlist_df[metric].dropna()
+                                    if len(all_values) > 0:
+                                        metric_mins.append(float(all_values.min()))
+                                        metric_maxs.append(float(all_values.max()))
+                                    else:
+                                        metric_mins.append(0)
+                                        metric_maxs.append(100)
+                        else:
+                            # Fallback: use min/max from actual data
+                            for metric in top_metrics:
+                                all_values = shortlist_df[metric].dropna()
+                                if len(all_values) > 0:
+                                    metric_mins.append(float(all_values.min()))
+                                    metric_maxs.append(float(all_values.max()))
+                                else:
+                                    metric_mins.append(0)
+                                    metric_maxs.append(100)
+                        
+                        # Normalize each metric to 0-100 scale
+                        normalized_p1_values = []
+                        normalized_p2_values = []
+                        
+                        for i in range(len(top_metrics)):
+                            min_val = metric_mins[i]
+                            max_val = metric_maxs[i]
+                            
+                            # Avoid division by zero
+                            if max_val == min_val:
+                                normalized_p1_values.append(50)  # Middle of scale
+                                normalized_p2_values.append(50)
+                            else:
+                                # Normalize to 0-100
+                                p1_norm = ((p1_values[i] - min_val) / (max_val - min_val)) * 100
+                                p2_norm = ((p2_values[i] - min_val) / (max_val - min_val)) * 100
+                                
+                                # Clamp to reasonable bounds
+                                normalized_p1_values.append(max(0, min(120, p1_norm)))
+                                normalized_p2_values.append(max(0, min(120, p2_norm)))
                         
                         import matplotlib.pyplot as plt
                         import matplotlib
@@ -7792,26 +7236,37 @@ elif page == "Performance Metrics":
                         angles = [n / float(N) * 2 * np.pi for n in range(N)]
                         angles += angles[:1]
                         
-                        p1_values += p1_values[:1]
-                        p2_values += p2_values[:1]
+                        normalized_p1_values += normalized_p1_values[:1]
+                        normalized_p2_values += normalized_p2_values[:1]
                         
-                        # Smaller figure size (half of original)
-                        fig, ax = plt.subplots(figsize=(4, 4), subplot_kw=dict(projection='polar'))
+                        # Figure size to accommodate full metric names
+                        fig, ax = plt.subplots(figsize=(6, 6), subplot_kw=dict(projection='polar'))
                         fig.patch.set_facecolor('#1e1e1e')
                         ax.set_facecolor('#1e1e1e')
                         
-                        ax.plot(angles, p1_values, 'o-', linewidth=2, label=player1, color='#8B0000', markersize=4)
-                        ax.fill(angles, p1_values, alpha=0.25, color='#8B0000')
-                        ax.plot(angles, p2_values, 'o-', linewidth=2, label=player2, color='#4a4a4a', markersize=4)
-                        ax.fill(angles, p2_values, alpha=0.15, color='#4a4a4a')
+                        # Plot player 2 first (so player 1 appears on top)
+                        # Use a lighter shade of red for player 2
+                        ax.plot(angles, normalized_p2_values, 'o-', linewidth=2, label=player2, color='#ff6b6b', markersize=4)
+                        ax.fill(angles, normalized_p2_values, alpha=0.15, color='#ff6b6b')
+                        
+                        # Plot player 1 on top
+                        ax.plot(angles, normalized_p1_values, 'o-', linewidth=2, label=player1, color='#8B0000', markersize=4)
+                        ax.fill(angles, normalized_p1_values, alpha=0.25, color='#8B0000')
                         
                         ax.set_xticks(angles[:-1])
-                        ax.set_xticklabels([m.replace('PAdj ', '').replace(' per 90', '')[:12] for m in top_metrics], 
-                                          color='#fafafa', fontsize=7)
-                        ax.tick_params(axis='x', pad=20, labelsize=7)
+                        # Clean metric names for display (remove truncation, show full names)
+                        def clean_metric_label(metric_name):
+                            """Clean metric name for display while keeping full name."""
+                            label = str(metric_name)
+                            label = label.replace('PAdj ', '').replace(' per 90', '').replace('Per 90', '')
+                            return label
                         
-                        max_val = max(max(p1_values), max(p2_values))
-                        ax.set_ylim(0, max_val * 1.2)
+                        metric_labels = [clean_metric_label(m) for m in top_metrics]
+                        ax.set_xticklabels(metric_labels, color='#fafafa', fontsize=7)
+                        ax.tick_params(axis='x', pad=25, labelsize=7)
+                        
+                        # Set y-axis to normalized scale (0-120 to allow some overflow)
+                        ax.set_ylim(0, 120)
                         ax.set_title(f'{player1} vs {player2}', size=11, color='#fafafa', fontweight='bold', pad=15)
                         
                         ax.legend(loc='upper right', bbox_to_anchor=(1.3, 1.1), 
@@ -7848,12 +7303,89 @@ elif page == "Performance Metrics":
             
             numeric_cols = filtered_df.select_dtypes(include=[np.number]).columns.tolist()
             
-            if len(numeric_cols) >= 2:
+            # Get all metrics from radar chart config and match them to available columns
+            available_metrics = []
+            if radar_chart_config:
+                # Collect all unique metrics from all position profiles
+                all_config_metrics = set()
+                for position, metrics_list in radar_chart_config.items():
+                    all_config_metrics.update(metrics_list)
+                
+                # Match each config metric to an actual column name
+                def find_best_column_match(metric_name, available_cols):
+                    """Find the best matching column for a metric name."""
+                    metric_lower = str(metric_name).lower().strip()
+                    
+                    # Normalize metric name
+                    metric_normalized = metric_lower.replace(',', '').replace('%', '%').replace('percent', '%')
+                    metric_normalized = metric_normalized.replace('per 90', 'per90').replace(' per 90', ' per90')
+                    metric_normalized = metric_normalized.replace('padj ', 'padj').replace('p adj ', 'padj').replace('p.adj ', 'padj')
+                    metric_normalized = ' '.join(metric_normalized.split())
+                    
+                    # Handle singular/plural variations
+                    def normalize_singular_plural(text):
+                        plural_to_singular = {
+                            'goals': 'goal', 'assists': 'assist', 'passes': 'pass',
+                            'dribbles': 'dribble', 'duels': 'duel', 'touches': 'touch',
+                            'runs': 'run', 'completions': 'completion',
+                            'interceptions': 'interception', 'tackles': 'tackle'
+                        }
+                        words = text.split()
+                        normalized_words = []
+                        for word in words:
+                            if word in plural_to_singular:
+                                normalized_words.append(plural_to_singular[word])
+                            elif word.rstrip('s') in plural_to_singular.values():
+                                normalized_words.append(word.rstrip('s'))
+                            else:
+                                normalized_words.append(word)
+                        return ' '.join(normalized_words)
+                    
+                    # Try exact match
+                    for col in available_cols:
+                        if str(col).lower().strip() == metric_lower:
+                            return col
+                    
+                    # Try normalized match
+                    for col in available_cols:
+                        col_normalized = str(col).lower().strip()
+                        col_normalized = col_normalized.replace(',', '').replace('%', '%').replace('percent', '%')
+                        col_normalized = col_normalized.replace('per 90', 'per90').replace(' per 90', ' per90')
+                        col_normalized = col_normalized.replace('padj ', 'padj').replace('p adj ', 'padj').replace('p.adj ', 'padj')
+                        col_normalized = ' '.join(col_normalized.split())
+                        if metric_normalized == col_normalized:
+                            return col
+                    
+                    # Try core match with singular/plural normalization
+                    metric_core = metric_normalized.replace(' per90', '').replace(' %', '').replace('padj', '').strip()
+                    metric_core_normalized = normalize_singular_plural(metric_core)
+                    for col in available_cols:
+                        col_lower = str(col).lower()
+                        col_core = col_lower.replace(' per 90', '').replace(' per90', '').replace(' %', '').replace('percent', '').replace('padj', '').strip()
+                        col_core_normalized = normalize_singular_plural(col_core)
+                        if metric_core_normalized == col_core_normalized:
+                            return col
+                        if metric_lower in col_lower or col_lower in metric_lower:
+                            return col
+                    
+                    return None
+                
+                # Match each config metric to a column
+                for config_metric in all_config_metrics:
+                    matched_col = find_best_column_match(config_metric, numeric_cols)
+                    if matched_col and matched_col not in available_metrics:
+                        available_metrics.append(matched_col)
+            
+            # If no metrics found from config, fall back to all numeric columns
+            if not available_metrics:
+                available_metrics = numeric_cols
+            
+            if len(available_metrics) >= 2:
                 col1, col2 = st.columns(2)
                 with col1:
-                    x_metric = st.selectbox("X-Axis Metric", numeric_cols, key="scatter_x")
+                    x_metric = st.selectbox("X-Axis Metric", available_metrics, key="scatter_x")
                 with col2:
-                    y_metric = st.selectbox("Y-Axis Metric", numeric_cols, key="scatter_y")
+                    y_metric = st.selectbox("Y-Axis Metric", available_metrics, key="scatter_y")
                 
                 # Position filter for scatter
                 if 'Position Profile' in filtered_df.columns:
@@ -7905,10 +7437,14 @@ elif page == "Performance Metrics":
                         chart_data = chart_data.dropna()
                         
                         if not chart_data.empty:
-                            chart = alt.Chart(chart_data).mark_circle(size=100, opacity=0.6).encode(
+                            chart = alt.Chart(chart_data).mark_circle(size=150, opacity=0.6).encode(
                                 x=alt.X('X_Metric', title=x_metric),
                                 y=alt.Y('Y_Metric', title=y_metric),
-                                tooltip=['Player', 'X_Metric', 'Y_Metric'],
+                                tooltip=[
+                                    alt.Tooltip('Player', title='Player'),
+                                    alt.Tooltip('X_Metric', title=x_metric, format='.2f'),
+                                    alt.Tooltip('Y_Metric', title=y_metric, format='.2f')
+                                ],
                                 color=alt.value('#8B0000')
                             ).properties(
                                 width=800,
@@ -7918,7 +7454,9 @@ elif page == "Performance Metrics":
                             ).configure_axis(
                                 labelColor='#fafafa',
                                 titleColor='#fafafa',
-                                gridColor='#4a4a4a'
+                                gridColor='#4a4a4a',
+                                labelFontSize=16,
+                                titleFontSize=18
                             )
                             
                             st.altair_chart(chart, use_container_width=True)
@@ -7929,7 +7467,10 @@ elif page == "Performance Metrics":
                 else:
                     st.info("No data available for scatter plot.")
             else:
-                st.info("Need at least 2 numeric metrics for scatter plot analysis.")
+                if len(available_metrics) < 2:
+                    st.info(f"Need at least 2 metrics from the radar chart configuration. Found {len(available_metrics)} matching metrics.")
+                else:
+                    st.info("Need at least 2 numeric metrics for scatter plot analysis.")
 
 elif page == "Player Database":
     st.header("👥 Player Database")
@@ -8104,62 +7645,202 @@ elif page == "Video Analysis":
         st.subheader("Add Video Review")
         st.markdown("Track your analysis of player videos and film. This complements your quantitative scouting data.")
         
-        # MP4 File Upload - OUTSIDE FORM so it triggers immediate rerun
+        # Multiple MP4 File Upload - OUTSIDE FORM so it triggers immediate rerun
         st.markdown("#### Video File Upload")
-        st.markdown("Upload MP4 video files downloaded from Wyscout or other sources. Files are stored locally and can be downloaded later.")
-        uploaded_video = st.file_uploader(
-            "Upload Video File (MP4)",
+        st.markdown("Upload one or multiple MP4 video files. Upload multiple videos to create a playlist. Files are stored locally and can be downloaded later.")
+        
+        # Initialize pending videos list in session state
+        if 'pending_videos' not in st.session_state:
+            st.session_state['pending_videos'] = []
+        
+        uploaded_videos = st.file_uploader(
+            "Upload Video File(s) (MP4)",
             type=['mp4'],
-            help="Upload MP4 video files. Maximum file size depends on your system settings.",
+            accept_multiple_files=True,
+            help="Upload one or multiple MP4 video files. Upload multiple videos to create a playlist.",
             key="video_uploader"
         )
         
-        # Store uploaded video path in session state (will be saved when form is submitted)
-        if uploaded_video is not None:
-            # Generate unique filename to avoid conflicts
-            timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
-            # We'll use a placeholder for player name since it's selected later
-            file_extension = uploaded_video.name.split('.')[-1] if '.' in uploaded_video.name else 'mp4'
-            video_filename = f"video_{timestamp}.{file_extension}"
-            video_file_path = videos_dir / video_filename
-            
-            # Save the uploaded file immediately (before form submission)
-            try:
-                uploaded_video_bytes = uploaded_video.getbuffer()
-                with open(video_file_path, 'wb') as f:
-                    f.write(uploaded_video_bytes)
-                st.success(f"Video uploaded: {uploaded_video.name} ({uploaded_video.size / (1024*1024):.2f} MB)")
-                # Store path in session state for form submission
-                st.session_state['pending_video_path'] = str(video_file_path)
-                st.session_state['pending_video_filename'] = uploaded_video.name
-            except Exception as e:
-                st.error(f"Error saving video file: {e}")
-                st.session_state['pending_video_path'] = None
+        # Handle multiple video uploads
+        if uploaded_videos is not None and len(uploaded_videos) > 0:
+            # Process each uploaded video
+            for uploaded_video in uploaded_videos:
+                # Check if this video is already in pending_videos (by name)
+                video_already_uploaded = any(
+                    v.get('original_filename') == uploaded_video.name 
+                    for v in st.session_state['pending_videos']
+                )
+                
+                if not video_already_uploaded:
+                    # Generate unique filename to avoid conflicts
+                    timestamp = datetime.now().strftime('%Y%m%d_%H%M%S_%f')[:-3]  # Include milliseconds
+                    file_extension = uploaded_video.name.split('.')[-1] if '.' in uploaded_video.name else 'mp4'
+                    video_filename = f"video_{timestamp}.{file_extension}"
+                    video_file_path = videos_dir / video_filename
+                    
+                    # Save the uploaded file immediately (before form submission)
+                    try:
+                        uploaded_video_bytes = uploaded_video.getbuffer()
+                        with open(video_file_path, 'wb') as f:
+                            f.write(uploaded_video_bytes)
+                        
+                        # Add to pending videos list
+                        video_info = {
+                            'file_path': str(video_file_path),
+                            'original_filename': uploaded_video.name,
+                            'file_size_mb': uploaded_video.size / (1024*1024),
+                            'uploaded_at': datetime.now().isoformat()
+                        }
+                        st.session_state['pending_videos'].append(video_info)
+                        st.success(f"✅ Uploaded: {uploaded_video.name} ({video_info['file_size_mb']:.2f} MB)")
+                    except Exception as e:
+                        st.error(f"Error saving video file {uploaded_video.name}: {e}")
         
-        # Video Preview - Show uploaded video immediately so user can watch while filling form
-        if uploaded_video is not None:
+        # Show uploaded videos summary
+        if st.session_state['pending_videos']:
+            st.markdown("---")
+            num_videos = len(st.session_state['pending_videos'])
+            if num_videos == 1:
+                st.info(f"📹 **1 video uploaded** - Ready to save review")
+            else:
+                st.info(f"📹 **{num_videos} videos uploaded** - Will create playlist when you save review")
+            
+            # Show list of uploaded videos
+            with st.expander(f"View Uploaded Videos ({num_videos})", expanded=False):
+                for idx, video_info in enumerate(st.session_state['pending_videos'], 1):
+                    col1, col2 = st.columns([3, 1])
+                    with col1:
+                        st.markdown(f"**{idx}.** {video_info['original_filename']} ({video_info['file_size_mb']:.2f} MB)")
+                    with col2:
+                        if st.button("Remove", key=f"remove_video_{idx}", use_container_width=True):
+                            # Remove video from list and delete file
+                            try:
+                                video_path = Path(video_info['file_path'])
+                                if video_path.exists():
+                                    video_path.unlink()
+                            except:
+                                pass
+                            st.session_state['pending_videos'].remove(video_info)
+                            st.rerun()
+        
+        # Video Preview - Show videos with sequential playback for playlists
+        if st.session_state['pending_videos']:
             st.markdown("---")
             st.markdown("#### Video Preview")
-            st.markdown("Watch the video below while filling out the form details.")
+            
+            num_videos = len(st.session_state['pending_videos'])
+            if num_videos == 1:
+                st.markdown("Preview the video below. All videos will be saved when you submit the form.")
+            else:
+                st.markdown(f"**Playlist Preview** - Videos will play sequentially. When one finishes, the next will automatically start.")
+                st.caption(f"Playing {num_videos} videos in sequence")
+            
+            # Video selection list (collapsible) - only show if multiple videos
+            if num_videos > 1:
+                with st.expander("📋 Select Video to Play", expanded=False):
+                    st.markdown("Click on a video below to jump to it:")
+                    
+                    # Initialize selected video index in session state
+                    if 'selected_video_index' not in st.session_state:
+                        st.session_state.selected_video_index = 0
+                    
+                    # Create video selection buttons
+                    for idx, video_info in enumerate(st.session_state['pending_videos']):
+                        col1, col2, col3 = st.columns([1, 4, 2])
+                        with col1:
+                            is_selected = st.session_state.selected_video_index == idx
+                            button_label = "▶" if is_selected else "▶"
+                            button_type = "primary" if is_selected else "secondary"
+                            if st.button(button_label, key=f"select_video_{idx}", use_container_width=True, type=button_type):
+                                st.session_state.selected_video_index = idx
+                                st.rerun()
+                        with col2:
+                            st.markdown(f"**{idx + 1}.** {video_info['original_filename']}")
+                        with col3:
+                            st.caption(f"{video_info['file_size_mb']:.2f} MB")
+                            if is_selected:
+                                st.caption("▶ Playing")
+            
             try:
-                st.video(uploaded_video)
-            except Exception as e:
-                st.error(f"Error displaying video preview: {e}")
-        elif 'pending_video_path' in st.session_state and st.session_state['pending_video_path']:
-            # Show video from previously uploaded file (persists across form interactions)
-            st.markdown("---")
-            st.markdown("#### Video Preview")
-            st.markdown("Watch the video below while filling out the form details.")
-            try:
-                video_file = Path(st.session_state['pending_video_path'])
-                if video_file.exists():
-                    with open(video_file, 'rb') as f:
-                        video_bytes = f.read()
-                    st.video(video_bytes)
+                # Load video files
+                video_files = []
+                for video_info in st.session_state['pending_videos']:
+                    video_path = Path(video_info['file_path'])
+                    if video_path.exists():
+                        with open(video_path, 'rb') as f:
+                            video_bytes = f.read()
+                        video_files.append({
+                            'bytes': video_bytes,
+                            'filename': video_info['original_filename']
+                        })
+                
+                if video_files:
+                    # Get the selected video index
+                    selected_idx = st.session_state.get('selected_video_index', 0)
+                    if selected_idx >= len(video_files):
+                        selected_idx = 0
+                        st.session_state.selected_video_index = 0
+                    
+                    # Show only the selected video
+                    selected_video = video_files[selected_idx]
+                    
+                    # Show video info
+                    if len(video_files) > 1:
+                        st.markdown(f"""
+                        <div style="margin-bottom: 15px; padding: 12px; background-color: #1e1e1e; border-radius: 5px;">
+                            <strong style="color: #fafafa;">Now Playing:</strong> 
+                            <span style="color: #8B0000;">{selected_video['filename']}</span>
+                            <span style="color: #888; margin-left: 10px;">
+                                ({selected_idx + 1} of {len(video_files)})
+                            </span>
+                        </div>
+                        """, unsafe_allow_html=True)
+                    
+                    # Display the single video player
+                    st.video(selected_video['bytes'])
+                    st.caption(f"Preview: {selected_video['filename']}")
+                    
+                    # Add JavaScript for sequential playback (only if multiple videos)
+                    if len(video_files) > 1:
+                        video_script = f"""
+                        <script>
+                            (function() {{
+                                const totalVideos = {len(video_files)};
+                                let currentIndex = {selected_idx};
+                                
+                                function playNext() {{
+                                    if (currentIndex < totalVideos - 1) {{
+                                        // Trigger Streamlit to select next video
+                                        const nextIndex = currentIndex + 1;
+                                        const nextButton = document.querySelector(`button[key="select_video_${{nextIndex}}"]`);
+                                        if (nextButton) {{
+                                            nextButton.click();
+                                        }}
+                                    }}
+                                }}
+                                
+                                // Monitor video end event
+                                setTimeout(function() {{
+                                    const video = document.querySelector('video');
+                                    if (video) {{
+                                        video.addEventListener('ended', function() {{
+                                            if (currentIndex < totalVideos - 1) {{
+                                                setTimeout(playNext, 500);
+                                            }}
+                                        }});
+                                    }}
+                                }}, 1000);
+                            }})();
+                        </script>
+                        """
+                        st.markdown(video_script, unsafe_allow_html=True)
+                        st.caption("💡 Tip: Video will automatically play the next one when it finishes. Use the list above to jump to any video.")
                 else:
-                    st.warning("Video file not found. Please upload again.")
+                    st.warning("Video file(s) not found. Please upload again.")
             except Exception as e:
                 st.error(f"Error displaying video preview: {e}")
+                import traceback
+                st.code(traceback.format_exc())
         
         st.markdown("---")
         
@@ -8328,6 +8009,17 @@ elif page == "Video Analysis":
         # Form for review details - filters and performance assessment are now outside
         with st.form("video_review_form"):
             
+            # Playlist name field (only show if multiple videos uploaded)
+            playlist_name = None
+            if len(st.session_state.get('pending_videos', [])) > 1:
+                st.markdown("#### Playlist Information")
+                playlist_name = st.text_input(
+                    "Playlist Name (Optional)",
+                    placeholder="e.g., 'Player Name - Season Highlights'",
+                    help="Name for this video playlist. Leave blank to use default naming."
+                )
+                st.markdown("---")
+            
             # Video Details
             st.markdown("#### Video Details")
             col_vid1, col_vid2 = st.columns(2)
@@ -8364,70 +8056,140 @@ elif page == "Video Analysis":
             submitted = st.form_submit_button("Save Review", use_container_width=True)
             
             if submitted and player_name:
-                # Get video file path from session state (saved during upload)
-                saved_video_path = st.session_state.get('pending_video_path', None)
+                pending_videos = st.session_state.get('pending_videos', [])
                 
-                # If video was uploaded, rename it with player name now that we know it
-                if saved_video_path and player_name:
-                    try:
-                        old_path = Path(saved_video_path)
-                        if old_path.exists():
-                            # Rename file to include player name
-                            safe_player_name = player_name.replace('/', '_').replace('\\', '_')
-                            timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
-                            file_extension = old_path.suffix or '.mp4'
-                            new_filename = f"{safe_player_name}_{timestamp}{file_extension}"
-                            new_path = videos_dir / new_filename
-                            old_path.rename(new_path)
-                            saved_video_path = str(new_path)
-                            st.session_state['pending_video_path'] = saved_video_path
-                    except Exception as e:
-                        st.warning(f"Could not rename video file: {e}")
-                
-                new_review = {
-                    'Player Name': player_name,
-                    'Review Date': review_date.strftime('%Y-%m-%d'),
-                    'Video Type': video_type,
-                    'Video Source': video_source,
-                    'Video URL': video_url,
-                    'Video File Path': saved_video_path if saved_video_path else '',
-                    'Games Reviewed': games_reviewed,
-                    'Video Score': video_score,
-                    'Status': status,
-                    'Quantitative Match': quantitative_match,
-                    'Technical Ability': technical_ability,
-                    'Tactical Awareness': tactical_awareness,
-                    'Decision Making': decision_making,
-                    'Physical Attributes': physical_attributes,
-                    'Work Rate': work_rate,
-                    'Communication': communication_video,
-                    'Leadership': leadership_video,
-                    'Composure': composure,
-                    'Overall Video Rating': overall_video_rating,
-                    'Total Video Score': st.session_state.get('video_total_score', 45),
-                    'Video Percentage': round(st.session_state.get('video_percentage', 50.0), 1),
-                    'Video Grade': st.session_state.get('video_grade', 'F'),
-                    'Key Observations': key_observations,
-                    'Strengths Identified': strengths_video,
-                    'Weaknesses Identified': weaknesses_video,
-                    'Red Flags': red_flags_video,
-                    'Recommendation': recommendation_video,
-                    'Notes': notes,
-                    'Created At': datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-                }
-                
-                if st.session_state.video_reviews.empty:
-                    st.session_state.video_reviews = pd.DataFrame([new_review])
+                if not pending_videos:
+                    st.error("Please upload at least one video file before saving.")
                 else:
-                    st.session_state.video_reviews = pd.concat([st.session_state.video_reviews, pd.DataFrame([new_review])], ignore_index=True)
-                
-                st.session_state.video_reviews.to_csv(video_reviews_file, index=False)
-                
-                # Clear the pending video path after saving
-                if 'pending_video_path' in st.session_state:
-                    del st.session_state['pending_video_path']
-                if 'pending_video_filename' in st.session_state:
-                    del st.session_state['pending_video_filename']
+                    safe_player_name = player_name.replace('/', '_').replace('\\', '_')
+                    timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
+                    
+                    # Generate playlist name if multiple videos and no name provided
+                    if len(pending_videos) > 1:
+                        if not playlist_name or not playlist_name.strip():
+                            playlist_name = f"{player_name} - Video Playlist"
+                        playlist_id = f"{safe_player_name}_playlist_{timestamp}"
+                    else:
+                        playlist_name = None
+                        playlist_id = None
+                    
+                    # Process each video
+                    saved_reviews = []
+                    for idx, video_info in enumerate(pending_videos, 1):
+                        old_path = Path(video_info['file_path'])
+                        
+                        if old_path.exists():
+                            try:
+                                # Rename file to include player name and playlist info if applicable
+                                file_extension = old_path.suffix or '.mp4'
+                                if len(pending_videos) > 1:
+                                    # Multiple videos: include playlist ID and video number
+                                    new_filename = f"{safe_player_name}_playlist_{timestamp}_video{idx:02d}{file_extension}"
+                                else:
+                                    # Single video: simple naming
+                                    new_filename = f"{safe_player_name}_{timestamp}{file_extension}"
+                                
+                                new_path = videos_dir / new_filename
+                                old_path.rename(new_path)
+                                saved_video_path = str(new_path)
+                                
+                                # Create review entry for this video
+                                new_review = {
+                                    'Player Name': player_name,
+                                    'Review Date': review_date.strftime('%Y-%m-%d'),
+                                    'Video Type': video_type,
+                                    'Video Source': video_source,
+                                    'Video URL': video_url,
+                                    'Video File Path': saved_video_path,
+                                    'Video Filename': video_info['original_filename'],
+                                    'Playlist Name': playlist_name if len(pending_videos) > 1 else '',
+                                    'Playlist ID': playlist_id if len(pending_videos) > 1 else '',
+                                    'Video Number': idx if len(pending_videos) > 1 else 1,
+                                    'Total Videos in Playlist': len(pending_videos) if len(pending_videos) > 1 else 1,
+                                    'Games Reviewed': games_reviewed,
+                                    'Video Score': video_score,
+                                    'Status': status,
+                                    'Quantitative Match': quantitative_match,
+                                    'Technical Ability': technical_ability,
+                                    'Tactical Awareness': tactical_awareness,
+                                    'Decision Making': decision_making,
+                                    'Physical Attributes': physical_attributes,
+                                    'Work Rate': work_rate,
+                                    'Communication': communication_video,
+                                    'Leadership': leadership_video,
+                                    'Composure': composure,
+                                    'Overall Video Rating': overall_video_rating,
+                                    'Total Video Score': st.session_state.get('video_total_score', 45),
+                                    'Video Percentage': round(st.session_state.get('video_percentage', 50.0), 1),
+                                    'Video Grade': st.session_state.get('video_grade', 'F'),
+                                    'Key Observations': key_observations,
+                                    'Strengths Identified': strengths_video,
+                                    'Weaknesses Identified': weaknesses_video,
+                                    'Red Flags': red_flags_video,
+                                    'Recommendation': recommendation_video,
+                                    'Notes': notes,
+                                    'Created At': datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+                                }
+                                saved_reviews.append(new_review)
+                                
+                            except Exception as e:
+                                st.warning(f"Could not rename video file {video_info['original_filename']}: {e}")
+                                # Still create review entry with original path
+                                new_review = {
+                                    'Player Name': player_name,
+                                    'Review Date': review_date.strftime('%Y-%m-%d'),
+                                    'Video Type': video_type,
+                                    'Video Source': video_source,
+                                    'Video URL': video_url,
+                                    'Video File Path': str(old_path),
+                                    'Video Filename': video_info['original_filename'],
+                                    'Playlist Name': playlist_name if len(pending_videos) > 1 else '',
+                                    'Playlist ID': playlist_id if len(pending_videos) > 1 else '',
+                                    'Video Number': idx if len(pending_videos) > 1 else 1,
+                                    'Total Videos in Playlist': len(pending_videos) if len(pending_videos) > 1 else 1,
+                                    'Games Reviewed': games_reviewed,
+                                    'Video Score': video_score,
+                                    'Status': status,
+                                    'Quantitative Match': quantitative_match,
+                                    'Technical Ability': technical_ability,
+                                    'Tactical Awareness': tactical_awareness,
+                                    'Decision Making': decision_making,
+                                    'Physical Attributes': physical_attributes,
+                                    'Work Rate': work_rate,
+                                    'Communication': communication_video,
+                                    'Leadership': leadership_video,
+                                    'Composure': composure,
+                                    'Overall Video Rating': overall_video_rating,
+                                    'Total Video Score': st.session_state.get('video_total_score', 45),
+                                    'Video Percentage': round(st.session_state.get('video_percentage', 50.0), 1),
+                                    'Video Grade': st.session_state.get('video_grade', 'F'),
+                                    'Key Observations': key_observations,
+                                    'Strengths Identified': strengths_video,
+                                    'Weaknesses Identified': weaknesses_video,
+                                    'Red Flags': red_flags_video,
+                                    'Recommendation': recommendation_video,
+                                    'Notes': notes,
+                                    'Created At': datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+                                }
+                                saved_reviews.append(new_review)
+                    
+                    # Save all reviews to CSV
+                    if saved_reviews:
+                        new_reviews_df = pd.DataFrame(saved_reviews)
+                        if st.session_state.video_reviews.empty:
+                            st.session_state.video_reviews = new_reviews_df
+                        else:
+                            st.session_state.video_reviews = pd.concat([st.session_state.video_reviews, new_reviews_df], ignore_index=True)
+                        
+                        st.session_state.video_reviews.to_csv(video_reviews_file, index=False)
+                        
+                        if len(saved_reviews) == 1:
+                            st.success(f"✅ Video review saved successfully!")
+                        else:
+                            st.success(f"✅ Playlist '{playlist_name}' created with {len(saved_reviews)} videos!")
+                    
+                    # Clear the pending videos after saving
+                    st.session_state['pending_videos'] = []
                 
                 st.success(f"Review saved for {player_name}")
                 if saved_video_path:
@@ -8889,7 +8651,7 @@ elif page == "Video Analysis":
                                         st.markdown("**Key Observations:**")
                                         st.info(row.get('Key Observations', ''))
     
-elif page == "To Do List":
+elif False and page == "To Do List":  # Removed To Do List page
     st.header("To Do List")
     
     # Refresh call log from file

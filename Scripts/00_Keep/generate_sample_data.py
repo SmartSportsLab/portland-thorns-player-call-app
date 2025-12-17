@@ -524,3 +524,8 @@ for i, player in enumerate(list(players_with_both_actual)[:5]):
     player_videos = len(video_reviews_df[video_reviews_df['Player Name'] == player])
     print(f"   {i+1}. {player} - {player_calls} call(s), {player_videos} review(s)")
 
+
+
+
+
+

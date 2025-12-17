@@ -1,0 +1,75 @@
+{
+  "Center Back": [
+    "Defensive duels per 90",
+    "Defensive duels won, %",
+    "PAdj Interceptions",
+    "PAdj Sliding tackles",
+    "Shots blocked per 90",
+    "Aerial duels per 90",
+    "Aerial duels won, %",
+    "Passes per 90",
+    "Accurate passes, %",
+    "Short / medium passes per 90",
+    "Accurate short / medium passes, %",
+    "Long passes per 90",
+    "Accurate long passes, %",
+    "Progressive passes per 90",
+    "Accurate progressive passes, %"
+  ],
+  "Centre Midfielder": [
+    "Defensive duels per 90",
+    "Defensive duels won, %",
+    "PAdj Interceptions",
+    "PAdj Sliding tackles",
+    "Progressive passes per 90",
+    "Accurate progressive passes, %",
+    "Short / medium passes per 90",
+    "Accurate short / medium passes, %",
+    "Long passes per 90",
+    "Accurate long passes, %",
+    "Received passes per 90",
+    "Dribbles per 90",
+    "Successful dribbles, %",
+    "Progressive runs per 90"
+  ],
+  "Attacking Midfielder": [
+    "Goals per 90",
+    "Assists per 90",
+    "Shot assists per 90",
+    "Second assists per 90",
+    "Third assists per 90",
+    "Offensive duels per 90",
+    "Offensive duels won, %",
+    "Smart passes per 90",
+    "Accurate smart passes, %",
+    "Through passes per 90",
+    "Accurate through passes, %",
+    "Deep completions per 90",
+    "Dribbles per 90",
+    "Successful dribbles, %",
+    "Received passes per 90",
+    "Touches in box per 90",
+    "Progressive runs per 90",
+    "xG per 90 - Goals per 90"
+  ],
+  "Winger": [
+    "Offensive duels per 90",
+    "Offensive duels won, %",
+    "Dribbles per 90",
+    "Successful dribbles, %",
+    "Crosses from right flank per 90",
+    "Accurate crosses from right flank, %",
+    "Accelerations per 90",
+    "Progressive runs per 90",
+    "Received long passes per 90",
+    "Received passes per 90",
+    "Assists per 90",
+    "Shot assists per 90",
+    "Second assists per 90",
+    "Third assists per 90"
+  ]
+}
+
+
+
+
