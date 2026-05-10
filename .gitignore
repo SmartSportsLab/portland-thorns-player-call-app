@@ -16,7 +16,9 @@ ACC:SEC Championship Reports/
 Exports/
 
 # Qualitative Data (contains sensitive info)
-Qualitative_Data/
+Qualitative_Data/*
+!Qualitative_Data/sample_call_log.csv
+!Qualitative_Data/sample_video_reviews.csv
 
 # Python cache
 __pycache__/

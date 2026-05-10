@@ -2455,9 +2455,9 @@ with col_lang2:
 if st.session_state.get("showcase_mode", False) and SAMPLE_CALL_LOG_FILE.exists():
     st.info(
         "**Showcase Mode is on.** The app is currently loaded with anonymised "
-        "sample data (28 calls across 15 NCAA prospects) so the Insights page, "
-        "tables and PDF report all render without setup. Toggle it off in the "
-        "sidebar to use your own call log."
+        "sample data (1,000 calls, 393 video reviews and 300 fictional NCAA "
+        "prospects) so the Insights page, tables and PDF report all render "
+        "without setup. Toggle it off in the sidebar to use your own data."
     )
 
 st.markdown("---")
