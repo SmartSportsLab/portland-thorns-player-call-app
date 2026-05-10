@@ -28,6 +28,8 @@ try:
     from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Table, TableStyle, PageBreak, Image, KeepTogether
     from reportlab.lib import colors
     from reportlab.lib.enums import TA_LEFT, TA_CENTER
+    from reportlab.graphics.shapes import Drawing
+    from reportlab.graphics.charts.barcharts import HorizontalBarChart
     PDF_AVAILABLE = True
 except ImportError:
     PDF_AVAILABLE = False
@@ -39,177 +41,21 @@ st.set_page_config(
 )
 
 # ===========================================
-# AUTHENTICATION CONFIGURATION
+# AUTHENTICATION (removed for public showcase)
 # ===========================================
-USERNAME = "MikeNorris"
-PASSWORD = "1234"
+# Login gate has been removed so the app can be opened directly by recruiters.
+# The auth flag is left as True so any downstream code that may reference it
+# continues to work without behaviour change.
+st.session_state["auth"] = True
 
-# Initialize authentication state - persist across reruns
-# Use query params as backup for hard refresh (CMD+R)
-if "auth" not in st.session_state:
-    # Check query params first (for hard refresh scenarios)
-    try:
-        qp = st.query_params
-        auth_token = qp.get("auth_token", None)
-        if auth_token == "authenticated":
-            st.session_state["auth"] = True
-        else:
-            st.session_state["auth"] = False
-    except:
-        st.session_state["auth"] = False
 
-# Set query param when authenticated to persist across hard refresh
-if st.session_state.get("auth", False):
-    try:
-        st.query_params["auth_token"] = "authenticated"
-    except:
-        pass
+def _login_page_removed():
+    """Sentinel placeholder. The original login_page() function and the
+    hardcoded credentials it referenced were removed when the login gate
+    was deleted; this stub exists only to keep historical references safe
+    if any external script still imports the symbol."""
+    raise RuntimeError("login_page has been removed from this build")
 
-# ===========================================
-# LOGIN PAGE FUNCTION
-# ===========================================
-def login_page():
-    """Display login page with Portland Thorns branding."""
-    st.markdown("""
-        <style>
-        [data-testid="stSidebar"], [data-testid="stToolbar"], header[data-testid="stHeader"] {
-            display: none !important;
-        }
-        [data-testid="stAppViewContainer"] {
-            background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
-            background-size: cover;
-            background-position: center;
-        }
-        div.block-container {
-            display: flex !important;
-            justify-content: center !important;
-            align-items: center !important;
-            height: 100vh !important;
-            padding-top: 0 !important;
-        }
-        .login-container {
-            background: rgba(20, 20, 25, 0.95);
-            border: 2px solid #8B0000;
-            border-radius: 20px;
-            box-shadow: 0 10px 40px rgba(139, 0, 0, 0.5);
-            backdrop-filter: blur(12px);
-            width: 450px;
-            padding: 3rem 3rem;
-            margin: auto;
-            display: flex !important;
-            flex-direction: column;
-            justify-content: center;
-            align-items: stretch;
-        }
-        .login-title {
-            font-size: 2.2rem;
-            font-weight: 900;
-            color: #8B0000;
-            margin-bottom: 0.4rem;
-            text-align: center;
-            text-shadow: 0 0 12px rgba(139, 0, 0, 0.5);
-        }
-        .login-sub {
-            text-align: center;
-            color: #f0f2f5;
-            font-size: 1.1rem;
-            margin-bottom: 2rem;
-        }
-        label { 
-            color: #d7dee8 !important; 
-            font-weight: 600 !important; 
-            font-size: 0.95rem !important; 
-        }
-        input[type="text"], input[type="password"] {
-            background-color: #0f1625 !important;
-            color: #e8eef7 !important;
-            border: 1px solid rgba(139, 0, 0, 0.3) !important;
-            border-radius: 10px !important;
-            height: 48px !important;
-            font-size: 0.95rem !important;
-        }
-        input[type="text"]:focus, input[type="password"]:focus {
-            border-color: #8B0000 !important;
-            box-shadow: 0 0 10px rgba(139, 0, 0, 0.3) !important;
-        }
-        button[kind="primary"] {
-            background-color: #8B0000 !important;
-            border-radius: 10px !important;
-            color: white !important;
-            height: 48px !important;
-            font-weight: 700 !important;
-            font-size: 1rem !important;
-            border: none !important;
-            transition: all 0.3s ease !important;
-        }
-        button[kind="primary"]:hover {
-            background: linear-gradient(90deg, #8B0000, #D10023) !important;
-            transform: translateY(-2px);
-            box-shadow: 0 0 20px rgba(139, 0, 0, 0.4);
-        }
-        @keyframes fadein {
-            from { opacity: 0; transform: translateY(-15px) scale(0.9); }
-            to { opacity: 1; transform: translateY(0) scale(1); }
-        }
-        .login-container {
-            animation: fadein 0.8s ease;
-        }
-        </style>
-    """, unsafe_allow_html=True)
-
-    # Logo and branding
-    logo_path = Path("/Users/daniel/Documents/Smart Sports Lab/Football/Sports Data Campus/Portland Thorns/Branding/portland-thorns-vector-logo-seeklogo/portland-thorns-seeklogo.png")
-    
-    if logo_path.exists():
-        with open(logo_path, "rb") as f:
-            logo_data = f.read()
-            logo_base64 = base64.b64encode(logo_data).decode()
-        
-        st.markdown(f"""
-            <div style="text-align:center; margin-bottom: 1.5rem;">
-                <img src="data:image/png;base64,{logo_base64}" width="180" style="animation: fadein 1s ease;">
-            </div>
-        """, unsafe_allow_html=True)
-    else:
-        st.markdown("""
-            <div style="text-align:center; margin-bottom: 1.5rem;">
-                <h1 style="color: #8B0000; font-size: 2.5rem;">Portland Thorns</h1>
-            </div>
-        """, unsafe_allow_html=True)
-
-    # Login form
-    placeholder = st.empty()
-    with placeholder.container():
-        st.markdown('<div class="login-title">Call Log System</div>', unsafe_allow_html=True)
-        st.markdown('<div class="login-sub">Player & Agent Call Management Platform</div>', unsafe_allow_html=True)
-
-        user = st.text_input("Username", placeholder="Enter your username", key="login_username")
-        pwd = st.text_input("Password", placeholder="Enter your password", type="password", key="login_password")
-
-        col1, col2, col3 = st.columns([1, 2, 1])
-        with col2:
-            if st.button("Login", use_container_width=True, type="primary"):
-                if user == USERNAME and pwd == PASSWORD:
-                    st.session_state["auth"] = True
-                    # Set query param to persist auth across refresh
-                    try:
-                        st.query_params["auth_token"] = "authenticated"
-                    except:
-                        pass
-                    st.success("Login successful")
-                    import time
-                    time.sleep(0.5)
-                    st.rerun()
-                else:
-                    st.error("❌ Incorrect username or password")
-
-        st.markdown("---")
-        st.markdown("""
-        <div style="text-align: center; color: #888; font-size: 0.85rem; margin-top: 1rem;">
-            Designed and created by Daniel Levitt<br>
-            <a href="mailto:daniellevitt32@gmail.com" style="color: #8B0000; text-decoration: none;">daniellevitt32@gmail.com</a>
-        </div>
-        """, unsafe_allow_html=True)
 
 # Portland Thorns Branding Colors
 THORNS_DARK_RED = "#8B0000"  # Dark red from color scale
@@ -1307,9 +1153,27 @@ DATA_DIR = BASE_DIR / 'Qualitative_Data'
 # Create directory and parents if they don't exist
 DATA_DIR.mkdir(parents=True, exist_ok=True)
 CALL_LOG_FILE = DATA_DIR / 'call_log.csv'
+SAMPLE_CALL_LOG_FILE = DATA_DIR / 'sample_call_log.csv'
+VIDEO_REVIEWS_FILE = DATA_DIR / 'video_reviews.csv'
+SAMPLE_VIDEO_REVIEWS_FILE = DATA_DIR / 'sample_video_reviews.csv'
 AGENT_DB_FILE = DATA_DIR / 'agents.csv'
 DRAFT_FILE = DATA_DIR / 'call_log_draft.json'
 PRESETS_FILE = DATA_DIR / 'column_visibility_presets.json'
+
+# Showcase Mode: when True, the app reads the sample call log instead of the
+# real one, so recruiters / first-time visitors see populated data and the
+# Insights page renders with realistic content. Defaults to True when the real
+# call log is missing or empty so the live demo never feels blank.
+def _default_showcase_mode():
+    if not CALL_LOG_FILE.exists():
+        return True
+    try:
+        return CALL_LOG_FILE.stat().st_size < 200
+    except Exception:
+        return True
+
+if "showcase_mode" not in st.session_state:
+    st.session_state["showcase_mode"] = _default_showcase_mode()
 
 # Try multiple possible shortlist file names
 # Check both BASE_DIR and parent directory (where the file might be uploaded)
@@ -1372,9 +1236,39 @@ if PLAYER_DB_FILE is None:
             break
 
 # Load player database with full info
-@st.cache_data
+def _player_names_from_sample_call_log():
+    """Return the unique sorted list of fictional player names from the
+    bundled sample call log. Used as the Showcase Mode source for
+    load_player_database()."""
+    try:
+        if not SAMPLE_CALL_LOG_FILE.exists():
+            return []
+        df = pd.read_csv(SAMPLE_CALL_LOG_FILE, usecols=["Player Name"])
+        names = (
+            df["Player Name"]
+            .dropna()
+            .astype(str)
+            .map(str.strip)
+            .loc[lambda s: s.str.len() > 0]
+            .unique()
+            .tolist()
+        )
+        return sorted(names)
+    except Exception:
+        return []
+
+
 def load_player_database():
-    """Load player names from shortlist file."""
+    """Load player names from shortlist file.
+
+    In Showcase Mode (or when no Player Database Excel is configured) the list
+    is sourced from the bundled sample call log so the Phone Calls form's
+    player dropdown stays populated for the portfolio demo.
+    """
+    if st.session_state.get("showcase_mode", False):
+        sample = _player_names_from_sample_call_log()
+        if sample:
+            return sample
     try:
         if PLAYER_DB_FILE and PLAYER_DB_FILE.exists():
             # Try different header rows (some files use header=2 for merged headers)
@@ -1402,11 +1296,59 @@ def load_player_database():
         st.error(f"Error loading player database: {e}")
         import traceback
         st.error(traceback.format_exc())
+    # Final fallback: derive from the sample call log if it's available
+    # (covers the case where there is no Player Database Excel at all).
+    sample = _player_names_from_sample_call_log()
+    if sample:
+        return sample
     return []
 
-@st.cache_data
+def _player_info_from_sample_call_log():
+    """Build a {player: {team, conference, position}} dict from the sample
+    call log so Showcase Mode can drive the Phone Calls cascading dropdowns
+    (Conference -> Team -> Player) without needing a Player Database Excel.
+
+    Most recent call wins for a given player so any in-flight transfers in
+    the synthetic data are reflected. Returns {} if the sample CSV is missing
+    or unreadable.
+    """
+    try:
+        if not SAMPLE_CALL_LOG_FILE.exists():
+            return {}
+        df = pd.read_csv(SAMPLE_CALL_LOG_FILE)
+        needed = {"Player Name", "Team", "Conference", "Position Profile", "Call Date"}
+        if not needed.issubset(df.columns):
+            return {}
+        df = df.copy()
+        df["Call Date"] = pd.to_datetime(df["Call Date"], errors="coerce")
+        df = df.sort_values("Call Date").dropna(subset=["Player Name"])
+        info = {}
+        for _, row in df.iterrows():
+            name = str(row["Player Name"]).strip()
+            if not name:
+                continue
+            info[name] = {
+                "team": str(row.get("Team", "") or "").strip(),
+                "conference": str(row.get("Conference", "") or "").strip(),
+                "position": str(row.get("Position Profile", "") or "").strip(),
+            }
+        return info
+    except Exception:
+        return {}
+
+
 def load_player_info():
-    """Load full player information including team and conference."""
+    """Load full player information including team and conference.
+
+    In Showcase Mode (or when no Player Database Excel is configured) the
+    dictionary is derived from the bundled sample call log so the Phone Calls
+    form's Conference -> Team -> Player dropdowns are fully populated for the
+    portfolio demo.
+    """
+    if st.session_state.get("showcase_mode", False):
+        sample = _player_info_from_sample_call_log()
+        if sample:
+            return sample
     try:
         if PLAYER_DB_FILE and PLAYER_DB_FILE.exists():
             player_info_dict = {}
@@ -1492,50 +1434,67 @@ def load_player_info():
         st.error(f"Error loading player info: {e}")
         import traceback
         st.error(traceback.format_exc())
+    # Final fallback: synthesise from the sample call log if it's available
+    # (covers the case where there is no Player Database Excel at all).
+    sample = _player_info_from_sample_call_log()
+    if sample:
+        return sample
     return {}
 
 # Load existing call log
 def load_call_log():
-    """Load existing call log."""
-    if CALL_LOG_FILE.exists():
+    """Load existing call log.
+
+    Honours Showcase Mode: when st.session_state["showcase_mode"] is True the
+    bundled sample dataset is loaded instead of the real call log. This lets
+    recruiters open the deployed app and immediately see populated tables,
+    insights and PDF reports without any setup.
+    """
+    target_file = CALL_LOG_FILE
+    if st.session_state.get("showcase_mode", False) and SAMPLE_CALL_LOG_FILE.exists():
+        target_file = SAMPLE_CALL_LOG_FILE
+
+    if target_file.exists():
         try:
-            df = pd.read_csv(CALL_LOG_FILE)
-            # Ensure we return a DataFrame even if empty
+            df = pd.read_csv(target_file)
             if df.empty:
                 return pd.DataFrame()
             return df
         except Exception as e:
-            # Don't show error in UI during normal operation, just return empty
             import traceback
             print(f"Error loading call log: {e}")
             print(traceback.format_exc())
             return pd.DataFrame()
     else:
-        # Debug: print path if file doesn't exist
-        print(f"Call log file not found at: {CALL_LOG_FILE}")
+        print(f"Call log file not found at: {target_file}")
         print(f"BASE_DIR: {BASE_DIR}")
         print(f"DATA_DIR: {DATA_DIR}")
     return pd.DataFrame()
 
 # Save call log
 def save_call_log(entry):
-    """Save call log entry to CSV."""
-    # Load existing call log
-    existing_df = load_call_log()
-    
-    # Convert entry to DataFrame if it's a dict
-    if isinstance(entry, dict):
-        new_df = pd.DataFrame([entry])
+    """Save call log entry to CSV.
+
+    In Showcase Mode the bundled sample dataset is read-only: writes are
+    redirected to the user's real CALL_LOG_FILE so demo data is never
+    polluted by recruiter clicks.
+    """
+    # Always read real existing data when appending (never the sample)
+    if CALL_LOG_FILE.exists():
+        try:
+            existing_df = pd.read_csv(CALL_LOG_FILE)
+        except Exception:
+            existing_df = pd.DataFrame()
     else:
-        new_df = entry
-    
-    # Append to existing data
+        existing_df = pd.DataFrame()
+
+    new_df = pd.DataFrame([entry]) if isinstance(entry, dict) else entry
+
     if not existing_df.empty:
         df = pd.concat([existing_df, new_df], ignore_index=True)
     else:
         df = new_df
-    
-    # Save to CSV
+
     df.to_csv(CALL_LOG_FILE, index=False)
 
 # Load agent database
@@ -1910,21 +1869,32 @@ def generate_call_log_pdf(entry):
         
         # Define styles - reduced sizes to fit on one page
         styles = getSampleStyleSheet()
-        title_style = ParagraphStyle(
-            'CustomTitle',
-            parent=styles['Heading1'],
-            fontSize=14,
-            textColor=colors.HexColor('#1f77b4'),
-            spaceAfter=8,
-            borderWidth=0,
-            borderPadding=0,
-            borderColor=colors.HexColor('#1f77b4'),
+        # Brand colours - aligned with the in-app Portland Thorns palette
+        THORNS_DARK_RED = colors.HexColor('#8B0000')
+        THORNS_RED      = colors.HexColor('#D10023')
+        THORNS_INK      = colors.HexColor('#222222')
+
+        header_brand_style = ParagraphStyle(
+            'BrandLine', parent=styles['Normal'],
+            fontName='Helvetica-Bold', fontSize=8,
+            textColor=colors.white, leading=10, alignment=TA_LEFT,
+        )
+        header_title_style = ParagraphStyle(
+            'BrandTitle', parent=styles['Heading1'],
+            fontName='Helvetica-Bold', fontSize=15,
+            textColor=colors.white, leading=18, alignment=TA_LEFT,
+        )
+        header_meta_style = ParagraphStyle(
+            'BrandMeta', parent=styles['Normal'],
+            fontName='Helvetica', fontSize=8,
+            textColor=colors.HexColor('#F5C9C9'), leading=10, alignment='RIGHT',
         )
         heading_style = ParagraphStyle(
             'CustomHeading',
             parent=styles['Heading2'],
+            fontName='Helvetica-Bold',
             fontSize=9,
-            textColor=colors.HexColor('#333333'),
+            textColor=THORNS_DARK_RED,
             spaceAfter=4,
             spaceBefore=6,
         )
@@ -1932,6 +1902,7 @@ def generate_call_log_pdf(entry):
             'CustomNormal',
             parent=styles['Normal'],
             fontSize=7,
+            textColor=THORNS_INK,
             spaceAfter=2,
         )
         small_style = ParagraphStyle(
@@ -1940,19 +1911,44 @@ def generate_call_log_pdf(entry):
             fontSize=6,
             textColor=colors.HexColor('#666666'),
         )
-        
+
         # Helper function to get value or N/A
         def get_value(key, default='N/A'):
             val = entry.get(key, default)
             if val is None or val == '' or (isinstance(val, str) and val.strip() == ''):
                 return default
             return str(val)
-        
-        # Title
+
+        # ---- Branded header bar -----------------------------------------------
+        # Full-width red bar with brand line on the left and prospect / date on the right.
         player_name = escape_text(entry.get('Player Name', 'Unknown Player'))
-        title = Paragraph(f"Call Log Report - {player_name}", title_style)
-        elements.append(title)
-        elements.append(Spacer(1, 0.05*inch))
+        call_date_disp = escape_text(get_value('Call Date'))
+        position_disp  = escape_text(get_value('Position Profile'))
+        team_disp      = escape_text(get_value('Team'))
+
+        brand_left = [
+            Paragraph("PORTLAND THORNS  ·  SCOUTING DEPARTMENT", header_brand_style),
+            Paragraph(f"{player_name}", header_title_style),
+        ]
+        brand_right = [
+            Paragraph(f"Call Log  ·  {call_date_disp}", header_meta_style),
+            Paragraph(f"{position_disp}  ·  {team_disp}", header_meta_style),
+        ]
+        header_table = Table(
+            [[brand_left, brand_right]],
+            colWidths=[5.0*inch, 2.9*inch],
+        )
+        header_table.setStyle(TableStyle([
+            ('BACKGROUND', (0, 0), (-1, -1), THORNS_DARK_RED),
+            ('VALIGN',     (0, 0), (-1, -1), 'MIDDLE'),
+            ('LEFTPADDING',  (0, 0), (-1, -1), 10),
+            ('RIGHTPADDING', (0, 0), (-1, -1), 10),
+            ('TOPPADDING',   (0, 0), (-1, -1), 6),
+            ('BOTTOMPADDING',(0, 0), (-1, -1), 6),
+            ('LINEBELOW', (0, 0), (-1, -1), 2, THORNS_RED),
+        ]))
+        elements.append(header_table)
+        elements.append(Spacer(1, 0.1*inch))
         
         # Call Information
         elements.append(Paragraph("Call Information", heading_style))
@@ -2045,9 +2041,65 @@ def generate_call_log_pdf(entry):
         total_score = entry.get('Assessment Total Score', 'N/A')
         total_pct = entry.get('Assessment Percentage', 'N/A')
         grade = entry.get('Assessment Grade', 'N/A')
-        total_text = f"<b>Total:</b> {total_score}/90 ({total_pct}%) | <b>Grade:</b> {grade}"
+        total_text = f"<b>Total:</b> {total_score}/70 ({total_pct}%) | <b>Grade:</b> {grade}"
         elements.append(Paragraph(total_text, normal_style))
-        elements.append(Spacer(1, 0.1*inch))
+        elements.append(Spacer(1, 0.05*inch))
+
+        # ---- Assessment score bar chart ---------------------------------------
+        # Visualises the seven player-trait scores plus overall rating so a coach
+        # can see strengths/weaknesses at a glance.
+        try:
+            score_keys = [
+                ('Communication',       'Comm'),
+                ('Maturity',            'Maturity'),
+                ('Coachability',        'Coach.'),
+                ('Leadership',          'Leader.'),
+                ('Confidence',          'Conf.'),
+                ('Tactical Knowledge',  'Tactical'),
+                ('Team Fit',            'Team Fit'),
+                ('Overall Rating',      'Overall'),
+            ]
+            score_values = []
+            score_labels = []
+            for src, lbl in score_keys:
+                val = entry.get(src, 0)
+                try:
+                    score_values.append(max(0.0, min(10.0, float(val))))
+                except (TypeError, ValueError):
+                    score_values.append(0.0)
+                score_labels.append(lbl)
+
+            chart_drawing = Drawing(540, 130)
+            bar_chart = HorizontalBarChart()
+            bar_chart.x = 70
+            bar_chart.y = 5
+            bar_chart.width = 440
+            bar_chart.height = 115
+            bar_chart.data = [score_values]
+            bar_chart.categoryAxis.categoryNames = score_labels
+            bar_chart.categoryAxis.labels.fontName = 'Helvetica'
+            bar_chart.categoryAxis.labels.fontSize = 7
+            bar_chart.categoryAxis.labels.fillColor = THORNS_INK
+            bar_chart.valueAxis.valueMin = 0
+            bar_chart.valueAxis.valueMax = 10
+            bar_chart.valueAxis.valueStep = 2
+            bar_chart.valueAxis.labels.fontName = 'Helvetica'
+            bar_chart.valueAxis.labels.fontSize = 6
+            bar_chart.valueAxis.labels.fillColor = colors.HexColor('#666666')
+            bar_chart.valueAxis.gridStrokeColor = colors.HexColor('#dddddd')
+            bar_chart.valueAxis.gridStrokeWidth = 0.4
+            bar_chart.valueAxis.visibleGrid = True
+            bar_chart.bars[0].fillColor = THORNS_DARK_RED
+            bar_chart.bars[0].strokeColor = None
+            bar_chart.barWidth = 7
+            bar_chart.barSpacing = 2
+            chart_drawing.add(bar_chart)
+            elements.append(chart_drawing)
+        except Exception as _e:
+            # Charts are nice-to-have - never break the report if reportlab graphics
+            # has an off-day with the data shape.
+            pass
+        elements.append(Spacer(1, 0.05*inch))
         
         # Personality & Self Awareness
         elements.append(Paragraph("Personality & Self Awareness", heading_style))
@@ -2118,11 +2170,36 @@ def generate_call_log_pdf(entry):
         elements.append(Paragraph(f"<b>Action Items:</b> {action_items}", normal_style))
         elements.append(Spacer(1, 0.05*inch))
         
-        # Footer
-        call_notes = truncate_text(get_value('Call Notes'), 60)
+        # ---- Branded footer ---------------------------------------------------
+        call_notes = truncate_text(get_value('Call Notes'), 80)
         created_at = escape_text(get_value('Created At'))
-        footer_text = f"Call Notes: {call_notes} | Created: {created_at}"
-        elements.append(Paragraph(footer_text, small_style))
+        elements.append(Paragraph(f"Call Notes: {call_notes}", small_style))
+        elements.append(Spacer(1, 0.04*inch))
+
+        footer_left  = Paragraph(
+            "<b>Portland Thorns FC</b>  ·  Scouting Department",
+            ParagraphStyle('FooterL', parent=small_style,
+                           fontName='Helvetica-Bold', fontSize=6,
+                           textColor=THORNS_DARK_RED, alignment=TA_LEFT),
+        )
+        footer_right = Paragraph(
+            f"Generated {created_at}",
+            ParagraphStyle('FooterR', parent=small_style,
+                           fontName='Helvetica', fontSize=6,
+                           textColor=colors.HexColor('#666666'), alignment='RIGHT'),
+        )
+        footer_table = Table(
+            [[footer_left, footer_right]],
+            colWidths=[4.0*inch, 3.9*inch],
+        )
+        footer_table.setStyle(TableStyle([
+            ('LINEABOVE', (0, 0), (-1, 0), 1, THORNS_DARK_RED),
+            ('TOPPADDING', (0, 0), (-1, 0), 4),
+            ('LEFTPADDING', (0, 0), (-1, 0), 0),
+            ('RIGHTPADDING', (0, 0), (-1, 0), 0),
+            ('VALIGN', (0, 0), (-1, 0), 'MIDDLE'),
+        ]))
+        elements.append(footer_table)
         
         # Build PDF
         doc.build(elements)
@@ -2305,13 +2382,22 @@ def get_players_by_team(team):
     return sorted(players)
 
 def get_call_number_for_player(player_name, team=None):
-    """Get the next call number for a player based on existing calls."""
+    """Get the next call number for a player based on existing calls.
+
+    Honours Showcase Mode: when active, the lookup runs against the bundled
+    sample dataset so the call number stays consistent with what the user
+    sees on the rest of the page.
+    """
     if not player_name or not player_name.strip():
         return 1
-    
+
+    target_file = CALL_LOG_FILE
+    if st.session_state.get("showcase_mode", False) and SAMPLE_CALL_LOG_FILE.exists():
+        target_file = SAMPLE_CALL_LOG_FILE
+
     try:
-        if CALL_LOG_FILE.exists():
-            df = pd.read_csv(CALL_LOG_FILE)
+        if target_file.exists():
+            df = pd.read_csv(target_file)
             if df.empty or 'Player Name' not in df.columns:
                 return 1
             
@@ -2364,16 +2450,22 @@ with col_lang2:
         st.session_state.language = selected_language
         st.rerun()
 
+# Showcase Mode banner: visible when the app is running on bundled sample data
+# so recruiters / first-time visitors immediately understand what they're seeing.
+if st.session_state.get("showcase_mode", False) and SAMPLE_CALL_LOG_FILE.exists():
+    st.info(
+        "**Showcase Mode is on.** The app is currently loaded with anonymised "
+        "sample data (28 calls across 15 NCAA prospects) so the Insights page, "
+        "tables and PDF report all render without setup. Toggle it off in the "
+        "sidebar to use your own call log."
+    )
+
 st.markdown("---")
 
 # ===========================================
-# AUTHENTICATION CHECK
+# AUTHENTICATION CHECK (removed for public showcase)
 # ===========================================
-if not st.session_state["auth"]:
-    login_page()
-    st.stop()  # Stop execution if not authenticated
-
-# Main app (only shown if authenticated)
+# Main app
 # Display branding header on every page
 display_branding_header()
 
@@ -2384,15 +2476,37 @@ st.markdown("---")
 # Player Overview PDF Viewer
 OVERVIEW_DIR = BASE_DIR / 'Player Overviews'
 
+# 0. Showcase Mode toggle (only shown when the bundled sample is available)
+if SAMPLE_CALL_LOG_FILE.exists():
+    showcase_on = st.sidebar.toggle(
+        "Showcase Mode (sample data)",
+        value=st.session_state.get("showcase_mode", False),
+        help=(
+            "When on, the app reads a bundled sample call log so the Insights "
+            "page and tables render without any setup. Turn off to use your "
+            "own call log file."
+        ),
+        key="showcase_toggle",
+    )
+    if showcase_on != st.session_state.get("showcase_mode", False):
+        st.session_state["showcase_mode"] = showcase_on
+        # Force a fresh load of call log + downstream caches
+        if "call_log" in st.session_state:
+            del st.session_state["call_log"]
+        st.rerun()
+
 # 1. Navigation menu (most important - at top)
 st.sidebar.markdown("### Navigation")
 page = st.sidebar.selectbox(
     "Select Page", 
     [
+        "Insights",  # Aggregations + charts driven by call log data
         "Phone Calls", 
         "Video Analysis",  # Enhanced video tracking
         "Player Summary",
-        "Performance Metrics",  # Power BI-style metrics visualization
+        # "Performance Metrics",  # Removed from portfolio build - depends on
+        #                            external Wyscout/Power BI export not bundled
+        #                            with the showcase dataset.
         # "Player Database", 
         # "Scouting Requests", 
         # "View Player Overview",
@@ -2400,6 +2514,7 @@ page = st.sidebar.selectbox(
         # "Export to SAP",
         # "Export Data"
     ],
+    index=0,
     key="page_selector",
     label_visibility="collapsed"
 )
@@ -2470,8 +2585,20 @@ if PLAYER_DB_FILE and PLAYER_DB_FILE.exists():
                     st.caption(f"• **Conferences:** {', '.join(stats['conferences'])}")
         except Exception as e:
             pass
+elif st.session_state.get("showcase_mode", False) and players_list:
+    with st.sidebar.expander("Showcase Sample Database", expanded=True):
+        sample_confs = sorted({info.get('conference', '') for info in player_info_dict.values() if info.get('conference')})
+        sample_teams = sorted({info.get('team', '') for info in player_info_dict.values() if info.get('team')})
+        sample_positions = sorted({info.get('position', '') for info in player_info_dict.values() if info.get('position')})
+        st.caption("Bundled with the app for the portfolio demo.")
+        st.caption(f"- **Players:** {len(players_list)}")
+        st.caption(f"- **Teams:** {len(sample_teams)}")
+        st.caption(f"- **Conferences:** {', '.join(sample_confs)}")
+        if sample_positions:
+            st.caption(f"- **Positions:** {', '.join(sample_positions)}")
+        st.caption("Turn off Showcase Mode at the top of the sidebar to use a real Excel database.")
 else:
-    st.sidebar.info("ℹ️ No file currently loaded. Upload a file below.")
+    st.sidebar.info("No file currently loaded. Upload a file below.")
 
 uploaded_file = st.sidebar.file_uploader(
     "Upload player database (Excel file)",
@@ -2486,9 +2613,14 @@ if uploaded_file is not None:
         uploaded_path = DATA_DIR / uploaded_file.name
         with open(uploaded_path, 'wb') as f:
             f.write(uploaded_file.getbuffer())
-        # Clear cache to reload with new file
-        load_player_database.clear()
-        load_player_info.clear()
+        # Clear caches if these loaders happen to be cached. They are not in
+        # showcase mode (we deliberately removed @st.cache_data so toggling
+        # Showcase Mode invalidates the result), but a future cached version
+        # would still work without crashing here.
+        if hasattr(load_player_database, "clear"):
+            load_player_database.clear()
+        if hasattr(load_player_info, "clear"):
+            load_player_info.clear()
         # Show temporary success message
         st.sidebar.success(f"Uploaded and saved: {uploaded_file.name}")
         st.rerun()
@@ -2743,6 +2875,291 @@ if page == "Phone Calls":
         reset_form()
         st.sidebar.success("Form refreshed! All fields cleared.")
         st.rerun()
+
+# ===========================================
+# INSIGHTS PAGE
+# ===========================================
+def render_insights_page():
+    """High-level overview of the call log: KPIs, charts and follow-up tracking.
+
+    Aggregates the captured qualitative data so coaches/analysts can see
+    activity patterns, agent quality and outstanding follow-ups at a glance.
+    Driven entirely off the same call_log.csv that the rest of the app writes
+    to (or the bundled sample data when Showcase Mode is on).
+    """
+    import altair as alt
+
+    st.header("Scouting Insights")
+    st.caption(
+        "Aggregated view of call activity, prospect quality and outstanding "
+        "follow-ups - generated from your call log."
+    )
+
+    df = load_call_log()
+    if df.empty:
+        st.info(
+            "No calls logged yet. Head to **Phone Calls** to log one - or turn "
+            "on **Showcase Mode** in the sidebar to explore with sample data."
+        )
+        return
+
+    # ---- Defensive type coercion ------------------------------------------------
+    df = df.copy()
+    df["Call Date"] = pd.to_datetime(df.get("Call Date"), errors="coerce")
+    for numeric_col in [
+        "Duration (min)", "Overall Rating", "Assessment Percentage",
+        "Agent Professionalism", "Agent Responsiveness",
+        "Agent Expectations", "Agent Transparency",
+    ]:
+        if numeric_col in df.columns:
+            df[numeric_col] = pd.to_numeric(df[numeric_col], errors="coerce")
+
+    today = pd.Timestamp(datetime.now().date())
+    last_7  = df[df["Call Date"] >= today - pd.Timedelta(days=7)]
+    last_30 = df[df["Call Date"] >= today - pd.Timedelta(days=30)]
+
+    # ---- KPI row ---------------------------------------------------------------
+    kpi_cols = st.columns(5)
+    kpi_cols[0].metric("Total calls", f"{len(df):,}")
+    kpi_cols[1].metric("Unique prospects", df["Player Name"].nunique() if "Player Name" in df.columns else 0)
+    kpi_cols[2].metric("Calls last 7 days", len(last_7))
+    if "Follow-up Needed" in df.columns and "Follow-up Date" in df.columns:
+        follow_up_dates = pd.to_datetime(df["Follow-up Date"], errors="coerce")
+        upcoming_mask = (
+            df["Follow-up Needed"].astype(str).str.lower().isin(["true", "1", "yes"])
+            & follow_up_dates.between(today, today + pd.Timedelta(days=14))
+        )
+        kpi_cols[3].metric("Follow-ups due (14d)", int(upcoming_mask.sum()))
+    else:
+        kpi_cols[3].metric("Follow-ups due (14d)", 0)
+    avg_rating = df.get("Overall Rating", pd.Series(dtype=float)).mean()
+    kpi_cols[4].metric(
+        "Avg overall rating",
+        f"{avg_rating:.1f} / 10" if pd.notna(avg_rating) else "n/a",
+    )
+
+    st.markdown("---")
+
+    # ---- Calls per week (timeline) --------------------------------------------
+    st.subheader("Call activity over time")
+    weekly = (
+        df.dropna(subset=["Call Date"])
+          .assign(_week=lambda d: d["Call Date"].dt.to_period("W").dt.start_time)
+          .groupby("_week").size().reset_index(name="Calls")
+    )
+    if not weekly.empty:
+        chart = (
+            alt.Chart(weekly)
+            .mark_area(line={"color": "#8B0000"}, color=alt.Gradient(
+                gradient="linear",
+                stops=[
+                    alt.GradientStop(color="#8B0000", offset=0),
+                    alt.GradientStop(color="#8B000020", offset=1),
+                ],
+                x1=1, x2=1, y1=1, y2=0,
+            ))
+            .encode(
+                x=alt.X("_week:T", title="Week"),
+                y=alt.Y("Calls:Q", title="Calls per week"),
+                tooltip=["_week:T", "Calls:Q"],
+            )
+            .properties(height=220)
+        )
+        st.altair_chart(chart, use_container_width=True)
+    else:
+        st.caption("No dated calls to plot yet.")
+
+    # ---- Coverage charts (Conference + Position) -------------------------------
+    st.subheader("Coverage")
+    cov_l, cov_r = st.columns(2)
+    with cov_l:
+        if "Conference" in df.columns and df["Conference"].notna().any():
+            conf_df = (
+                df["Conference"].fillna("Unknown")
+                  .value_counts().rename_axis("Conference").reset_index(name="Calls")
+            )
+            st.altair_chart(
+                alt.Chart(conf_df)
+                .mark_bar(color="#8B0000")
+                .encode(
+                    x=alt.X("Calls:Q", title="Calls"),
+                    y=alt.Y("Conference:N", sort="-x", title=None),
+                    tooltip=["Conference", "Calls"],
+                )
+                .properties(height=220, title="Calls by conference"),
+                use_container_width=True,
+            )
+        else:
+            st.caption("No conference data yet.")
+    with cov_r:
+        if "Position Profile" in df.columns and df["Position Profile"].notna().any():
+            pos_df = (
+                df["Position Profile"].fillna("Unknown")
+                  .value_counts().rename_axis("Position Profile").reset_index(name="Calls")
+            )
+            st.altair_chart(
+                alt.Chart(pos_df)
+                .mark_bar(color="#D10023")
+                .encode(
+                    x=alt.X("Calls:Q", title="Calls"),
+                    y=alt.Y("Position Profile:N", sort="-x", title=None),
+                    tooltip=["Position Profile", "Calls"],
+                )
+                .properties(height=220, title="Calls by position profile"),
+                use_container_width=True,
+            )
+        else:
+            st.caption("No position data yet.")
+
+    # ---- Outcomes (Recommendation + Interest Level) ----------------------------
+    st.subheader("Outcomes")
+    out_l, out_r = st.columns(2)
+    rec_order = ["Sign Now", "Continue Tracking", "Watch Next Season", "Pass"]
+    with out_l:
+        if "Recommendation" in df.columns and df["Recommendation"].notna().any():
+            rec_df = (
+                df["Recommendation"].fillna("Unspecified")
+                  .value_counts().rename_axis("Recommendation").reset_index(name="Calls")
+            )
+            st.altair_chart(
+                alt.Chart(rec_df)
+                .mark_bar()
+                .encode(
+                    x=alt.X("Calls:Q", title="Calls"),
+                    y=alt.Y("Recommendation:N", sort=rec_order, title=None),
+                    color=alt.Color(
+                        "Recommendation:N",
+                        scale=alt.Scale(
+                            domain=rec_order,
+                            range=["#1f7a1f", "#8B0000", "#c98200", "#555555"],
+                        ),
+                        legend=None,
+                    ),
+                    tooltip=["Recommendation", "Calls"],
+                )
+                .properties(height=220, title="Recommendation breakdown"),
+                use_container_width=True,
+            )
+        else:
+            st.caption("No recommendations recorded yet.")
+    with out_r:
+        if "Interest Level" in df.columns and df["Interest Level"].notna().any():
+            interest_order = ["Very High", "High", "Medium", "Low", "Unsure"]
+            int_df = (
+                df["Interest Level"].fillna("Unspecified")
+                  .value_counts().rename_axis("Interest Level").reset_index(name="Calls")
+            )
+            st.altair_chart(
+                alt.Chart(int_df)
+                .mark_bar(color="#444444")
+                .encode(
+                    x=alt.X("Calls:Q", title="Calls"),
+                    y=alt.Y("Interest Level:N", sort=interest_order, title=None),
+                    tooltip=["Interest Level", "Calls"],
+                )
+                .properties(height=220, title="Player interest level"),
+                use_container_width=True,
+            )
+        else:
+            st.caption("No interest data yet.")
+
+    # ---- Agent quality ---------------------------------------------------------
+    agent_cols = ["Agent Professionalism", "Agent Responsiveness",
+                  "Agent Expectations", "Agent Transparency"]
+    if "Agent Name" in df.columns and any(c in df.columns for c in agent_cols):
+        st.subheader("Agent quality")
+        # Exclude self-represented / blank agent names
+        agent_df = df[df["Agent Name"].fillna("").str.strip().str.lower().isin(
+            [n for n in df["Agent Name"].fillna("").str.strip().str.lower().unique()
+             if n and n not in {"self-represented", "—"}]
+        )]
+        if not agent_df.empty:
+            present_cols = [c for c in agent_cols if c in agent_df.columns]
+            agg = (
+                agent_df.groupby("Agent Name")[present_cols]
+                        .mean(numeric_only=True)
+                        .round(1)
+                        .reset_index()
+            )
+            agg["Calls"] = agent_df.groupby("Agent Name").size().values
+            agg["Avg score"] = agg[present_cols].mean(axis=1).round(1)
+            agg = agg.sort_values("Avg score", ascending=False)
+            st.dataframe(
+                agg.rename(columns={
+                    "Agent Professionalism": "Prof",
+                    "Agent Responsiveness": "Resp",
+                    "Agent Expectations": "Expect",
+                    "Agent Transparency": "Trans",
+                }),
+                use_container_width=True,
+                hide_index=True,
+            )
+        else:
+            st.caption("Only self-represented players logged so far.")
+
+    # ---- Action lists ----------------------------------------------------------
+    st.subheader("Action items")
+    act_l, act_r = st.columns(2)
+    with act_l:
+        st.markdown("**Follow-ups due in the next 14 days**")
+        if "Follow-up Date" in df.columns and "Follow-up Needed" in df.columns:
+            fdf = df.assign(
+                _due=pd.to_datetime(df["Follow-up Date"], errors="coerce"),
+                _needed=df["Follow-up Needed"].astype(str).str.lower().isin(["true", "1", "yes"]),
+            )
+            upcoming = fdf[
+                fdf["_needed"]
+                & fdf["_due"].between(today, today + pd.Timedelta(days=14))
+            ].sort_values("_due")
+            if not upcoming.empty:
+                show_cols = [c for c in ["Player Name", "Team", "_due", "Recommendation"]
+                             if c in upcoming.columns or c == "_due"]
+                tbl = upcoming[show_cols].rename(columns={"_due": "Due"})
+                tbl["Due"] = tbl["Due"].dt.strftime("%Y-%m-%d")
+                st.dataframe(tbl, use_container_width=True, hide_index=True)
+            else:
+                st.caption("Nothing due in the next 14 days.")
+        else:
+            st.caption("Follow-up data not present.")
+    with act_r:
+        st.markdown("**Most-tracked prospects**")
+        if "Player Name" in df.columns:
+            top_players = (
+                df.groupby("Player Name")
+                  .agg(Calls=("Player Name", "size"),
+                       Last_call=("Call Date", "max"),
+                       Avg_rating=("Overall Rating", "mean"))
+                  .sort_values("Calls", ascending=False)
+                  .head(8)
+                  .reset_index()
+            )
+            top_players["Last_call"] = pd.to_datetime(top_players["Last_call"], errors="coerce").dt.strftime("%Y-%m-%d")
+            top_players["Avg_rating"] = top_players["Avg_rating"].round(1)
+            st.dataframe(
+                top_players.rename(columns={
+                    "Player Name": "Prospect",
+                    "Last_call": "Last call",
+                    "Avg_rating": "Avg rating",
+                }),
+                use_container_width=True,
+                hide_index=True,
+            )
+
+    st.markdown("---")
+    st.caption(
+        f"Window: {df['Call Date'].min().strftime('%Y-%m-%d') if df['Call Date'].notna().any() else 'n/a'} "
+        f"to {df['Call Date'].max().strftime('%Y-%m-%d') if df['Call Date'].notna().any() else 'n/a'}. "
+        f"{len(df)} call(s), {df['Player Name'].nunique() if 'Player Name' in df.columns else 0} prospect(s)."
+    )
+
+
+# ===========================================
+# PAGE DISPATCH
+# ===========================================
+if page == "Insights":
+    render_insights_page()
+    st.stop()
+
 
 if page == "Phone Calls":
     # Remove hash from URL and scroll to top on page load/refresh
@@ -5043,14 +5460,23 @@ elif page == "Player Summary":
         # Refresh call log from file to ensure we have latest data
         st.session_state.call_log = load_call_log()
         
-        # Load video reviews
-        video_reviews_file = DATA_DIR / 'video_reviews.csv'
-        if 'video_reviews' not in st.session_state:
+        # Load video reviews. Honours Showcase Mode so the bundled sample
+        # dataset (>=1 review per player) drives the page during the demo;
+        # writes still go to the real file so the sample isn't polluted.
+        video_reviews_file = VIDEO_REVIEWS_FILE
+        showcase_video_active = (
+            st.session_state.get("showcase_mode", False)
+            and SAMPLE_VIDEO_REVIEWS_FILE.exists()
+        )
+        target_video_file = SAMPLE_VIDEO_REVIEWS_FILE if showcase_video_active else video_reviews_file
+        # Always re-read in showcase mode so toggling Showcase Mode updates
+        # immediately - otherwise the page caches the previous source.
+        if 'video_reviews' not in st.session_state or showcase_video_active:
             st.session_state.video_reviews = pd.DataFrame()
-        if video_reviews_file.exists() and st.session_state.video_reviews.empty:
+        if target_video_file.exists() and st.session_state.video_reviews.empty:
             try:
-                st.session_state.video_reviews = pd.read_csv(video_reviews_file)
-            except:
+                st.session_state.video_reviews = pd.read_csv(target_video_file)
+            except Exception:
                 pass
         
         # Get all unique players from both call logs and video reviews
@@ -5059,12 +5485,98 @@ elif page == "Player Summary":
             all_players.update(st.session_state.call_log['Player Name'].unique().tolist())
         if not st.session_state.video_reviews.empty and 'Player Name' in st.session_state.video_reviews.columns:
             all_players.update(st.session_state.video_reviews['Player Name'].unique().tolist())
-        
+
+        # Build a {player -> {'conference','team'}} map prioritising the call
+        # log (which always has Conference/Team) and falling back to the
+        # globally loaded player_info_dict for any video-only prospects.
+        player_meta = {}
+        if (not st.session_state.call_log.empty
+                and 'Player Name' in st.session_state.call_log.columns):
+            cols_present = [c for c in ('Player Name', 'Conference', 'Team')
+                            if c in st.session_state.call_log.columns]
+            for _, row in (st.session_state.call_log[cols_present]
+                           .dropna(subset=['Player Name'])
+                           .iterrows()):
+                name = str(row['Player Name']).strip()
+                if not name:
+                    continue
+                meta = player_meta.setdefault(name, {'conference': '', 'team': ''})
+                conf = str(row.get('Conference', '') or '').strip()
+                team = str(row.get('Team', '') or '').strip()
+                if conf and not meta['conference']:
+                    meta['conference'] = conf
+                if team and not meta['team']:
+                    meta['team'] = team
+        for name in all_players:
+            if name in player_meta:
+                continue
+            info = player_info_dict.get(name, {}) if isinstance(player_info_dict, dict) else {}
+            player_meta[name] = {
+                'conference': str(info.get('conference', '') or '').strip(),
+                'team':       str(info.get('team', '') or '').strip(),
+            }
+
         if not all_players:
             st.info("No call logs or video reviews yet.")
             selected_player = None
         else:
-            selected_player = st.selectbox("Select Player", sorted(list(all_players)))
+            # Cascading filters: Conference -> Team -> Player
+            conferences_available = sorted({
+                m['conference'] for m in player_meta.values() if m.get('conference')
+            })
+            sel_col_conf, sel_col_team, sel_col_player = st.columns([1, 1, 2])
+
+            with sel_col_conf:
+                selected_conference = st.selectbox(
+                    "Conference",
+                    ["All"] + conferences_available,
+                    key="ps_filter_conference",
+                )
+
+            if selected_conference == "All":
+                teams_available = sorted({
+                    m['team'] for m in player_meta.values() if m.get('team')
+                })
+            else:
+                teams_available = sorted({
+                    m['team'] for m in player_meta.values()
+                    if m.get('team') and m.get('conference') == selected_conference
+                })
+            with sel_col_team:
+                selected_team = st.selectbox(
+                    "Team",
+                    ["All"] + teams_available,
+                    key="ps_filter_team",
+                )
+
+            # Apply filters to the player pool
+            if selected_team != "All":
+                filtered_players = sorted([
+                    n for n, m in player_meta.items() if m.get('team') == selected_team
+                ])
+            elif selected_conference != "All":
+                filtered_players = sorted([
+                    n for n, m in player_meta.items()
+                    if m.get('conference') == selected_conference
+                ])
+            else:
+                filtered_players = sorted(all_players)
+
+            with sel_col_player:
+                if filtered_players:
+                    selected_player = st.selectbox(
+                        f"Select Player ({len(filtered_players)})",
+                        filtered_players,
+                        key="ps_selected_player",
+                    )
+                else:
+                    st.selectbox(
+                        "Select Player (0)", [""],
+                        key="ps_selected_player_empty",
+                        disabled=True,
+                    )
+                    st.caption("No players match the current Conference/Team filters.")
+                    selected_player = None
         
         if selected_player:
             # Filter call logs for selected player
@@ -7641,16 +8153,21 @@ elif page == "Video Analysis":
     videos_dir = DATA_DIR / 'video_uploads'
     videos_dir.mkdir(exist_ok=True)
     
-    # Initialize video reviews in session state
-    if 'video_reviews' not in st.session_state:
+    # Load existing reviews. Honours Showcase Mode so the page works as a
+    # demo without any saved reviews on disk. Writes still target the real
+    # file (see save block below) so the sample dataset stays pristine.
+    video_reviews_file = VIDEO_REVIEWS_FILE
+    showcase_video_active = (
+        st.session_state.get("showcase_mode", False)
+        and SAMPLE_VIDEO_REVIEWS_FILE.exists()
+    )
+    target_video_file = SAMPLE_VIDEO_REVIEWS_FILE if showcase_video_active else video_reviews_file
+    if 'video_reviews' not in st.session_state or showcase_video_active:
         st.session_state.video_reviews = pd.DataFrame()
-    
-    # Load existing reviews
-    video_reviews_file = DATA_DIR / 'video_reviews.csv'
-    if video_reviews_file.exists() and st.session_state.video_reviews.empty:
+    if target_video_file.exists() and st.session_state.video_reviews.empty:
         try:
-            st.session_state.video_reviews = pd.read_csv(video_reviews_file)
-        except:
+            st.session_state.video_reviews = pd.read_csv(target_video_file)
+        except Exception:
             pass
     
     tab1, tab2 = st.tabs(["Add Review", "Review Status"])
@@ -8195,7 +8712,10 @@ elif page == "Video Analysis":
                         else:
                             st.session_state.video_reviews = pd.concat([st.session_state.video_reviews, new_reviews_df], ignore_index=True)
                         
-                        st.session_state.video_reviews.to_csv(video_reviews_file, index=False)
+                        # Always persist to the real file even when Showcase
+                        # Mode is sourcing from the bundled sample - we never
+                        # overwrite the showcase dataset.
+                        st.session_state.video_reviews.to_csv(VIDEO_REVIEWS_FILE, index=False)
                         
                         if len(saved_reviews) == 1:
                             st.success(f"✅ Video review saved successfully!")
